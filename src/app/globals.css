@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --white-primary: #ffffff;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --bg-color: #f8f9fa;
+  --text-color: rgb(46, 46, 46);
+  --border-color: #eeeeee;
+  --button-bg-color: #3aa0ff;
+  --button-text-color: #ffffff;
+  --button-hover-bg-color: #60a5fa;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.custom-bg {
+  background-color: var(--bg-color);
+}
+
+.custom-text {
+  color: var(--text-color);
+}
+
+.custom-button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+}
+
+.custom-button:hover {
+  background-color: var(--button-hover-bg-color);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes border-rgb {
+  0% {
+    border-color: #2294f2; /* Blue */
+  }
+  33% {
+    border-color: #ffffff; /* Green */
+  }
+  100% {
+    border-color: #2294f2; /* Blue */
+  }
+}
+
+.animate-border-rgb {
+  animation: border-rgb 3s linear infinite;
 }
