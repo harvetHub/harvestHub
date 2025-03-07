@@ -10,12 +10,17 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [role, setRole] = useState("customer");
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [mobileNumberError, setMobileNumberError] = useState("");
+  const [addressError, setAddressError] = useState("");
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     let valid = true;
 
@@ -47,8 +52,45 @@ export default function Signup() {
       setConfirmPasswordError("");
     }
 
+    if (!mobileNumber) {
+      setMobileNumberError("Phone number is required");
+      valid = false;
+    } else {
+      setMobileNumberError("");
+    }
+
+    if (!address) {
+      setAddressError("Address is required");
+      valid = false;
+    } else {
+      setAddressError("");
+    }
+
     if (valid) {
-      // Handle signup logic here
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          mobileNumber,
+          address,
+          role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("User signed up successfully");
+        // Handle successful signup (e.g., redirect to login page)
+      } else {
+        console.error("Error signing up:", data.error);
+        // Handle error (e.g., show error message to the user)
+      }
     }
   };
 
@@ -56,7 +98,13 @@ export default function Signup() {
     <section className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
         <div className="relative flex items-end px-4 pb-10 pt-60 sm:pb-16 md:justify-center lg:pb-24 bg-gray-50 sm:px-6 lg:px-8">
-          <div className="absolute inset-0"></div>
+          <div className="absolute inset-0">
+            {/* <img
+              className="object-cover object-top w-full h-full"
+              src="https://cdn.rareblocks.xyz/collection/celebration/images/signin/4/girl-thinking.jpg"
+              alt=""
+            /> */}
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
         </div>
 
@@ -150,6 +198,78 @@ export default function Signup() {
 
                 <div>
                   <label
+                    htmlFor="mobileNumber"
+                    className="text-base font-medium text-gray-900"
+                  >
+                    Phone Number
+                  </label>
+                  <div className="mt-2.5 relative text-gray-400 focus-within:text-gray-600">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 h-9 pointer-events-none">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1.003 1.003 0 0 1 1.01-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1C9.61 22 2 14.39 2 5.5a1 1 0 0 1 1-1H6.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1.003 1.003 0 0 1-.24 1.01l-2.2 2.21Z"
+                        />
+                      </svg>
+                    </div>
+                    <Input
+                      type="text"
+                      id="mobileNumber"
+                      placeholder="Enter your phone number"
+                      value={mobileNumber}
+                      onChange={(e) => setMobileNumber(e.target.value)}
+                      className="block w-full py-4 pl-10 pr-4 text-black placeholder-gray-500 transition-all duration-200 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:border-blue-600 focus:bg-white caret-blue-600"
+                    />
+                    {mobileNumberError && (
+                      <p className="text-destructive text-sm mt-2">
+                        {mobileNumberError}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="address"
+                    className="text-base font-medium text-gray-900"
+                  >
+                    Address
+                  </label>
+                  <div className="mt-2.5 relative text-gray-400 focus-within:text-gray-600">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 h-9 pointer-events-none">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 5.5 11 6.2 11.74c.4.41 1.02.41 1.42 0C13.5 20 19 14.25 19 9c0-3.87-3.13-7-7-7Zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5Z"
+                        />
+                      </svg>
+                    </div>
+                    <Input
+                      type="text"
+                      id="address"
+                      placeholder="Enter your address"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="block w-full py-4 pl-10 pr-4 text-black placeholder-gray-500 transition-all duration-200 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:border-blue-600 focus:bg-white caret-blue-600"
+                    />
+                    {addressError && (
+                      <p className="text-destructive text-sm mt-2">
+                        {addressError}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label
                     htmlFor="password"
                     className="text-base font-medium text-gray-900"
                   >
@@ -227,6 +347,7 @@ export default function Signup() {
                     )}
                   </div>
                 </div>
+
                 <p className="mt-2 text-right text-gray-600">
                   Already have an account?{" "}
                   <Link
