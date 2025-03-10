@@ -1,15 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Swal from "sweetalert2";
 
-export default function Home() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,15 +44,49 @@ export default function Home() {
         const data = await response.json();
 
         if (response.ok) {
-          console.log("User logged in successfully", data);
-          // Handle successful login (e.g., redirect to dashboard)
+          Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            icon: "success",
+            title: "User logged in successfully",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+          router.push("/dashboard");
         } else {
-          console.error("Error logging in:", data.error);
-          // Handle error (e.g., show error message to the user)
+          Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            icon: "error",
+            title: data.error,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
         }
-      } catch (error) {
-        console.error("Error logging in:", error);
-        // Handle error (e.g., show error message to the user)
+      } catch {
+        Swal.fire({
+          toast: true,
+          position: "bottom-end",
+          icon: "error",
+          title: "An unexpected error occurred. Please try again later.",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
       }
     }
   };

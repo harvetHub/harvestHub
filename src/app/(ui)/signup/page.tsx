@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Link from "next/link";
-import { inputFieldsConfig } from "@/lib/config";
+import { inputFieldsConfig } from "@/lib/signupConfig";
 import { InputField } from "@/components/signup/InputField";
 import { validateSignupFormData } from "@/utils/validation/signupValidationFields";
 import Swal from "sweetalert2";
