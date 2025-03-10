@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/utils/supabase/client";
 
-export default async function handler(
+export default async function signup(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -29,8 +29,12 @@ export default async function handler(
       {
         user_id: user?.id,
         username,
+        name: {
+          first_name: "",
+          last_name: "",
+        },
         email,
-        password: password, // Assuming you want to store the password hash
+        password: password,
         mobile_number: phoneNumber,
         address,
         role,

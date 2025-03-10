@@ -11,7 +11,7 @@ export default function Home() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     let valid = true;
     if (!email) {
@@ -29,7 +29,28 @@ export default function Home() {
     }
 
     if (valid) {
-      // Handle login logic here
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("User logged in successfully", data);
+          // Handle successful login (e.g., redirect to dashboard)
+        } else {
+          console.error("Error logging in:", data.error);
+          // Handle error (e.g., show error message to the user)
+        }
+      } catch (error) {
+        console.error("Error logging in:", error);
+        // Handle error (e.g., show error message to the user)
+      }
     }
   };
 
