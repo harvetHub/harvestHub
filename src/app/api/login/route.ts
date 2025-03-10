@@ -1,30 +1,28 @@
-//create a login function that will be called when the user clicks the login button
-import type { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "@/utils/supabase/client";
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseServerClient } from "@/utils/supabase/server";
 
-export default async function login(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "POST") {
-    const { email, password } = req.body;
+export async function POST(req: NextRequest) {
+  const { email, password } = await req.json();
 
-    // Perform server-side validation if needed
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      return res.status(400).json({ error: error.message });
-    }
-
-    return res
-      .status(200)
-      .json({ message: "User logged in successfully", data });
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+  // Perform server-side validation if needed
+  if (!email || !password) {
+    return NextResponse.json(
+      { error: "Email and password are required" },
+      { status: 400 }
+    );
   }
+
+  const { data, error } = await supabaseServerClient.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  return NextResponse.json(
+    { message: "User logged in successfully", data },
+    { status: 200 }
+  );
 }
