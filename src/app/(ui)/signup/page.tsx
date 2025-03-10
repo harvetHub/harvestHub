@@ -6,6 +6,7 @@ import Link from "next/link";
 import { inputFieldsConfig } from "@/lib/config";
 import { InputField } from "@/components/signup/InputField";
 import { validateSignupFormData } from "@/utils/validation/signupValidationFields";
+import Swal from "sweetalert2";
 
 export default function Signup() {
   type FormDataKeys =
@@ -54,26 +55,51 @@ export default function Signup() {
     const isValid = Object.values(newErrors).every((error) => error === "");
 
     if (isValid) {
-      const response = await fetch("/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          role,
-        }),
-      });
+      try {
+        const response = await fetch("/api/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            role,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        console.log("User signed up successfully");
-        // Handle successful signup (e.g., redirect to login page)
-      } else {
-        console.error("Error signing up:", data.error);
+        console.log(data);
+
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "User signed up successfully",
+          });
+          // Handle successful signup (e.g., redirect to login page)
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.error,
+          });
+          // Handle error (e.g., show error message to the user)
+        }
+      } catch {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An unexpected error occurred. Please try again later.",
+        });
         // Handle error (e.g., show error message to the user)
       }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Please correct the errors in the form.",
+      });
     }
   };
 
