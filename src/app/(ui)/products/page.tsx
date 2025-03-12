@@ -146,7 +146,7 @@ const Products = () => {
               {filteredProducts.map((product) => (
                 <Card
                   key={product.product_id}
-                  className="shadow-lg flex flex-col justify-between"
+                  className="shadow-lg flex flex-col gap-4 justify-between"
                 >
                   <CardHeader>
                     <Image
@@ -154,7 +154,7 @@ const Products = () => {
                       alt={product.name}
                       width={150}
                       height={150}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-40 object-cover"
                       onError={(e) => {
                         e.currentTarget.src = fallbackImage;
                       }}
