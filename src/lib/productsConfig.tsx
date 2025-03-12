@@ -6,6 +6,7 @@ export interface Product {
   image_url: string;
   category: string;
   product_type: string;
+  rating?: number;
 }
 
 export const categories = [

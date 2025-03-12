@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
+import StarRating from "@/components/StarRating";
 import { Product, categories } from "@/lib/productsConfig";
 
 const fallbackImage =
@@ -143,7 +144,10 @@ const Products = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {filteredProducts.map((product) => (
-                <Card key={product.product_id} className="shadow-lg">
+                <Card
+                  key={product.product_id}
+                  className="shadow-lg flex flex-col justify-between"
+                >
                   <CardHeader>
                     <Image
                       src={product.image_url || fallbackImage}
@@ -157,13 +161,16 @@ const Products = () => {
                     />
                     <CardTitle className="mt-4">{product.name}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p>{product.description}</p>
-                    <p className="font-bold mt-2">
-                      ₱{product.price.toFixed(2)}
+                  <CardContent className="flex-grow">
+                    <p className="description overflow-hidden text-ellipsis">
+                      {product.description}
                     </p>
+                    <div className="mt-4">
+                      <p className="font-bold">₱{product.price.toFixed(2)}</p>
+                      <StarRating rating={product.rating || 0} />
+                    </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="mt-auto">
                     <Button className="w-full">Add to Cart</Button>
                   </CardFooter>
                 </Card>
