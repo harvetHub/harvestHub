@@ -13,32 +13,9 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Product, categories } from "@/lib/productsConfig";
 
-interface Product {
-  product_id: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string;
-  category: string;
-}
-
-const categories = [
-  "All",
-  "Seeds",
-  "Fertilizers",
-  "Tools",
-  "Pesticides",
-  "Irrigation Equipment",
-  "Animal Feed",
-  "Machinery",
-  "Greenhouse Supplies",
-  "Soil Amendments",
-  "Crop Protection",
-];
-
-const fallbackImage =
-  "https://images.unsplash.com/photo-1633380110125-f6e685676160?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+const fallbackImage = "";
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -52,7 +29,13 @@ const Products = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await fetch(`/api/products?page=${page}&limit=${limit}`);
+      const query = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(filter !== "All" && { product_type: filter }),
+      }).toString();
+
+      const response = await fetch(`/api/products?${query}`);
       const data = await response.json();
       setProducts(data.products);
       setFilteredProducts(data.products);
@@ -60,14 +43,10 @@ const Products = () => {
     };
 
     fetchProducts();
-  }, [page, limit]);
+  }, [page, limit, filter]);
 
   useEffect(() => {
     let filtered = products;
-
-    if (filter !== "All") {
-      filtered = filtered.filter((product) => product.category === filter);
-    }
 
     if (searchTerm) {
       filtered = filtered.filter((product) =>
@@ -81,7 +60,7 @@ const Products = () => {
     );
 
     setFilteredProducts(filtered);
-  }, [filter, searchTerm, priceRange, products]);
+  }, [searchTerm, priceRange, products]);
 
   const handleFilterChange = (category: string) => {
     setFilter(category);
@@ -96,7 +75,15 @@ const Products = () => {
   return (
     <MainLayout>
       <div className="container mx-auto p-4 flex">
-        <div className="w-1/5 p-4">
+        <div className="w-1/4 p-4">
+          <h2 className="text-xl font-bold mt-8 mb-4">Search Products</h2>
+          <Input
+            type="text"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full mb-4"
+          />
           <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
           <div className="space-y-2">
             {categories.map((category) => (
@@ -111,33 +98,26 @@ const Products = () => {
             ))}
           </div>
 
-          <h2 className="text-xl font-bold mt-8 mb-4">Search Products</h2>
-          <Input
-            type="text"
-            placeholder="Search by name"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-
           <h2 className="text-xl font-bold mt-8 mb-4">Price Range</h2>
           <Slider
             min={0}
             max={1000}
             value={priceRange}
-            onChange={(e) => setPriceRange(e as unknown as [number, number])}
+            onValueChange={(value: number[]) =>
+              setPriceRange(value as [number, number])
+            }
             className="w-full"
           />
           <div className="flex justify-between mt-2">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
+            <span>₱{priceRange[0]}</span>
+            <span>₱{priceRange[1]}</span>
           </div>
         </div>
 
         <div className="w-3/4 p-4">
           <h1 className="text-3xl font-bold text-center mb-8">Products</h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
               <Card key={product.product_id} className="shadow-lg">
                 <CardHeader>
@@ -155,7 +135,7 @@ const Products = () => {
                 </CardHeader>
                 <CardContent>
                   <p>{product.description}</p>
-                  <p className="font-bold mt-2">${product.price.toFixed(2)}</p>
+                  <p className="font-bold mt-2">₱{product.price.toFixed(2)}</p>
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full">Add to Cart</Button>
