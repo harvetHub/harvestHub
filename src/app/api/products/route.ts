@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "10");
   const productType = searchParams.get("product_type");
+  const searchTerm = searchParams.get("search_term");
   const offset = (page - 1) * limit;
 
   let query = supabaseServerClient
@@ -13,7 +14,9 @@ export async function GET(req: NextRequest) {
     .select("*", { count: "exact" })
     .range(offset, offset + limit - 1);
 
-  if (productType) {
+  if (searchTerm) {
+    query = query.ilike("name", `%${searchTerm}%`);
+  } else if (productType) {
     query = query.eq("product_type", productType);
   }
 

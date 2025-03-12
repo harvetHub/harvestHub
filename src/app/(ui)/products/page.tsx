@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Product, categories } from "@/lib/productsConfig";
 
-const fallbackImage = "";
+const fallbackImage =
+  "https://via.placeholder.com/150?text=Image+Not+Available";
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -26,33 +28,31 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       const query = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...(filter !== "All" && { product_type: filter }),
+        ...(filter !== "All" && !searchTerm && { product_type: filter }),
+        ...(searchTerm && { search_term: searchTerm }),
       }).toString();
 
       const response = await fetch(`/api/products?${query}`);
       const data = await response.json();
-      setProducts(data.products);
-      setFilteredProducts(data.products);
-      setTotal(data.total);
+      setProducts(data.products || []);
+      setFilteredProducts(data.products || []);
+      setTotal(data.total || 0);
+      setLoading(false);
     };
 
     fetchProducts();
-  }, [page, limit, filter]);
+  }, [page, limit, filter, searchTerm]);
 
   useEffect(() => {
     let filtered = products;
-
-    if (searchTerm) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
 
     filtered = filtered.filter(
       (product) =>
@@ -60,7 +60,7 @@ const Products = () => {
     );
 
     setFilteredProducts(filtered);
-  }, [searchTerm, priceRange, products]);
+  }, [priceRange, products]);
 
   const handleFilterChange = (category: string) => {
     setFilter(category);
@@ -74,8 +74,8 @@ const Products = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto p-4 flex">
-        <div className="w-1/4 p-4">
+      <div className="container mx-auto p-4 flex flex-col md:flex-row">
+        <div className="w-full md:w-1/4 p-4">
           <h2 className="text-xl font-bold mt-8 mb-4">Search Products</h2>
           <Input
             type="text"
@@ -114,59 +114,87 @@ const Products = () => {
           </div>
         </div>
 
-        <div className="w-3/4 p-4">
+        <div className="w-full md:w-3/4 p-4">
           <h1 className="text-3xl font-bold text-center mb-8">Products</h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredProducts.map((product) => (
-              <Card key={product.product_id} className="shadow-lg">
-                <CardHeader>
-                  <Image
-                    src={product.image_url || fallbackImage}
-                    alt={product.name}
-                    width={150}
-                    height={150}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = fallbackImage;
-                    }}
-                  />
-                  <CardTitle className="mt-4">{product.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{product.description}</p>
-                  <p className="font-bold mt-2">₱{product.price.toFixed(2)}</p>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full">Add to Cart</Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {[...Array(8)].map((_, index) => (
+                <Card key={index} className="shadow-lg">
+                  <CardHeader>
+                    <Skeleton className="w-full h-48" />
+                    <CardTitle className="mt-4">
+                      <Skeleton className="h-6 w-3/4" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </CardContent>
+                  <CardFooter>
+                    <Skeleton className="h-10 w-full" />
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <p className="text-center text-xl">No products found.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {filteredProducts.map((product) => (
+                <Card key={product.product_id} className="shadow-lg">
+                  <CardHeader>
+                    <Image
+                      src={product.image_url || fallbackImage}
+                      alt={product.name}
+                      width={150}
+                      height={150}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = fallbackImage;
+                      }}
+                    />
+                    <CardTitle className="mt-4">{product.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{product.description}</p>
+                    <p className="font-bold mt-2">
+                      ₱{product.price.toFixed(2)}
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full">Add to Cart</Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
 
-          <div className="mt-12 flex justify-center gap-2">
-            <Button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-            >
-              Previous
-            </Button>
-            {[...Array(totalPages)].map((_, index) => (
+          {filteredProducts.length > 0 && (
+            <div className="mt-12 flex justify-center gap-2">
               <Button
-                key={index}
-                onClick={() => handlePageChange(index + 1)}
-                variant={page === index + 1 ? "default" : "outline"}
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1}
               >
-                {index + 1}
+                Previous
               </Button>
-            ))}
-            <Button
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages}
-            >
-              Next
-            </Button>
-          </div>
+              {[...Array(totalPages)].map((_, index) => (
+                <Button
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  variant={page === index + 1 ? "default" : "outline"}
+                >
+                  {index + 1}
+                </Button>
+              ))}
+              <Button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>

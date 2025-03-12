@@ -34,12 +34,6 @@ const Header: FC = () => {
           <Link href="/products" className="mr-4">
             Products
           </Link>
-          <Link href="/about" className="mr-4">
-            About
-          </Link>
-          <Link href="/contact" className="mr-4">
-            Contact
-          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="text-white">
