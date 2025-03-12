@@ -25,7 +25,7 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [page, setPage] = useState(1);
   const [limit] = useState(13); // Ensure limit is set to 13
   const [total, setTotal] = useState(0);
@@ -102,7 +102,7 @@ const Products = () => {
           <h2 className="text-xl font-bold mt-8 mb-4">Price Range</h2>
           <Slider
             min={0}
-            max={1000}
+            max={10000}
             value={priceRange}
             onValueChange={(value: number[]) =>
               setPriceRange(value as [number, number])
