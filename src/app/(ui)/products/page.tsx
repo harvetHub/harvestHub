@@ -14,6 +14,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
+import Pagination from "@/components/Pagination";
 import { Product, categories } from "@/lib/productsConfig";
 
 const fallbackImage =
@@ -26,7 +27,7 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(13); // Ensure limit is set to 13
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -119,7 +120,7 @@ const Products = () => {
 
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {[...Array(8)].map((_, index) => (
+              {[...Array(13)].map((_, index) => (
                 <Card key={index} className="shadow-lg">
                   <CardHeader>
                     <Skeleton className="w-full h-48" />
@@ -171,29 +172,11 @@ const Products = () => {
           )}
 
           {filteredProducts.length > 0 && (
-            <div className="mt-12 flex justify-center gap-2">
-              <Button
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1}
-              >
-                Previous
-              </Button>
-              {[...Array(totalPages)].map((_, index) => (
-                <Button
-                  key={index}
-                  onClick={() => handlePageChange(index + 1)}
-                  variant={page === index + 1 ? "default" : "outline"}
-                >
-                  {index + 1}
-                </Button>
-              ))}
-              <Button
-                onClick={() => handlePageChange(page + 1)}
-                disabled={page === totalPages}
-              >
-                Next
-              </Button>
-            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
       </div>
