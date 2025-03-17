@@ -8,9 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cartStore";
 
 const Header: FC = () => {
   const router = useRouter();
+  const cartItems = useCartStore((state) => state.items);
 
   const handleLogout = async () => {
     const response = await fetch("/api/logout", {
@@ -33,6 +35,11 @@ const Header: FC = () => {
         <nav className="flex items-center">
           <Link href="/products" className="mr-4">
             Products
+          </Link>
+          <Link href="/cart" className="mr-4">
+            <Button variant="ghost" className="text-white">
+              Cart ({cartItems.length})
+            </Button>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
