@@ -120,7 +120,7 @@ const Products = () => {
           <h1 className="text-3xl font-bold text-center mb-8">Products</h1>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {[...Array(13)].map((_, index) => (
                 <Card key={index} className="shadow-lg">
                   <CardHeader>
@@ -142,7 +142,7 @@ const Products = () => {
           ) : filteredProducts.length === 0 ? (
             <p className="text-center text-xl">No products found.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {filteredProducts.map((product) => (
                 <Card
                   key={product.product_id}

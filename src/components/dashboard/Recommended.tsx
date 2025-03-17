@@ -12,7 +12,7 @@ import Image from "next/image";
 
 const RecommendedItemsSection: FC = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {recommendedItems.map((item) => (
         <Card key={item.id} className="shadow-lg">
           <CardHeader>
