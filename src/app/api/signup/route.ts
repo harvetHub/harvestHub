@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServerClient } from "@/utils/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const { username, email, password, mobileNumber, address, role } =
-    await req.json();
+  const { username, email, password, mobileNumber, address } = await req.json();
 
   // Perform server-side validation if needed
-  if (!username || !email || !password || !mobileNumber || !address || !role) {
+  if (!username || !email || !password || !mobileNumber || !address) {
     return NextResponse.json(
       { error: "All fields are required" },
       { status: 400 }
@@ -35,25 +34,29 @@ export async function POST(req: NextRequest) {
 
   // Save the additional user data in your database
   const { error: insertError } = await supabaseServerClient
-    .from("user")
+    .from("users")
     .insert([
       {
         user_id: user?.id,
-        username,
+        username: username,
         name: {
           first_name: "",
           last_name: "",
+          middle_name: "",
         },
-        email,
-        password_hash: password, // Assuming you want to store the password hash
+        email: email,
         mobile_number: mobileNumber,
-        address,
-        role,
+        address: address,
         created_at: new Date().toISOString(),
       },
     ]);
 
   if (insertError) {
+    // If there is an error inserting user data, delete the user from auth
+    if (user?.id) {
+      await supabaseServerClient.auth.admin.deleteUser(user.id);
+    }
+
     return NextResponse.json({ error: insertError.message }, { status: 400 });
   }
 

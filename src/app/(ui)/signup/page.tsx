@@ -7,6 +7,7 @@ import { inputFieldsConfig } from "@/lib/signupConfig";
 import { InputField } from "@/components/signup/InputField";
 import { validateSignupFormData } from "@/utils/validation/signupValidationFields";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
   type FormDataKeys =
@@ -40,7 +41,8 @@ export default function Signup() {
     mobileNumberError: "",
     addressError: "",
   });
-  const [role] = useState("customer");
+
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -63,13 +65,10 @@ export default function Signup() {
           },
           body: JSON.stringify({
             ...formData,
-            role,
           }),
         });
 
         const data = await response.json();
-
-        console.log(data);
 
         if (response.ok) {
           Swal.fire({
@@ -77,7 +76,7 @@ export default function Signup() {
             title: "Success",
             text: "User signed up successfully",
           });
-          // Handle successful signup (e.g., redirect to login page)
+          router.push("/");
         } else {
           Swal.fire({
             icon: "error",
