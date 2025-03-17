@@ -18,6 +18,7 @@ const Checkout = () => {
 
   const handlePlaceOrder = () => {
     // Implement place order logic here
+
     clearCart();
     router.push("/cart/order-confirmation");
   };
