@@ -8,9 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cartStore";
+import { ShoppingCartIcon, UserIcon, CogIcon } from "@heroicons/react/20/solid";
+
+import { LogOutIcon, HelpingHandIcon } from "lucide-react";
 
 const Header: FC = () => {
   const router = useRouter();
+  const cartItems = useCartStore((state) => state.items);
 
   const handleLogout = async () => {
     const response = await fetch("/api/logout", {
@@ -34,20 +39,28 @@ const Header: FC = () => {
           <Link href="/products" className="mr-4">
             Products
           </Link>
+          <Link href="/cart" className="mr-4">
+            <Button variant="ghost" className="text-white flex items-center">
+              <ShoppingCartIcon className="w-5 h-5 mr-1" />({cartItems.length})
+            </Button>
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-white">
-                Profile
+              <Button variant="ghost" className="text-white flex items-center">
+                <UserIcon className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onSelect={() => router.push("/settings")}>
+                <CogIcon className="w-5 h-5 mr-2" />
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push("/support")}>
+                <HelpingHandIcon className="w-5 h-5 mr-2" />
                 Support
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleLogout}>
+                <LogOutIcon className="w-5 h-5 mr-2" />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
