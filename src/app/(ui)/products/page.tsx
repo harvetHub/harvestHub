@@ -27,7 +27,9 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
   const [page, setPage] = useState(1);
   const [limit] = useState(13); // Ensure limit is set to 13
   const [total, setTotal] = useState(0);
@@ -74,6 +76,22 @@ const Products = () => {
     setPage(newPage);
   };
 
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0 && value <= maxPrice) {
+      setMinPrice(value);
+      setPriceRange([value, priceRange[1]]);
+    }
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= minPrice && value <= 1000) {
+      setMaxPrice(value);
+      setPriceRange([priceRange[0], value]);
+    }
+  };
+
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -88,6 +106,39 @@ const Products = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full mb-4"
           />
+
+          <h2 className="text-xl font-bold mt-8 mb-4 border-t pt-4">
+            Price Range
+          </h2>
+          <div className="flex items-center space-x-2 mb-4">
+            <Input
+              type="number"
+              value={minPrice}
+              onChange={handleMinPriceChange}
+              className="w-1/2"
+              placeholder="Min"
+            />
+            <Input
+              type="number"
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+              className="w-1/2"
+              placeholder="Max"
+            />
+          </div>
+          <Slider
+            min={0}
+            max={1000}
+            value={priceRange}
+            onValueChange={(value: number[]) =>
+              setPriceRange(value as [number, number])
+            }
+            className="w-full"
+          />
+          <div className="flex justify-between mt-2 mb-4 border-b pb-4">
+            <span>₱{priceRange[0]}</span>
+            <span>₱{priceRange[1]}</span>
+          </div>
           <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
           <div className="space-y-2">
             {categories.map((category) => (
@@ -100,21 +151,6 @@ const Products = () => {
                 {category}
               </Button>
             ))}
-          </div>
-
-          <h2 className="text-xl font-bold mt-8 mb-4">Price Range</h2>
-          <Slider
-            min={0}
-            max={10000}
-            value={priceRange}
-            onValueChange={(value: number[]) =>
-              setPriceRange(value as [number, number])
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between mt-2">
-            <span>₱{priceRange[0]}</span>
-            <span>₱{priceRange[1]}</span>
           </div>
         </div>
 
