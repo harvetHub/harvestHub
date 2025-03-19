@@ -95,7 +95,7 @@ export default function AdminLogin() {
 
   return (
     <section className="bg-white h-screen flex items-center justify-center">
-      <div className="flex items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
+      <div className="flex shadow-xl border rounded-2xl min-w-[280px] m-4 w-1/4 items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
         <div className="xl:w-full xl:max-w-sm 2xl:max-w-md xl:mx-auto">
           <h2 className="text-3xl font-bold text-center leading-tight text-black sm:text-4xl">
             Admin Login
