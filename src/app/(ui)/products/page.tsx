@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
 import StarRating from "@/components/StarRating";
 import { Product, categories } from "@/lib/productsConfig";
+import { useCartStore } from "@/store/cartStore";
 
 const fallbackImage =
   "https://via.placeholder.com/150?text=Image+Not+Available";
@@ -26,11 +27,14 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
   const [page, setPage] = useState(1);
   const [limit] = useState(13); // Ensure limit is set to 13
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -72,6 +76,22 @@ const Products = () => {
     setPage(newPage);
   };
 
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 0 && value <= maxPrice) {
+      setMinPrice(value);
+      setPriceRange([value, priceRange[1]]);
+    }
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= minPrice && value <= 1000) {
+      setMaxPrice(value);
+      setPriceRange([priceRange[0], value]);
+    }
+  };
+
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -86,6 +106,39 @@ const Products = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full mb-4"
           />
+
+          <h2 className="text-xl font-bold mt-8 mb-4 border-t pt-4">
+            Price Range
+          </h2>
+          <div className="flex items-center space-x-2 mb-4">
+            <Input
+              type="number"
+              value={minPrice}
+              onChange={handleMinPriceChange}
+              className="w-1/2"
+              placeholder="Min"
+            />
+            <Input
+              type="number"
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+              className="w-1/2"
+              placeholder="Max"
+            />
+          </div>
+          <Slider
+            min={0}
+            max={1000}
+            value={priceRange}
+            onValueChange={(value: number[]) =>
+              setPriceRange(value as [number, number])
+            }
+            className="w-full"
+          />
+          <div className="flex justify-between mt-2 mb-4 border-b pb-4">
+            <span>₱{priceRange[0]}</span>
+            <span>₱{priceRange[1]}</span>
+          </div>
           <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
           <div className="space-y-2">
             {categories.map((category) => (
@@ -99,28 +152,13 @@ const Products = () => {
               </Button>
             ))}
           </div>
-
-          <h2 className="text-xl font-bold mt-8 mb-4">Price Range</h2>
-          <Slider
-            min={0}
-            max={10000}
-            value={priceRange}
-            onValueChange={(value: number[]) =>
-              setPriceRange(value as [number, number])
-            }
-            className="w-full"
-          />
-          <div className="flex justify-between mt-2">
-            <span>₱{priceRange[0]}</span>
-            <span>₱{priceRange[1]}</span>
-          </div>
         </div>
 
         <div className="w-full md:w-3/4 p-4">
           <h1 className="text-3xl font-bold text-center mb-8">Products</h1>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {[...Array(13)].map((_, index) => (
                 <Card key={index} className="shadow-lg">
                   <CardHeader>
@@ -142,11 +180,11 @@ const Products = () => {
           ) : filteredProducts.length === 0 ? (
             <p className="text-center text-xl">No products found.</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {filteredProducts.map((product) => (
                 <Card
                   key={product.product_id}
-                  className="shadow-lg flex flex-col gap-4 justify-between"
+                  className="shadow-lg flex flex-col justify-between"
                 >
                   <CardHeader>
                     <Image
@@ -154,7 +192,7 @@ const Products = () => {
                       alt={product.name}
                       width={150}
                       height={150}
-                      className="w-full h-40 object-cover"
+                      className="w-full h-48 object-cover"
                       onError={(e) => {
                         e.currentTarget.src = fallbackImage;
                       }}
@@ -171,7 +209,20 @@ const Products = () => {
                     </div>
                   </CardContent>
                   <CardFooter className="mt-auto">
-                    <Button className="w-full">Add to Cart</Button>
+                    <Button
+                      className="w-full"
+                      onClick={() =>
+                        addItem({
+                          productId: product.product_id,
+                          name: product.name,
+                          price: product.price,
+                          quantity: 1,
+                          image_url: product.image_url || fallbackImage,
+                        })
+                      }
+                    >
+                      Add to Cart
+                    </Button>
                   </CardFooter>
                 </Card>
               ))}
