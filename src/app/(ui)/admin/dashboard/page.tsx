@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import AdminSidebar from "@/components/AdminSidebar";
 import {
   BarChart,
   Bar,
@@ -10,7 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useRouter } from "next/navigation";
 
 const salesData = [
   { name: "Jan", sales: 400 },
@@ -22,16 +21,14 @@ const salesData = [
 ];
 
 export default function AdminDashboard() {
-  const router = useRouter();
-
-  const navigateTo = (path: string) => {
-    router.push(path);
-  };
-
   return (
-    <section className="bg-gray-50 min-h-screen">
-      <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold text-center mb-8">Admin Dashboard</h1>
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
+      <AdminSidebar />
+
+      {/* Main Content */}
+      <main className="flex-1 bg-gray-50 p-6">
+        <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
         {/* Analytics Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -81,63 +78,7 @@ export default function AdminDashboard() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-
-        {/* Management Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button
-                className="w-full"
-                onClick={() => navigateTo("/admin/products")}
-              >
-                Manage Products
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button
-                className="w-full"
-                onClick={() => navigateTo("/admin/orders")}
-              >
-                Manage Orders
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button
-                className="w-full"
-                onClick={() => navigateTo("/admin/users")}
-              >
-                Manage Users
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventory Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button
-                className="w-full"
-                onClick={() => navigateTo("/admin/inventory")}
-              >
-                Manage Inventory
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </section>
+      </main>
+    </div>
   );
 }
