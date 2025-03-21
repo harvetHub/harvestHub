@@ -38,7 +38,7 @@ const AdminSidebar = () => {
           onClick={() => navigateTo("/admin/products")}
         >
           <Package className="w-5 h-5 sm:block hidden" />
-          <span>Product</span>
+          <span>Products</span>
         </Button>
         <Button
           variant="ghost"
@@ -48,7 +48,7 @@ const AdminSidebar = () => {
           onClick={() => navigateTo("/admin/orders")}
         >
           <ShoppingCart className="w-5 h-5 sm:block hidden" />
-          <span>Order</span>
+          <span>Orders</span>
         </Button>
         <Button
           variant="ghost"
@@ -58,7 +58,7 @@ const AdminSidebar = () => {
           onClick={() => navigateTo("/admin/users")}
         >
           <Users className="w-5 h-5 sm:block hidden" />
-          <span>User</span>
+          <span>Users</span>
         </Button>
         <Button
           variant="ghost"
