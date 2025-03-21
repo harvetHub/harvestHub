@@ -56,6 +56,7 @@ export default function ProductManagement() {
     price: "",
     image_url: "",
     product_type: categories[0].value,
+    sku: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
@@ -83,6 +84,7 @@ export default function ProductManagement() {
       price: "",
       image_url: "",
       product_type: categories[0].value,
+      sku: "",
     });
     setIsDialogOpen(true);
   };
@@ -95,6 +97,7 @@ export default function ProductManagement() {
       price: product.price.toString(),
       image_url: product.image_url,
       product_type: product.product_type,
+      sku: product.sku || "",
     });
     setIsDialogOpen(true);
   };
@@ -131,9 +134,21 @@ export default function ProductManagement() {
       !formData.name ||
       !formData.description ||
       !formData.price ||
-      !formData.product_type
+      !formData.product_type ||
+      !formData.sku
     ) {
       Swal.fire("Error", "Please fill in all required fields.", "error");
+      return;
+    }
+
+    if (
+      products.some(
+        (product) =>
+          product.sku === formData.sku &&
+          product.product_id !== editingProduct?.product_id
+      )
+    ) {
+      Swal.fire("Error", "SKU must be unique.", "error");
       return;
     }
 
@@ -170,8 +185,10 @@ export default function ProductManagement() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = products.filter((product) =>
-      product.name.toLowerCase().includes(term)
+    const filtered = products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(term) ||
+        (product.sku?.toLowerCase() ?? "").includes(term)
     );
     setFilteredProducts(
       selectedFilter === "All"
@@ -228,6 +245,7 @@ export default function ProductManagement() {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Image</TableHead>
+              <TableHead>SKU</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Price</TableHead>
@@ -247,6 +265,7 @@ export default function ProductManagement() {
                     className="rounded-md"
                   />
                 </TableCell>
+                <TableCell>{product.sku}</TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>
                   {
@@ -335,6 +354,12 @@ export default function ProductManagement() {
                   </option>
                 ))}
               </select>
+              <Input
+                name="sku"
+                placeholder="SKU (e.g., PROD-1234)"
+                value={formData.sku}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="mt-4 flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>

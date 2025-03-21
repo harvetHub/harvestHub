@@ -6,4 +6,5 @@ export type Product = {
   image_url: string;
   product_type: string;
   rating?: number;
+  sku?: string;
 };
