@@ -23,8 +23,8 @@ const AdminSidebar = () => {
           }`}
           onClick={() => navigateTo("/admin/dashboard")}
         >
-          <Home className="w-5 h-5 sm:block hidden" />
-          <span>Dashboard</span>
+          <Home className="w-5 h-5 " />
+          <span className={"sm:block hidden"}>Dashboard</span>
         </Button>
 
         <p className="text-sm text-gray-400 mb-2 py-2 px-2 border-y border-gray-400/50">
@@ -37,8 +37,8 @@ const AdminSidebar = () => {
           }`}
           onClick={() => navigateTo("/admin/products")}
         >
-          <Package className="w-5 h-5 sm:block hidden" />
-          <span>Products</span>
+          <Package className="w-5 h-5 " />
+          <span className={"sm:block hidden"}>Products</span>
         </Button>
         <Button
           variant="ghost"
@@ -47,8 +47,8 @@ const AdminSidebar = () => {
           }`}
           onClick={() => navigateTo("/admin/orders")}
         >
-          <ShoppingCart className="w-5 h-5 sm:block hidden" />
-          <span>Orders</span>
+          <ShoppingCart className="w-5 h-5 " />
+          <span className={"sm:block hidden"}>Orders</span>
         </Button>
         <Button
           variant="ghost"
@@ -57,8 +57,8 @@ const AdminSidebar = () => {
           }`}
           onClick={() => navigateTo("/admin/users")}
         >
-          <Users className="w-5 h-5 sm:block hidden" />
-          <span>Users</span>
+          <Users className="w-5 h-5 " />
+          <span className={"sm:block hidden"}>Users</span>
         </Button>
         <Button
           variant="ghost"
@@ -67,8 +67,8 @@ const AdminSidebar = () => {
           }`}
           onClick={() => navigateTo("/admin/inventory")}
         >
-          <Box className="w-5 h-5 sm:block hidden" />
-          <span>Inventory</span>
+          <Box className="w-5 h-5 " />
+          <span className={"sm:block hidden"}>Inventory</span>
         </Button>
       </nav>
     </aside>
