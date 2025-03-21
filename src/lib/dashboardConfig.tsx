@@ -37,59 +37,6 @@ export const featuredProducts = [
   },
 ];
 
-export const categories = [
-  {
-    id: 1,
-    name: "Seeds",
-    icon: "🌱",
-  },
-  {
-    id: 2,
-    name: "Fertilizers",
-    icon: "💩",
-  },
-  {
-    id: 3,
-    name: "Tools",
-    icon: "🛠️",
-  },
-  {
-    id: 4,
-    name: "Pesticides",
-    icon: "🧴",
-  },
-  {
-    id: 5,
-    name: "Irrigation Equipment",
-    icon: "💧",
-  },
-  {
-    id: 6,
-    name: "Animal Feed",
-    icon: "🐄",
-  },
-  {
-    id: 7,
-    name: "Machinery",
-    icon: "🚜",
-  },
-  {
-    id: 8,
-    name: "Greenhouse Supplies",
-    icon: "🏡",
-  },
-  {
-    id: 9,
-    name: "Soil Amendments",
-    icon: "🌿",
-  },
-  {
-    id: 10,
-    name: "Crop Protection",
-    icon: "🛡️",
-  },
-];
-
 export const recommendedItems = [
   {
     id: 1,
