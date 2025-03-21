@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Home, Package, ShoppingCart, Users, Box } from "lucide-react";
