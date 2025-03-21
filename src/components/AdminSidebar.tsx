@@ -27,7 +27,7 @@ const AdminSidebar = () => {
           <span>Dashboard</span>
         </Button>
 
-        <p className="text-sm text-gray-400 mb-2 p-4 border-b border-gray-400/50">
+        <p className="text-sm text-gray-400 mb-2 py-2 px-2 border-y border-gray-400/50">
           Management
         </p>
         <Button
