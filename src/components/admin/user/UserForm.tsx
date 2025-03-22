@@ -34,7 +34,9 @@ const UserForm: React.FC<UserFormProps> = ({
   onSave,
   onCancel,
 }) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    formData.profile_image || null
+  );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
