@@ -193,6 +193,10 @@ export default function UserManagement() {
             }}
             onSave={handleSaveUser}
             onCancel={() => setIsDialogOpen(false)}
+            onImageUpload={(imageFile) => {
+              console.log("Image uploaded:", imageFile);
+              // Handle image upload logic here
+            }}
           />
         )}
       </section>

@@ -14,7 +14,7 @@ export type Product = {
 
 export type User = {
   user_id?: number;
-  name?: { first: ""; middle: ""; last: "" };
+  name?: { first: string; middle: string; last: string };
   username: string;
   email: string;
   address?: string;
@@ -22,4 +22,7 @@ export type User = {
   role?: string;
   created_at?: string;
   updated_at?: string;
+  profile_image?: string;
+  password?: string;
+  password_confirmation?: string;
 };
