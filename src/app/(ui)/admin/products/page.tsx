@@ -45,10 +45,12 @@ export default function ProductManagement() {
     description: "",
     price: 0,
     image_url: "",
-    product_type: categories[0].value,
+    product_type: "",
     sku: "",
   });
   const [errors, setErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const handleInputChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement
@@ -73,7 +75,7 @@ export default function ProductManagement() {
       description: "",
       price: 0,
       image_url: "",
-      product_type: categories[0].value,
+      product_type: "",
       sku: "",
     });
     setErrors({});
@@ -155,6 +157,29 @@ export default function ProductManagement() {
     setIsDialogOpen(false);
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    filterProducts(term, selectedCategory);
+  };
+
+  const handleCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const category = e.target.value;
+    setSelectedCategory(category);
+    filterProducts(searchTerm, category);
+  };
+
+  const filterProducts = (term: string, category: string) => {
+    const filtered = products.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(term);
+      const matchesCategory = category
+        ? product.product_type === category
+        : true;
+      return matchesSearch && matchesCategory;
+    });
+    setFilteredProducts(filtered);
+  };
+
   return (
     <div className="flex min-h-screen">
       <AdminSidebar />
@@ -164,9 +189,21 @@ export default function ProductManagement() {
         <div className="flex items-center space-x-4 mb-4">
           <Input
             placeholder="Search products..."
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={searchTerm}
+            onChange={handleSearch}
           />
+          <select
+            value={selectedCategory}
+            onChange={handleCategoryFilter}
+            className="block w-1/3 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All</option>
+            {categories.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.name}
+              </option>
+            ))}
+          </select>
           <Button onClick={handleAddProduct}>Add Product</Button>
         </div>
 
