@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductTable from "@/components/admin/product/ProductTable";
 import ProductForm from "@/components/admin/product/ProductForm";
 import { validateProduct } from "@/utils/admin/product/formValidation";
@@ -10,34 +10,11 @@ import AdminSidebar from "@/components/AdminSidebar";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const mockProducts: Product[] = [
-  {
-    product_id: "1",
-    name: "Product A",
-    description: "Description for Product A",
-    price: 100,
-    image_url: "/placeholder.png",
-    product_type: "seeds",
-    sku: "SEEDS-001",
-    rating: 4.5,
-  },
-  {
-    product_id: "2",
-    name: "Product B",
-    description: "Description for Product B",
-    price: 200,
-    image_url: "/placeholder.png",
-    product_type: "fertilizers",
-    sku: "FERT-002",
-    rating: 4.0,
-  },
-];
+import Pagination from "@/components/Pagination";
 
 export default function ProductManagement() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [filteredProducts, setFilteredProducts] =
-    useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
@@ -51,6 +28,43 @@ export default function ProductManagement() {
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total pages
+
+  // Fetch products from the API
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/products?page=${page}&limit=10&product_type=${selectedCategory}&search_term=${searchTerm}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setProducts(data.products);
+        setFilteredProducts(data.products);
+        setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages
+      } else {
+        Swal.fire("Error", data.error || "Failed to fetch products", "error");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      Swal.fire(
+        "Error",
+        `An unexpected error occurred: ${errorMessage}`,
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, selectedCategory, page]);
 
   const handleInputChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement
@@ -96,7 +110,7 @@ export default function ProductManagement() {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = async (productId: string) => {
     Swal.fire({
       title: "Are you sure?",
       text: "This action cannot be undone!",
@@ -104,19 +118,31 @@ export default function ProductManagement() {
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "Cancel",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updatedProducts = products.filter(
-          (product) => product.product_id !== productId
-        );
-        setProducts(updatedProducts);
-        setFilteredProducts(updatedProducts);
-        Swal.fire("Deleted!", "The product has been deleted.", "success");
+        try {
+          const response = await fetch(`/api/products/${productId}`, {
+            method: "DELETE",
+          });
+          if (response.ok) {
+            Swal.fire("Deleted!", "The product has been deleted.", "success");
+            fetchProducts(); // Refresh the product list
+          } else {
+            const data = await response.json();
+            Swal.fire(
+              "Error",
+              data.error || "Failed to delete product",
+              "error"
+            );
+          }
+        } catch {
+          Swal.fire("Error", "An unexpected error occurred", "error");
+        }
       }
     });
   };
 
-  const handleSaveProduct = () => {
+  const handleSaveProduct = async () => {
     const validationErrors = validateProduct(
       formData,
       products,
@@ -127,57 +153,46 @@ export default function ProductManagement() {
       return;
     }
 
-    if (editingProduct) {
-      // Update existing product
-      const updatedProducts = products.map((product) =>
-        product.product_id === editingProduct.product_id
-          ? {
-              ...editingProduct,
-              ...formData,
-              price: parseFloat(formData.price.toString()),
-            }
-          : product
-      );
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      Swal.fire("Success", "Product updated successfully.", "success");
-    } else {
-      // Add new product
-      const newProduct: Product = {
-        product_id: (products.length + 1).toString(),
-        ...formData,
-        price: parseFloat(formData.price.toString()),
-      };
-      const updatedProducts = [...products, newProduct];
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      Swal.fire("Success", "Product added successfully.", "success");
-    }
+    try {
+      const response = await fetch(`/api/products`, {
+        method: editingProduct ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    setIsDialogOpen(false);
+      if (response.ok) {
+        Swal.fire(
+          "Success",
+          editingProduct
+            ? "Product updated successfully."
+            : "Product added successfully.",
+          "success"
+        );
+        setIsDialogOpen(false);
+        fetchProducts(); // Refresh the product list
+      } else {
+        const data = await response.json();
+        Swal.fire("Error", data.error || "Failed to save product", "error");
+      }
+    } catch {
+      Swal.fire("Error", "An unexpected error occurred", "error");
+    }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    filterProducts(term, selectedCategory);
+    setSearchTerm(e.target.value.toLowerCase());
+    setPage(1); // Reset to the first page when searching
   };
 
   const handleCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const category = e.target.value;
-    setSelectedCategory(category);
-    filterProducts(searchTerm, category);
+    setSelectedCategory(e.target.value);
+    setPage(1); // Reset to the first page when filtering by category
   };
 
-  const filterProducts = (term: string, category: string) => {
-    const filtered = products.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(term);
-      const matchesCategory = category
-        ? product.product_type === category
-        : true;
-      return matchesSearch && matchesCategory;
-    });
-    setFilteredProducts(filtered);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
   return (
@@ -197,7 +212,7 @@ export default function ProductManagement() {
             onChange={handleCategoryFilter}
             className="block w-1/3 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">All</option>
+            <option value="">All Categories</option>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.name}
@@ -207,11 +222,26 @@ export default function ProductManagement() {
           <Button onClick={handleAddProduct}>Add Product</Button>
         </div>
 
-        <ProductTable
-          products={filteredProducts}
-          onEdit={handleEditProduct}
-          onDelete={handleDeleteProduct}
-        />
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            <div className="flex m-4">
+              <ProductTable
+                products={filteredProducts}
+                onEdit={handleEditProduct}
+                onDelete={handleDeleteProduct}
+              />
+            </div>
+            {filteredProducts.length > 0 && (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
+          </>
+        )}
 
         {isDialogOpen && (
           <ProductForm
