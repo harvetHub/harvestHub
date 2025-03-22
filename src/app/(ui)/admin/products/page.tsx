@@ -205,7 +205,7 @@ export default function ProductManagement() {
 
   return (
     <AdminMainLayout>
-      <section className="container mx-auto py-10">
+      <section className="mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Product Management</h1>
 
         <div className="flex items-center space-x-4 mb-4">

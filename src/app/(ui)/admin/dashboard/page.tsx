@@ -24,7 +24,7 @@ export default function AdminDashboard() {
   return (
     <AdminMainLayout>
       {/* Main Content */}
-      <main className="flex-1 bg-gray-50 p-6">
+      <main className="flex-1 bg-gray-50 mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
         {/* Analytics Section */}
