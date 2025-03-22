@@ -6,7 +6,7 @@ import ProductForm from "@/components/admin/product/ProductForm";
 import { validateProduct } from "@/utils/admin/product/formValidation";
 import { Product } from "@/lib/definitions";
 import { categories } from "@/lib/productsConfig";
-import AdminSidebar from "@/components/AdminSidebar";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

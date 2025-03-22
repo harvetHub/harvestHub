@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AdminSidebar from "@/components/AdminSidebar";
+import AdminSidebar from "@/components/admin/AdminSidebar";
 import {
   BarChart,
   Bar,
