@@ -210,9 +210,9 @@ export default function ProductManagement() {
           <select
             value={selectedCategory}
             onChange={handleCategoryFilter}
-            className="block w-1/3 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="block w-1/3 min-w-fit py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">All Categories</option>
+            <option value="">All</option>
             {categories.map((category) => (
               <option key={category.value} value={category.value}>
                 {category.name}
@@ -222,25 +222,20 @@ export default function ProductManagement() {
           <Button onClick={handleAddProduct}>Add Product</Button>
         </div>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <>
-            <div className="flex m-4">
-              <ProductTable
-                products={filteredProducts}
-                onEdit={handleEditProduct}
-                onDelete={handleDeleteProduct}
-              />
-            </div>
-            {filteredProducts.length > 0 && (
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
-          </>
+        <div className="flex m-4">
+          <ProductTable
+            products={filteredProducts}
+            onEdit={handleEditProduct}
+            onDelete={handleDeleteProduct}
+            loading={loading}
+          />
+        </div>
+        {filteredProducts.length > 0 && (
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         )}
 
         {isDialogOpen && (
