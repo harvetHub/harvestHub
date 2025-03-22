@@ -73,7 +73,7 @@ export async function DELETE(req: NextRequest) {
   const { data, error } = await supabaseServerClient
     .from("users")
     .delete()
-    .eq("id", user_id);
+    .eq("user_id", user_id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
