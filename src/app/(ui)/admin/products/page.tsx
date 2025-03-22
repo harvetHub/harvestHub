@@ -124,22 +124,27 @@ export default function ProductManagement() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`/api/products/${productId}`, {
-            method: "DELETE",
-          });
+          const response = await fetch(
+            `/api/admin/products?product_id=${productId}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          const data = await response.json();
+
           if (response.ok) {
             Swal.fire("Deleted!", "The product has been deleted.", "success");
             fetchProducts(); // Refresh the product list
           } else {
-            const data = await response.json();
             Swal.fire(
               "Error",
-              data.error || "Failed to delete product",
+              data.error || "Failed to delete product.",
               "error"
             );
           }
         } catch {
-          Swal.fire("Error", "An unexpected error occurred", "error");
+          Swal.fire("Error", "An unexpected error occurred.", "error");
         }
       }
     });

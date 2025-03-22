@@ -114,3 +114,37 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const product_id = searchParams.get("product_id");
+
+    if (!product_id) {
+      return NextResponse.json(
+        { error: "Product ID is required." },
+        { status: 400 }
+      );
+    }
+
+    // Delete the product from the database
+    const { data, error } = await supabaseServerClient
+      .from("products")
+      .delete()
+      .eq("product_id", +product_id);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json(
+      { message: "Product deleted successfully.", product: data },
+      { status: 200 }
+    );
+  } catch {
+    return NextResponse.json(
+      { error: "An unexpected error occurred." },
+      { status: 500 }
+    );
+  }
+}
