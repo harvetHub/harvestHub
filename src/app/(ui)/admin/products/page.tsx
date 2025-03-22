@@ -6,11 +6,11 @@ import ProductForm from "@/components/admin/product/ProductForm";
 import { validateProduct } from "@/utils/admin/product/formValidation";
 import { Product } from "@/lib/definitions";
 import { categories } from "@/lib/productsConfig";
-import AdminSidebar from "@/components/admin/AdminSidebar";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/Pagination";
+import { AdminMainLayout } from "@/layout/AdminMainLayout";
 
 export default function ProductManagement() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -204,8 +204,7 @@ export default function ProductManagement() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <AdminSidebar />
+    <AdminMainLayout>
       <section className="container mx-auto py-10">
         <h1 className="text-3xl font-bold mb-8">Product Management</h1>
 
@@ -259,6 +258,6 @@ export default function ProductManagement() {
           />
         )}
       </section>
-    </div>
+    </AdminMainLayout>
   );
 }
