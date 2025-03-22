@@ -16,7 +16,8 @@ import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import Pagination from "@/components/Pagination";
 import StarRating from "@/components/StarRating";
-import { Product, categories } from "@/lib/productsConfig";
+import { categories } from "@/lib/productsConfig";
+import { Product } from "@/lib/definitions";
 import { useCartStore } from "@/store/cartStore";
 
 const fallbackImage =
@@ -68,8 +69,8 @@ const Products = () => {
     setFilteredProducts(filtered);
   }, [priceRange, products]);
 
-  const handleFilterChange = (category: string) => {
-    setFilter(category);
+  const handleFilterChange = (categoryValue: string) => {
+    setFilter(categoryValue);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -86,7 +87,7 @@ const Products = () => {
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value >= minPrice && value <= 1000) {
+    if (!isNaN(value) && value >= minPrice) {
       setMaxPrice(value);
       setPriceRange([priceRange[0], value]);
     }
@@ -128,7 +129,7 @@ const Products = () => {
           </div>
           <Slider
             min={0}
-            max={1000}
+            max={maxPrice}
             value={priceRange}
             onValueChange={(value: number[]) =>
               setPriceRange(value as [number, number])
@@ -141,14 +142,23 @@ const Products = () => {
           </div>
           <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
           <div className="space-y-2">
+            <Button
+              key="all"
+              variant={filter === "All" ? "default" : "outline"}
+              onClick={() => handleFilterChange("All")}
+              className="w-full text-left"
+            >
+              All
+            </Button>
             {categories.map((category) => (
               <Button
-                key={category}
-                variant={filter === category ? "default" : "outline"}
-                onClick={() => handleFilterChange(category)}
-                className="w-full text-left"
+                key={category.value}
+                variant={filter === category.value ? "default" : "outline"}
+                onClick={() => handleFilterChange(category.value)}
+                className="w-full text-left flex items-center space-x-2"
               >
-                {category}
+                <span>{category.icon}</span>
+                <span>{category.name}</span>
               </Button>
             ))}
           </div>

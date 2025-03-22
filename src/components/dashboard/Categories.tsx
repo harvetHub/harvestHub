@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { categories } from "@/lib/dashboardConfig";
+import { categories } from "@/lib/productsConfig";
 
 const CategoriesSection: FC = () => {
   return (
