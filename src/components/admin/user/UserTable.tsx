@@ -37,7 +37,7 @@ const UserTable: React.FC<UserTableProps> = ({
       </TableHeader>
       <TableBody>
         {loading
-          ? Array.from({ length: 5 }).map((_, index) => (
+          ? Array.from({ length: 10 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell>
                   <div className="h-4 bg-gray-300 rounded w-12 animate-pulse"></div>
