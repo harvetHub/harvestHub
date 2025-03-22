@@ -33,9 +33,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   isOpen,
   onClose,
 }) => {
-  console.log("Categories:", categories); // Debug categories
-  console.log("Selected Product Type:", formData.product_type); // Debug selected product type
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>

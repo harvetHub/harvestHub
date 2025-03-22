@@ -93,7 +93,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </Button>
                     <Button
                       variant="destructive"
-                      onClick={() => onDelete(product.product_id || "")}
+                      onClick={() => onDelete(String(product.product_id || ""))}
                     >
                       Delete
                     </Button>

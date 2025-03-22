@@ -18,6 +18,7 @@ export default function ProductManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
+    product_id: 0,
     name: "",
     description: "",
     price: 0,
@@ -85,6 +86,7 @@ export default function ProductManagement() {
   const handleAddProduct = () => {
     setEditingProduct(null);
     setFormData({
+      product_id: 0,
       name: "",
       description: "",
       price: 0,
@@ -99,6 +101,7 @@ export default function ProductManagement() {
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
+      product_id: product.product_id ?? 0,
       name: product.name,
       description: product.description,
       price: product.price,
@@ -154,7 +157,7 @@ export default function ProductManagement() {
     }
 
     try {
-      const response = await fetch(`/api/products`, {
+      const response = await fetch(`/api/admin/products`, {
         method: editingProduct ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
