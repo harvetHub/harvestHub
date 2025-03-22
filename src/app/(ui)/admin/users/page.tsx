@@ -77,7 +77,7 @@ export default function UserManagement() {
     setEditingUser(user);
     setFormData({
       user_id: user.user_id,
-      name: user.name || { first: "", middle: "", last: "" },
+      name: { first: "", middle: "", last: "" },
       username: user.username,
       email: user.email,
       role: user.role || "",
