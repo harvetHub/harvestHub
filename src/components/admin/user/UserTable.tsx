@@ -63,7 +63,7 @@ const UserTable: React.FC<UserTableProps> = ({
               <TableRow key={index + 1}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
-                  {`${user.name?.first || ""} ${user.name?.middle || ""} ${
+                  {`${user.name?.first || "N/A"} ${user.name?.middle || ""} ${
                     user.name?.last || ""
                   }`.trim()}
                 </TableCell>
