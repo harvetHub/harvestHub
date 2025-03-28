@@ -194,7 +194,7 @@ const Products = () => {
               {filteredProducts.map((product) => (
                 <Card
                   key={product.product_id}
-                  className="shadow-lg flex flex-col justify-between"
+                  className="flex rounded-sm border-none flex-col justify-between"
                 >
                   <CardHeader>
                     <Image
@@ -223,7 +223,7 @@ const Products = () => {
                       className="w-full"
                       onClick={() =>
                         addItem({
-                          productId: product.product_id,
+                          productId: product.product_id?.toString() || "",
                           name: product.name,
                           price: product.price,
                           quantity: 1,
