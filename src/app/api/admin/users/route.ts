@@ -13,6 +13,8 @@ export async function GET() {
 }
 
 // This route handles the creation, update, and deletion of users
+import { uploadImageToStorage } from "@/utils/uploadImageToStorage";
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { name, username, email, address, mobile_number, image_url } = body;
@@ -28,7 +30,6 @@ export async function POST(req: NextRequest) {
       .single();
 
   if (emailCheckError && emailCheckError.code !== "PGRST116") {
-    // Handle unexpected errors during email check
     return NextResponse.json(
       { error: emailCheckError.message },
       { status: 400 }
@@ -42,6 +43,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let uploadedImageUrl = image_url;
+
+  // If image_url is present, upload the image to Supabase Storage
+  if (image_url) {
+    try {
+      const fileName = `users/${Date.now()}_${username}.jpg`; // Generate a unique file name
+      const bucketName = "user-images"; // Replace with your Supabase bucket name
+      uploadedImageUrl = await uploadImageToStorage(
+        image_url,
+        fileName,
+        bucketName
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Image upload failed:", error.message);
+      return NextResponse.json(
+        { error: "Failed to upload image. Please try again." },
+        { status: 500 }
+      );
+    }
+  }
+
   // Insert the new user
   const { data, error } = await supabaseServerClient.from("users").insert([
     {
@@ -50,7 +73,7 @@ export async function POST(req: NextRequest) {
       email,
       address,
       mobile_number,
-      image_url,
+      image_url: uploadedImageUrl,
     },
   ]);
 
@@ -60,7 +83,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ message: "User added successfully.", user: data });
 }
-
 // This route handles the update and deletion of users
 export async function PUT(req: NextRequest) {
   const body = await req.json();
@@ -77,7 +99,6 @@ export async function PUT(req: NextRequest) {
       .single();
 
   if (emailCheckError && emailCheckError.code !== "PGRST116") {
-    // Handle unexpected errors during email check
     return NextResponse.json(
       { error: emailCheckError.message },
       { status: 400 }
@@ -91,6 +112,28 @@ export async function PUT(req: NextRequest) {
     );
   }
 
+  let uploadedImageUrl = image_url;
+
+  // If image_url is present, upload the image to Supabase Storage
+  if (image_url) {
+    try {
+      const fileName = `users/${Date.now()}_${username}.jpg`; // Generate a unique file name
+      const bucketName = "user-images"; // Replace with your Supabase bucket name
+      uploadedImageUrl = await uploadImageToStorage(
+        image_url,
+        fileName,
+        bucketName
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Image upload failed:", error.message);
+      return NextResponse.json(
+        { error: "Failed to upload image. Please try again." },
+        { status: 500 }
+      );
+    }
+  }
+
   // Update the user
   const { data, error } = await supabaseServerClient
     .from("users")
@@ -100,7 +143,7 @@ export async function PUT(req: NextRequest) {
       email,
       address,
       mobile_number,
-      image_url,
+      image_url: uploadedImageUrl,
     })
     .eq("user_id", user_id);
 

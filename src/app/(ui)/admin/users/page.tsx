@@ -34,6 +34,8 @@ export default function UserManagement() {
       const response = await fetch("/api/admin/users");
       const data = await response.json();
 
+      console.log("data:", JSON.stringify(data, null, 2));
+
       if (response.ok) {
         setUsers(data.users);
         setFilteredUsers(data.users);
