@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import Swal from "sweetalert2";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
 import { User } from "@/lib/definitions";
-import { uploadImageToStorage } from "@/utils/uploadImageToStorage";
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
@@ -80,11 +79,7 @@ export default function UserManagement() {
     setEditingUser(user);
     setFormData({
       user_id: user.user_id,
-      name: {
-        first: user.name?.first || "",
-        middle: user.name?.middle || "",
-        last: user.name?.last || "",
-      },
+      name: { first: "", middle: "", last: "" },
       username: user.username,
       email: user.email,
       image_url: user.image_url,
@@ -152,30 +147,12 @@ export default function UserManagement() {
     }
 
     try {
-      let uploadedImageUrl = formData.image_url;
-
-      // If a new image file is selected, upload it to Supabase Storage
-      if (formData.image_url && formData.image_url.startsWith("blob:")) {
-        const fileName = `users/${Date.now()}_${
-          editingUser?.username || "user"
-        }`;
-        const bucketName = "user-images"; // Replace with your Supabase bucket name
-        uploadedImageUrl = await uploadImageToStorage(
-          new File([], formData.image_url), // Replace with actual file
-          fileName,
-          bucketName
-        );
-      }
-
-      // Update the formData with the uploaded image URL
-      const updatedFormData = { ...formData, image_url: uploadedImageUrl };
-
       const response = await fetch("/api/admin/users", {
         method: editingUser ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedFormData),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -198,7 +175,7 @@ export default function UserManagement() {
       }
     } catch (error) {
       console.error("Error saving user:", error);
-      Swal.fire("Error", "An unexpected error occurred.", "error");
+      // Swal.fire("Error", "An unexpected error occurred.", "error");
     }
   };
 
@@ -251,16 +228,8 @@ export default function UserManagement() {
             onSave={handleSaveUser}
             onCancel={() => setIsDialogOpen(false)}
             onImageUpload={(imageFile) => {
-              const fileName = `users/${Date.now()}_${imageFile.name}`;
-              const bucketName = "user-images"; // Replace with your Supabase bucket name
-              uploadImageToStorage(imageFile, fileName, bucketName)
-                .then((url) => {
-                  setFormData({ ...formData, image_url: url });
-                })
-                .catch((error) => {
-                  console.error("Image upload failed:", error);
-                  Swal.fire("Error", "Failed to upload image.", "error");
-                });
+              console.log("Image uploaded:", imageFile);
+              // Handle image upload logic here
             }}
           />
         )}
