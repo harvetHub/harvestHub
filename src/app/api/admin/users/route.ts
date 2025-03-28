@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+// This route handles the creation, update, and deletion of users
+import { uploadImageToStorage } from "@/utils/uploadImageToStorage";
+import { supabaseServer } from "@/utils/supabase/server";
 
 // This route handles CRUD operations for users in the admin panel
 export async function GET() {
-  const { data, error } = await supabaseServerClient.from("users").select("*");
+  const { data, error } = await supabaseServer.from("users").select("*");
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -12,9 +14,6 @@ export async function GET() {
   return NextResponse.json({ users: data }, { status: 200 });
 }
 
-// This route handles the creation, update, and deletion of users
-import { uploadImageToStorage } from "@/utils/uploadImageToStorage";
-
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { name, username, email, address, mobile_number, image_url } = body;
@@ -22,12 +21,11 @@ export async function POST(req: NextRequest) {
   console.log("Received data:", JSON.stringify(body, null, 2));
 
   // Check if the email already exists
-  const { data: existingUser, error: emailCheckError } =
-    await supabaseServerClient
-      .from("users")
-      .select("email")
-      .eq("email", email)
-      .single();
+  const { data: existingUser, error: emailCheckError } = await supabaseServer
+    .from("users")
+    .select("email")
+    .eq("email", email)
+    .single();
 
   if (emailCheckError && emailCheckError.code !== "PGRST116") {
     return NextResponse.json(
@@ -66,7 +64,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Insert the new user
-  const { data, error } = await supabaseServerClient.from("users").insert([
+  const { data, error } = await supabaseServer.from("users").insert([
     {
       name,
       username,
@@ -90,13 +88,12 @@ export async function PUT(req: NextRequest) {
     body;
 
   // Check if the email already exists for a different user
-  const { data: existingUser, error: emailCheckError } =
-    await supabaseServerClient
-      .from("users")
-      .select("user_id, email")
-      .eq("email", email)
-      .neq("user_id", user_id)
-      .single();
+  const { data: existingUser, error: emailCheckError } = await supabaseServer
+    .from("users")
+    .select("user_id, email")
+    .eq("email", email)
+    .neq("user_id", user_id)
+    .single();
 
   if (emailCheckError && emailCheckError.code !== "PGRST116") {
     return NextResponse.json(
@@ -135,7 +132,7 @@ export async function PUT(req: NextRequest) {
   }
 
   // Update the user
-  const { data, error } = await supabaseServerClient
+  const { data, error } = await supabaseServer
     .from("users")
     .update({
       name,
@@ -169,7 +166,7 @@ export async function DELETE(req: NextRequest) {
     );
   }
 
-  const { data, error } = await supabaseServerClient
+  const { data, error } = await supabaseServer
     .from("users")
     .delete()
     .eq("user_id", user_id);

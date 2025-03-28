@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+import { supabaseServer } from "@/utils/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert the new product into the database
-    const { data, error } = await supabaseServerClient.from("products").insert([
+    const { data, error } = await supabaseServer.from("products").insert([
       {
         name,
         description,
@@ -85,7 +85,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // Update the product in the database
-    const { data, error } = await supabaseServerClient
+    const { data, error } = await supabaseServer
       .from("products")
       .update({
         name,
@@ -128,7 +128,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Delete the product from the database
-    const { data, error } = await supabaseServerClient
+    const { data, error } = await supabaseServer
       .from("products")
       .delete()
       .eq("product_id", +product_id);

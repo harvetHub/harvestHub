@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+import { supabaseServer } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const searchTerm = searchParams.get("search_term");
   const offset = (page - 1) * limit;
 
-  let query = supabaseServerClient
+  let query = supabaseServer
     .from("products")
     .select("*", { count: "exact" })
     .range(offset, offset + limit - 1);

@@ -1,10 +1,10 @@
-import { supabaseServerClient } from "./supabase/server";
+import { supabaseServer } from "./supabase/server";
 
 /**
- * Uploads an image to supabaseServerClient Storage.
+ * Uploads an image to supabaseServer Storage.
  * @param imageFile - The image file to upload (from an <input> element).
  * @param fileName - The name to save the file as in the bucket.
- * @param bucketName - The name of the supabaseServerClient Storage bucket.
+ * @param bucketName - The name of the supabaseServer Storage bucket.
  * @returns The public URL of the uploaded image.
  */
 export const uploadImageToStorage = async (
@@ -22,8 +22,8 @@ export const uploadImageToStorage = async (
       throw new Error("Bucket name is required.");
     }
 
-    // Upload the file to supabaseServerClient Storage
-    const { data, error } = await supabaseServerClient.storage
+    // Upload the file to supabaseServer Storage
+    const { data, error } = await supabaseServer.storage
       .from(bucketName)
       .upload(fileName, imageFile, {
         contentType: imageFile.type, // Use the file's MIME type
@@ -35,7 +35,7 @@ export const uploadImageToStorage = async (
     }
 
     // Get the public URL of the uploaded image
-    const publicUrlData = supabaseServerClient.storage
+    const publicUrlData = supabaseServer.storage
       .from(bucketName)
       .getPublicUrl(data.path);
 

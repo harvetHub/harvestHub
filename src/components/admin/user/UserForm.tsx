@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label"; // Import Label for better styling
 import { User } from "@/lib/definitions";
 import Image from "next/image";
 import { useState } from "react";
@@ -19,7 +20,7 @@ interface UserFormProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImageUpload: (file: File) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -43,15 +44,9 @@ const UserForm: React.FC<UserFormProps> = ({
     if (file) {
       const previewUrl = URL.createObjectURL(file); // Generate a preview URL
       setImagePreview(previewUrl); // Update the image preview
-      onImageUpload(e);
 
-      // Update the formData.image_url using the onChange handler
-      onChange({
-        target: {
-          name: "image_url",
-          value: previewUrl,
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
+      // Pass the file to the parent component for uploading
+      onImageUpload(file);
     }
   };
 
@@ -101,7 +96,14 @@ const UserForm: React.FC<UserFormProps> = ({
               )}
             </div>
 
-            <input
+            <Label
+              htmlFor="image-upload"
+              className="text-sm font-medium text-gray-700"
+            >
+              Upload Profile Image
+            </Label>
+            <Input
+              id="image-upload"
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
