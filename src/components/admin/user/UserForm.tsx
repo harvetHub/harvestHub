@@ -35,14 +35,23 @@ const UserForm: React.FC<UserFormProps> = ({
   onCancel,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(
-    formData.profile_image || null
+    formData.image_url || null
   );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImagePreview(URL.createObjectURL(file)); // Generate a preview URL
-      onImageUpload(e); // Call the parent handler to handle the file
+      const previewUrl = URL.createObjectURL(file); // Generate a preview URL
+      setImagePreview(previewUrl); // Update the image preview
+      onImageUpload(e);
+
+      // Update the formData.image_url using the onChange handler
+      onChange({
+        target: {
+          name: "image_url",
+          value: previewUrl,
+        },
+      } as React.ChangeEvent<HTMLInputElement>);
     }
   };
 
@@ -99,8 +108,8 @@ const UserForm: React.FC<UserFormProps> = ({
               className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
 
-            {errors.profile_image && (
-              <p className="text-red-500 text-sm">{errors.profile_image}</p>
+            {errors.image_url && (
+              <p className="text-red-500 text-sm">{errors.image_url}</p>
             )}
           </div>
 

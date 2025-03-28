@@ -15,13 +15,13 @@ export default function UserManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<User>({
-    user_id: 0,
+    user_id: "",
     name: { first: "", middle: "", last: "" },
     username: "",
     email: "",
-    role: "",
     address: "",
     mobile_number: "",
+    image_url: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof User, string>>>({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -63,11 +63,13 @@ export default function UserManagement() {
   const handleAddUser = () => {
     setEditingUser(null);
     setFormData({
-      user_id: 0,
+      user_id: "",
       name: { first: "", middle: "", last: "" },
       username: "",
       email: "",
-      role: "",
+      image_url: "",
+      address: "",
+      mobile_number: "",
     });
     setErrors({});
     setIsDialogOpen(true);
@@ -80,7 +82,9 @@ export default function UserManagement() {
       name: { first: "", middle: "", last: "" },
       username: user.username,
       email: user.email,
-      role: user.role || "",
+      image_url: user.image_url,
+      address: user.address || "",
+      mobile_number: user.mobile_number || "",
     });
     setErrors({});
     setIsDialogOpen(true);
@@ -115,7 +119,33 @@ export default function UserManagement() {
     });
   };
 
+  const validateUserForm = (
+    formData: User
+  ): Partial<Record<keyof User, string>> => {
+    const validationErrors: Partial<Record<keyof User, string>> = {};
+
+    // Validate required fields
+    if (!formData.username) validationErrors.username = "Username is required.";
+    if (!formData.email) validationErrors.email = "Email is required.";
+    if (!formData.address) validationErrors.address = "Address is required.";
+    if (!formData.mobile_number)
+      validationErrors.mobile_number = "Mobile number is required.";
+
+    return validationErrors;
+  };
+
   const handleSaveUser = async () => {
+    // Call the validation function
+    const validationErrors = validateUserForm(formData);
+
+    // Set errors if validation fails
+    setErrors(validationErrors);
+
+    // Stop execution if there are validation errors
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
     try {
       const response = await fetch("/api/admin/users", {
         method: editingUser ? "PUT" : "POST",
@@ -126,6 +156,9 @@ export default function UserManagement() {
       });
 
       const data = await response.json();
+
+      // Log the results for debugging
+      console.log("API Response:", data);
 
       if (response.ok) {
         Swal.fire(
@@ -140,8 +173,9 @@ export default function UserManagement() {
       } else {
         Swal.fire("Error", data.error || "Failed to save user.", "error");
       }
-    } catch {
-      Swal.fire("Error", "An unexpected error occurred.", "error");
+    } catch (error) {
+      console.error("Error saving user:", error);
+      // Swal.fire("Error", "An unexpected error occurred.", "error");
     }
   };
 
