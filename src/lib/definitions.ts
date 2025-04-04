@@ -12,9 +12,15 @@ export type Product = {
   updated_at?: string;
 };
 
+export type Nametype = {
+  first?: string;
+  middle?: string;
+  last?: string;
+};
+
 export type User = {
   user_id?: string;
-  name?: { first: string; middle: string; last: string };
+  name?: Nametype;
   username: string;
   email: string;
   address?: string;

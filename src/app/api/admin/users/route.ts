@@ -111,8 +111,8 @@ export async function PUT(req: NextRequest) {
 
   let uploadedImageUrl = image_url;
 
-  // If image_url is present, upload the image to Supabase Storage
-  if (image_url) {
+  // If image_url is a File object, upload the image to Supabase Storage
+  if (image_url && typeof image_url !== "string") {
     try {
       const fileName = `users/${Date.now()}_${username}.jpg`; // Generate a unique file name
       const bucketName = "user-images"; // Replace with your Supabase bucket name
@@ -121,6 +121,7 @@ export async function PUT(req: NextRequest) {
         fileName,
         bucketName
       );
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Image upload failed:", error.message);
