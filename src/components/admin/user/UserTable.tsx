@@ -78,7 +78,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     </Button>
                     <Button
                       variant="destructive"
-                      onClick={() => onDelete(user.user_id || 0)}
+                      onClick={() => onDelete(Number(user.user_id) || 0)}
                     >
                       Delete
                     </Button>

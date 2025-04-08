@@ -85,7 +85,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       ?.name
                   }
                 </TableCell>
-                <TableCell>₱{product.price.toFixed(2)}</TableCell>
+                <TableCell>
+                  ₱
+                  {new Intl.NumberFormat("en-US", {
+                    minimumFractionDigits: 2,
+                  }).format(product.price)}
+                </TableCell>
+
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button variant="outline" onClick={() => onEdit(product)}>
