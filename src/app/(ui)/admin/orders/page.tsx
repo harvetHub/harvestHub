@@ -19,6 +19,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import Swal from "sweetalert2";
 
 interface Order {
@@ -48,7 +55,6 @@ export default function OrdersManagement() {
       const data = await response.json();
 
       if (response.ok) {
-        // Fetch customer names for each order
         const ordersWithNames = await Promise.all(
           data.orders.map(async (order: Order) => {
             const userResponse = await fetch(
@@ -57,7 +63,7 @@ export default function OrdersManagement() {
             const userData = await userResponse.json();
             return {
               ...order,
-              customer_name: userData.user?.name || "Unknown",
+              customer_name: userData.user?.name || "N/A",
             };
           })
         );
@@ -138,6 +144,31 @@ export default function OrdersManagement() {
         }
       }
     });
+  };
+
+  const handleUpdateOrderStatus = async (status: string) => {
+    if (!selectedOrder) return;
+
+    try {
+      const response = await fetch(`/api/admin/orders`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ order_id: selectedOrder.order_id, status }),
+      });
+
+      if (response.ok) {
+        Swal.fire("Success", "Order status updated successfully.", "success");
+        fetchOrders(); // Refresh the orders list
+        setSelectedOrder(null); // Close the modal
+      } else {
+        const data = await response.json();
+        Swal.fire("Error", data.error || "Failed to update order.", "error");
+      }
+    } catch {
+      Swal.fire("Error", "An unexpected error occurred.", "error");
+    }
   };
 
   return (
@@ -232,15 +263,55 @@ export default function OrdersManagement() {
           </Table>
         </div>
 
+        {/* Modal for Managing Order */}
         {selectedOrder && (
-          <div className="modal">
-            {/* Modal content for managing the selected order */}
-            <h2>Manage Order</h2>
-            <p>Order ID: {selectedOrder.order_id}</p>
-            <p>Customer Name: {selectedOrder.customer_name}</p>
-            <p>Status: {selectedOrder.status}</p>
-            {/* Add additional fields and actions for managing the order */}
-          </div>
+          <Dialog
+            open={!!selectedOrder}
+            onOpenChange={() => setSelectedOrder(null)}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Manage Order</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p>
+                  <strong>Order ID:</strong> {selectedOrder.order_id}
+                </p>
+                <p>
+                  <strong>Customer Name:</strong> {selectedOrder.customer_name}
+                </p>
+                <p>
+                  <strong>Status:</strong> {selectedOrder.status}
+                </p>
+                <p>
+                  <strong>Total Amount:</strong> ₱
+                  {new Intl.NumberFormat("en-US", {
+                    minimumFractionDigits: 2,
+                  }).format(selectedOrder.total_amount)}
+                </p>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="default"
+                  onClick={() => handleUpdateOrderStatus("Ready for Pickup")}
+                >
+                  Mark as Ready for Pickup
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => handleUpdateOrderStatus("Released")}
+                >
+                  Mark as Released
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedOrder(null)}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </section>
     </AdminMainLayout>
