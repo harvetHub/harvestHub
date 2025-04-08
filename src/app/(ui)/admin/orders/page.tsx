@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,21 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import OrdersTable from "@/components/admin/order/OrderTable";
+import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
 import Swal from "sweetalert2";
 
 interface Order {
@@ -106,10 +92,6 @@ export default function OrdersManagement() {
     setFilteredOrders(filtered);
   };
 
-  const handleManageOrder = (order: Order) => {
-    setSelectedOrder(order);
-  };
-
   const handleCancelOrder = async (orderId: number) => {
     Swal.fire({
       title: "Are you sure?",
@@ -184,7 +166,7 @@ export default function OrdersManagement() {
           />
           <Select onValueChange={handlePaymentFilter}>
             <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Filter by Payment Status" />
+              <SelectValue placeholder="Select Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Paid">Paid</SelectItem>
@@ -194,124 +176,19 @@ export default function OrdersManagement() {
           </Select>
         </div>
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer Name</TableHead>
-                <TableHead>Order Date</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Shipping Method</TableHead>
-                <TableHead>Payment Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-4">
-                    Loading...
-                  </TableCell>
-                </TableRow>
-              ) : filteredOrders.length > 0 ? (
-                filteredOrders.map((order) => (
-                  <TableRow key={order.order_id}>
-                    <TableCell>{order.order_id}</TableCell>
-                    <TableCell>{order.customer_name}</TableCell>
-                    <TableCell>
-                      {new Date(order.order_date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      ₱
-                      {new Intl.NumberFormat("en-US", {
-                        minimumFractionDigits: 2,
-                      }).format(order.total_amount)}
-                    </TableCell>
-                    <TableCell>{order.status}</TableCell>
-                    <TableCell>{order.shipping_method || "N/A"}</TableCell>
-                    <TableCell>{order.payment_status}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCancelOrder(order.order_id)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleManageOrder(order)}
-                        >
-                          Manage
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-4">
-                    No orders found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <OrdersTable
+          orders={filteredOrders}
+          loading={loading}
+          onCancelOrder={handleCancelOrder}
+          onManageOrder={(order) => setSelectedOrder({ ...order, user_id: "" })} // Pass an empty string for user_id
+        />
 
-        {/* Modal for Managing Order */}
         {selectedOrder && (
-          <Dialog
-            open={!!selectedOrder}
-            onOpenChange={() => setSelectedOrder(null)}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Manage Order</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <p>
-                  <strong>Order ID:</strong> {selectedOrder.order_id}
-                </p>
-                <p>
-                  <strong>Customer Name:</strong> {selectedOrder.customer_name}
-                </p>
-                <p>
-                  <strong>Status:</strong> {selectedOrder.status}
-                </p>
-                <p>
-                  <strong>Total Amount:</strong> ₱
-                  {new Intl.NumberFormat("en-US", {
-                    minimumFractionDigits: 2,
-                  }).format(selectedOrder.total_amount)}
-                </p>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="default"
-                  onClick={() => handleUpdateOrderStatus("Ready for Pickup")}
-                >
-                  Mark as Ready for Pickup
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={() => handleUpdateOrderStatus("Released")}
-                >
-                  Mark as Released
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setSelectedOrder(null)}
-                >
-                  Close
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <ManageOrderModal
+            order={selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+            onUpdateStatus={handleUpdateOrderStatus}
+          />
         )}
       </section>
     </AdminMainLayout>
