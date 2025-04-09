@@ -1,122 +1,180 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState, useEffect } from "react";
-import { AdminMainLayout } from "@/layout/AdminMainLayout";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import Swal from "sweetalert2";
+import Pagination from "@/components/Pagination";
+import { AdminMainLayout } from "@/layout/AdminMainLayout";
+import InventoryTable from "@/components/admin/inventory/InvenTable";
 
-interface InventoryItem {
-  id: number;
-  name: string;
-  quantity: number;
-  price: number;
-  category: string;
-}
+import { categories } from "@/lib/productsConfig";
+import Swal from "sweetalert2";
+import { InventoryType } from "@/lib/definitions";
 
 export default function InventoryManagement() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [filteredInventory, setFilteredInventory] = useState<InventoryItem[]>(
-    []
-  );
+  const [inventory, setInventory] = useState<InventoryType[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [newQuantity, setNewQuantity] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total pages
 
   // Fetch inventory items from the API
-  const fetchInventory = async () => {
+  const fetchInventory = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/admin/inventory");
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: "10",
+        ...(selectedCategory ? { product_type: selectedCategory } : {}),
+        ...(searchTerm ? { search_term: searchTerm } : {}),
+      });
+
+      const response = await fetch(`/api/products?${queryParams.toString()}`);
       const data = await response.json();
 
       if (response.ok) {
-        setInventory(data.items || []);
-        setFilteredInventory(data.items || []);
+        setInventory(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data.products.map((product: any) => ({
+            id: product.product_id,
+            name: product.name,
+            category:
+              categories.find((cat) => cat.value === product.product_type)
+                ?.name || "Unknown",
+            stocks: product.stocks,
+            price: product.price,
+          }))
+        );
+        setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages
       } else {
-        console.error("Failed to fetch inventory:", data.error);
+        Swal.fire("Error", data.error || "Failed to fetch inventory", "error");
       }
     } catch (error) {
-      console.error("An unexpected error occurred:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      Swal.fire(
+        "Error",
+        `An unexpected error occurred: ${errorMessage}`,
+        "error"
+      );
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [page, selectedCategory, searchTerm]);
 
   useEffect(() => {
     fetchInventory();
-  }, []);
+  }, [fetchInventory]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    const filtered = inventory.filter((item) =>
-      item.name.toLowerCase().includes(term)
-    );
-    setFilteredInventory(filtered);
+    setSearchTerm(e.target.value.toLowerCase());
+    setPage(1); // Reset to the first page when searching
   };
 
-  const handleManageItem = (item: InventoryItem) => {
-    setSelectedItem(item);
-    setNewQuantity(item.quantity); // Initialize the quantity input with the current quantity
+  const handleCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+    setPage(1); // Reset to the first page when filtering by category
   };
 
-  const handleCloseModal = () => {
-    setSelectedItem(null);
-    setNewQuantity(null);
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
-  const handleUpdateQuantity = async () => {
-    if (!selectedItem || newQuantity === null) return;
+  const handleAddStock = (item: InventoryType) => {
+    Swal.fire({
+      title: "Add Stock",
+      input: "number",
+      inputLabel: `Enter quantity to add for ${item.name}`,
+      inputAttributes: {
+        min: "1",
+      },
+      showCancelButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const quantityToAdd = parseInt(result.value, 10);
+        if (isNaN(quantityToAdd) || quantityToAdd <= 0) {
+          Swal.fire("Error", "Invalid quantity entered.", "error");
+          return;
+        }
 
-    try {
-      const response = await fetch(`/api/admin/inventory`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: selectedItem.id,
-          quantity: newQuantity,
-        }),
-      });
+        try {
+          const response = await fetch(`/api/products`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: item.id,
+              quantity: item.stocks + quantityToAdd,
+            }),
+          });
 
-      if (response.ok) {
-        Swal.fire({
-          title: "Success",
-          text: "Stock quantity updated successfully.",
-          icon: "success",
-        });
-        fetchInventory(); // Refresh the inventory list
-        handleCloseModal(); // Close the modal
-      } else {
-        const data = await response.json();
-        Swal.fire({
-          title: "Error",
-          text: data.error || "Failed to update stock quantity.",
-          icon: "error",
-        });
+          if (response.ok) {
+            Swal.fire("Success", "Stock added successfully.", "success");
+            fetchInventory(); // Refresh inventory
+          } else {
+            const data = await response.json();
+            Swal.fire("Error", data.error || "Failed to add stock.", "error");
+          }
+        } catch (error) {
+          Swal.fire("Error", "An unexpected error occurred.", "error");
+        }
       }
-    } catch (error) {
-      console.error("An unexpected error occurred:", error);
-      Swal.fire({
-        title: "Error",
-        text: "An unexpected error occurred.",
-        icon: "error",
-      });
-    }
+    });
+  };
+
+  const handleReduceStock = (item: InventoryType) => {
+    Swal.fire({
+      title: "Reduce Stock",
+      input: "number",
+      inputLabel: `Enter quantity to reduce for ${item.name}`,
+      inputAttributes: {
+        min: "1",
+        max: item.stocks.toString(),
+      },
+      showCancelButton: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const quantityToReduce = parseInt(result.value, 10);
+        if (
+          isNaN(quantityToReduce) ||
+          quantityToReduce <= 0 ||
+          quantityToReduce > item.stocks
+        ) {
+          Swal.fire("Error", "Invalid quantity entered.", "error");
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/products`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: item.id,
+              quantity: item.stocks - quantityToReduce,
+            }),
+          });
+
+          if (response.ok) {
+            Swal.fire("Success", "Stock reduced successfully.", "success");
+            fetchInventory(); // Refresh inventory
+          } else {
+            const data = await response.json();
+            Swal.fire(
+              "Error",
+              data.error || "Failed to reduce stock.",
+              "error"
+            );
+          }
+        } catch (error) {
+          Swal.fire("Error", "An unexpected error occurred.", "error");
+        }
+      }
+    });
   };
 
   return (
@@ -130,97 +188,34 @@ export default function InventoryManagement() {
             value={searchTerm}
             onChange={handleSearch}
           />
+          <select
+            value={selectedCategory}
+            onChange={handleCategoryFilter}
+            className="block w-1/3 min-w-fit py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All</option>
+            {categories.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredInventory.length > 0 ? (
-                filteredInventory.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.id}</TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.quantity}</TableCell>
-                    <TableCell>
-                      ₱
-                      {new Intl.NumberFormat("en-US", {
-                        minimumFractionDigits: 2,
-                      }).format(item.price)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleManageItem(item)}
-                      >
-                        Manage
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    No inventory items found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+        <div className="flex m-4">
+          <InventoryTable
+            inventory={inventory}
+            onAddStock={handleAddStock}
+            onReduceStock={handleReduceStock}
+            loading={loading}
+          />
         </div>
-
-        {selectedItem && (
-          <Dialog open={!!selectedItem} onOpenChange={handleCloseModal}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Manage Inventory Item</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <p>
-                  <strong>ID:</strong> {selectedItem.id}
-                </p>
-                <p>
-                  <strong>Name:</strong> {selectedItem.name}
-                </p>
-                <p>
-                  <strong>Category:</strong> {selectedItem.category}
-                </p>
-                <p>
-                  <strong>Current Quantity:</strong> {selectedItem.quantity}
-                </p>
-                <div>
-                  <label htmlFor="quantity" className="block font-medium">
-                    Update Quantity:
-                  </label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    value={newQuantity ?? ""}
-                    onChange={(e) => setNewQuantity(Number(e.target.value))}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="default" onClick={handleUpdateQuantity}>
-                  Update Quantity
-                </Button>
-                <Button variant="outline" onClick={handleCloseModal}>
-                  Close
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+        {inventory.length > 0 && (
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         )}
       </section>
     </AdminMainLayout>

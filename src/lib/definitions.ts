@@ -7,9 +7,18 @@ export type Product = {
   product_type: string;
   rating?: number;
   sku?: string;
-  stock_quantity?: number;
+  stocks?: number;
+  reorder_level?: number;
   created_at?: string;
   updated_at?: string;
+};
+
+export type InventoryType = {
+  id: number;
+  name: string;
+  category: string;
+  stocks: number;
+  price: number;
 };
 
 export type Nametype = {
