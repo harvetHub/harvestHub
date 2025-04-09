@@ -1,22 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
 
-// GET: Fetch all orders or a specific order by ID
+// GET: Fetch all orders or a specific order by ID with pagination and filtering
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const orderId = searchParams.get("order_id");
+  const page = parseInt(searchParams.get("page") || "1", 10); // Default to page 1
+  const limit = parseInt(searchParams.get("limit") || "10", 10); // Default to 10 items per page
+  const status = searchParams.get("status");
+  const searchTerm = searchParams.get("search_term");
+  const offset = (page - 1) * limit; // Calculate the offset for pagination
 
   try {
-    let query = supabaseServer.from("orders").select("*, users!inner(name)");
+    // Base query
+    let query = supabaseServer
+      .from("orders")
+      .select("*, users!inner(name)", { count: "exact" }) // Include total count for pagination
+      .range(offset, offset + limit - 1); // Fetch only the required range of data
 
-    if (orderId) {
-      query = query.eq("order_id", orderId);
+    // Apply filters
+    if (status && status !== "All") {
+      query = query.eq("payment_status", status);
+    }
+    if (searchTerm) {
+      query = query.ilike("users.name->>first", `%${searchTerm}%`); // Search by customer's first name
     }
 
-    const { data: orders, error: ordersError } = await query;
+    // Execute query
+    const { data: orders, count, error } = await query;
 
-    if (ordersError) {
-      return NextResponse.json({ error: ordersError.message }, { status: 400 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     // Map orders to include the full customer name
@@ -32,8 +45,15 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    // Return paginated response
     return NextResponse.json(
-      { orders: ordersWithCustomerNames },
+      {
+        orders: ordersWithCustomerNames,
+        totalItems: count, // Total number of items in the database
+        totalPages: Math.ceil((count ?? 0) / limit), // Total number of pages
+        currentPage: page, // Current page
+        limit, // Items per page
+      },
       { status: 200 }
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

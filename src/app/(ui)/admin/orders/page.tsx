@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import OrdersTable from "@/components/admin/order/OrderTable";
 import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
+import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
 
 interface Order {
@@ -27,69 +28,56 @@ interface Order {
 
 export default function OrdersManagement() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [paymentFilter, setPaymentFilter] = useState<string | null>(null);
+  const [statusType, setStatusType] = useState<string | null>("All");
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
+
   // Fetch orders from the API
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/orders");
+      const response = await fetch(
+        `/api/admin/orders?page=${currentPage}&limit=${itemsPerPage}&status=${statusType}&search_term=${searchTerm}`
+      );
       const data = await response.json();
 
       if (response.ok) {
-        const ordersWithNames = await Promise.all(
-          data.orders.map(async (order: Order) => {
-            const userResponse = await fetch(
-              `/api/admin/users?user_id=${order.user_id}`
-            );
-            const userData = await userResponse.json();
-            return {
-              ...order,
-              customer_name: userData.user?.name || "N/A",
-            };
-          })
-        );
-
-        setOrders(ordersWithNames);
-        setFilteredOrders(ordersWithNames);
+        setOrders(data.orders);
+        setTotalPages(data.totalPages);
       } else {
         Swal.fire("Error", data.error || "Failed to fetch orders", "error");
       }
-    } catch {
-      Swal.fire("Error", "An unexpected error occurred", "error");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      Swal.fire(
+        "Error",
+        `An unexpected error occurred: ${errorMessage}`,
+        "error"
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, statusType, searchTerm]);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value.toLowerCase();
-    setSearchTerm(term);
-    filterOrders(term, paymentFilter);
+    setSearchTerm(e.target.value.toLowerCase());
+    setCurrentPage(1); // Reset to the first page after filtering
   };
 
-  const handlePaymentFilter = (value: string | null) => {
-    setPaymentFilter(value);
-    filterOrders(searchTerm, value);
-  };
-
-  const filterOrders = (term: string, paymentStatus: string | null) => {
-    const filtered = orders.filter((order) => {
-      const matchesSearch = order.customer_name.toLowerCase().includes(term);
-      const matchesPayment = paymentStatus
-        ? order.payment_status === paymentStatus
-        : true;
-      return matchesSearch && matchesPayment;
-    });
-    setFilteredOrders(filtered);
+  const handleStatusFilter = (value: string | null) => {
+    setStatusType(value);
+    setCurrentPage(1); // Reset to the first page after filtering
   };
 
   const handleCancelOrder = async (orderId: number) => {
@@ -153,6 +141,10 @@ export default function OrdersManagement() {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <AdminMainLayout>
       <section className="mx-auto p-6">
@@ -164,11 +156,12 @@ export default function OrdersManagement() {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Select onValueChange={handlePaymentFilter}>
+          <Select onValueChange={handleStatusFilter}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select Status" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="All">All</SelectItem>
               <SelectItem value="Paid">Paid</SelectItem>
               <SelectItem value="Unpaid">Unpaid</SelectItem>
               <SelectItem value="Refunded">Refunded</SelectItem>
@@ -177,11 +170,19 @@ export default function OrdersManagement() {
         </div>
 
         <OrdersTable
-          orders={filteredOrders}
+          orders={orders}
           loading={loading}
           onCancelOrder={handleCancelOrder}
-          onManageOrder={(order) => setSelectedOrder({ ...order, user_id: "" })} // Pass an empty string for user_id
+          onManageOrder={(order) => setSelectedOrder({ ...order, user_id: "" })}
         />
+
+        {orders.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
 
         {selectedOrder && (
           <ManageOrderModal
