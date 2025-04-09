@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { toSentenceCase } from "@/utils/toSentenceCase";
 
 interface Order {
   order_id: number;
@@ -52,28 +53,28 @@ export default function OrdersTable({
             Array.from({ length: 10 }).map((_, index) => (
               <TableRow key={index}>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
                 <TableCell>
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
                 </TableCell>
               </TableRow>
             ))
@@ -81,7 +82,7 @@ export default function OrdersTable({
             orders.map((order) => (
               <TableRow key={order.order_id}>
                 <TableCell>{order.order_id}</TableCell>
-                <TableCell>{order.customer_name}</TableCell>
+                <TableCell>{toSentenceCase(order.customer_name)}</TableCell>
                 <TableCell>
                   {new Date(order.order_date).toLocaleDateString()}
                 </TableCell>
