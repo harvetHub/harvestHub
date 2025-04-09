@@ -45,6 +45,7 @@ export default function InventoryManagement() {
                 ?.name || "Unknown",
             stocks: product.stocks,
             price: product.price,
+            image_url: product.image_url,
           }))
         );
         setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages

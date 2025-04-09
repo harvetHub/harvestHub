@@ -7,19 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-
-interface InventoryItem {
-  id: number;
-  name: string;
-  category: string;
-  stocks: number;
-  price: number;
-}
+import { InventoryType } from "@/lib/definitions";
+import Image from "next/image";
 
 interface InventoryTableProps {
-  inventory: InventoryItem[];
-  onAddStock: (item: InventoryItem) => void;
-  onReduceStock: (item: InventoryItem) => void;
+  inventory: InventoryType[];
+  onAddStock: (item: InventoryType) => void;
+  onReduceStock: (item: InventoryType) => void;
   loading: boolean; // Indicates loading state
 }
 
@@ -34,9 +28,10 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
       <TableHeader>
         <TableRow>
           <TableHead>ID</TableHead>
+          <TableHead>Image</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Category</TableHead>
-          <TableHead>Quantity</TableHead>
+          <TableHead>Stock Quantity</TableHead>
           <TableHead>Price</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
@@ -48,6 +43,9 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
               <TableRow key={index}>
                 <TableCell>
                   <div className="h-4 bg-gray-300 rounded w-12 animate-pulse"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-8 bg-gray-300 rounded w-12 animate-pulse"></div>
                 </TableCell>
                 <TableCell>
                   <div className="h-4 bg-gray-300 rounded w-32 animate-pulse"></div>
@@ -69,9 +67,20 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
           : inventory.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{item.id}</TableCell>
+                <TableCell>
+                  <Image
+                    src={item.image_url || "/placeholder.png"}
+                    alt={""}
+                    width={50}
+                    height={50}
+                    className="rounded-md"
+                  />
+                </TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.category}</TableCell>
-                <TableCell>{item.stocks}</TableCell>
+                <TableCell>
+                  <span className="font-bold ">{item.stocks}</span>
+                </TableCell>
                 <TableCell>
                   ₱
                   {new Intl.NumberFormat("en-US", {
