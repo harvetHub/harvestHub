@@ -48,11 +48,35 @@ export default function OrdersTable({
         </TableHeader>
         <TableBody>
           {loading ? (
-            <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
-                Loading...
-              </TableCell>
-            </TableRow>
+            // Skeleton Loader
+            Array.from({ length: 10 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                </TableCell>
+              </TableRow>
+            ))
           ) : orders.length > 0 ? (
             orders.map((order) => (
               <TableRow key={order.order_id}>
