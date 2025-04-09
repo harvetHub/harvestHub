@@ -32,3 +32,13 @@ export type User = {
   password_confirmation?: string;
   image_url?: string;
 };
+
+export interface Order {
+  order_id: number;
+  customer_name: string;
+  order_date: string;
+  total_amount: number;
+  status: string;
+  shipping_method: string | null;
+  payment_status: string;
+}

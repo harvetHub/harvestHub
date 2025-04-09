@@ -8,16 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toSentenceCase } from "@/utils/toSentenceCase";
-
-interface Order {
-  order_id: number;
-  customer_name: string;
-  order_date: string;
-  total_amount: number;
-  status: string;
-  shipping_method: string | null;
-  payment_status: string;
-}
+import { Order } from "@/lib/definitions";
 
 interface OrdersTableProps {
   orders: Order[];
