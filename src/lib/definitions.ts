@@ -20,6 +20,7 @@ export type InventoryType = {
   stocks: number;
   price: number;
   image_url: string;
+  sku: string;
 };
 
 export type Nametype = {

@@ -36,17 +36,22 @@ export default function InventoryManagement() {
 
       if (response.ok) {
         setInventory(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data.products.map((product: any) => ({
-            id: product.product_id,
-            name: product.name,
-            category:
-              categories.find((cat) => cat.value === product.product_type)
-                ?.name || "Unknown",
-            stocks: product.stocks,
-            price: product.price,
-            image_url: product.image_url,
-          }))
+          data.products
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((product: any) => ({
+              id: product.product_id,
+              sku: product.sku,
+              name: product.name,
+              category:
+                categories.find((cat) => cat.value === product.product_type)
+                  ?.name || "Unknown",
+              stocks: product.stocks,
+              price: product.price,
+              image_url: product.image_url,
+            }))
+            .sort((a: { name: string }, b: { name: string }) =>
+              a.name.localeCompare(b.name)
+            )
         );
         setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages
       } else {
@@ -64,7 +69,6 @@ export default function InventoryManagement() {
       setLoading(false);
     }
   }, [page, selectedCategory, searchTerm]);
-
   useEffect(() => {
     fetchInventory();
   }, [fetchInventory]);
@@ -101,7 +105,7 @@ export default function InventoryManagement() {
         }
 
         try {
-          const response = await fetch(`/api/products`, {
+          const response = await fetch(`/api/admin/inventory`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -149,7 +153,7 @@ export default function InventoryManagement() {
         }
 
         try {
-          const response = await fetch(`/api/products`, {
+          const response = await fetch(`/api/admin/inventory`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",

@@ -29,6 +29,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
         <TableRow>
           <TableHead>ID</TableHead>
           <TableHead>Image</TableHead>
+          <TableHead>SKU</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Category</TableHead>
           <TableHead>Stock Quantity</TableHead>
@@ -76,6 +77,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                     className="rounded-md"
                   />
                 </TableCell>
+                <TableCell>{item.sku}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.category}</TableCell>
                 <TableCell>
