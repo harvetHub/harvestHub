@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { User } from "@/lib/definitions";
+import { toSentenceCase } from "@/utils/toSentenceCase";
 
 interface UserTableProps {
   users: User[];
@@ -63,9 +64,11 @@ const UserTable: React.FC<UserTableProps> = ({
               <TableRow key={index + 1}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
-                  {`${user.name?.first || "N/A"} ${user.name?.middle || ""} ${
-                    user.name?.last || ""
-                  }`.trim()}
+                  {toSentenceCase(
+                    `${user.name?.first || "N/A"} ${user.name?.middle || ""} ${
+                      user.name?.last || ""
+                    }`.trim()
+                  )}
                 </TableCell>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>

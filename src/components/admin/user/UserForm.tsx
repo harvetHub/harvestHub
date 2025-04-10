@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label"; // Import Label for better styling
 import { User } from "@/lib/definitions";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserIcon } from "@heroicons/react/20/solid";
 
 interface UserFormProps {
@@ -36,8 +36,15 @@ const UserForm: React.FC<UserFormProps> = ({
   onCancel,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(
-    formData.image_url || null
+    typeof formData.image_url === "string" ? formData.image_url : null
   );
+
+  // Update the image preview when the formData.image_url changes
+  useEffect(() => {
+    if (typeof formData.image_url === "string") {
+      setImagePreview(formData.image_url); // Set the previously uploaded image URL
+    }
+  }, [formData.image_url]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,9 +92,9 @@ const UserForm: React.FC<UserFormProps> = ({
             <div className="w-40 h-40 bg-gray-100 rounded-full overflow-clip mt-2 flex items-center justify-center border-2 border-gray-200">
               {imagePreview ? (
                 <Image
-                  src={imagePreview}
-                  width={100}
-                  height={100}
+                  src={imagePreview ? imagePreview : ""}
+                  width={300}
+                  height={300}
                   alt="Uploaded"
                   className="w-full h-full object-cover"
                 />
@@ -102,9 +109,10 @@ const UserForm: React.FC<UserFormProps> = ({
             >
               Upload Profile Image
             </Label>
-            <Input
+            <input
               id="image-upload"
               type="file"
+              name="image"
               accept="image/*"
               onChange={handleImageUpload}
               className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"

@@ -41,7 +41,7 @@ export type User = {
   updated_at?: string;
   password?: string;
   password_confirmation?: string;
-  image_url?: string;
+  image_url?: string | File;
 };
 
 export interface Order {

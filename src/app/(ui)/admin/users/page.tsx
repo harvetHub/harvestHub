@@ -158,12 +158,22 @@ export default function UserManagement() {
     }
 
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("user_id", formData.user_id || "");
+      formDataToSend.append("name", JSON.stringify(formData.name));
+      formDataToSend.append("username", formData.username);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("address", formData.address || "");
+      formDataToSend.append("mobile_number", formData.mobile_number || "");
+
+      // Append the image file if it exists
+      if (formData.image_url instanceof File) {
+        formDataToSend.append("image_url", formData.image_url);
+      }
+
       const response = await fetch("/api/admin/users", {
         method: editingUser ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend, // Use FormData
       });
 
       const data = await response.json();
@@ -236,10 +246,10 @@ export default function UserManagement() {
             }}
             onSave={handleSaveUser}
             onCancel={() => setIsDialogOpen(false)}
-            onImageUpload={(imageUrl) => {
+            onImageUpload={(file) => {
               setFormData({
                 ...formData,
-                image_url: URL.createObjectURL(imageUrl),
+                image_url: file,
               });
             }}
           />
