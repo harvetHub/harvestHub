@@ -1,17 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import UserTable from "@/components/admin/user/UserTable";
 import UserForm from "@/components/admin/user/UserForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Pagination from "@/components/Pagination"; // Ensure you have a Pagination component
 import Swal from "sweetalert2";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
 import { User } from "@/lib/definitions";
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total pages
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<User>({
@@ -24,19 +28,25 @@ export default function UserManagement() {
     image_url: "",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof User, string>>>({});
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
 
   // Fetch users from the API
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/users");
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: "10", // Default limit per page
+        ...(searchTerm ? { search_term: searchTerm } : {}),
+      });
+
+      const response = await fetch(
+        `/api/admin/users?${queryParams.toString()}`
+      );
       const data = await response.json();
 
       if (response.ok) {
         setUsers(data.users);
-        setFilteredUsers(data.users);
+        setTotalPages(data.totalPages); // Set total pages from API response
       } else {
         Swal.fire("Error", data.error || "Failed to fetch users", "error");
       }
@@ -45,19 +55,20 @@ export default function UserManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, searchTerm]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = users.filter((user) =>
-      `${user.name?.first} ${user.name?.last}`.toLowerCase().includes(term)
-    );
-    setFilteredUsers(filtered);
+    setPage(1); // Reset to the first page when searching
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
   const handleAddUser = () => {
@@ -67,9 +78,9 @@ export default function UserManagement() {
       name: { first: "", middle: "", last: "" },
       username: "",
       email: "",
-      image_url: "",
       address: "",
       mobile_number: "",
+      image_url: "",
     });
     setErrors({});
     setIsDialogOpen(true);
@@ -79,12 +90,12 @@ export default function UserManagement() {
     setEditingUser(user);
     setFormData({
       user_id: user.user_id,
-      name: { first: "", middle: "", last: "" },
+      name: user.name || { first: "", middle: "", last: "" },
       username: user.username,
       email: user.email,
-      image_url: user.image_url,
       address: user.address || "",
       mobile_number: user.mobile_number || "",
+      image_url: user.image_url || "",
     });
     setErrors({});
     setIsDialogOpen(true);
@@ -157,9 +168,6 @@ export default function UserManagement() {
 
       const data = await response.json();
 
-      // Log the results for debugging
-      console.log("API Response:", data);
-
       if (response.ok) {
         Swal.fire(
           "Success",
@@ -173,9 +181,8 @@ export default function UserManagement() {
       } else {
         Swal.fire("Error", data.error || "Failed to save user.", "error");
       }
-    } catch (error) {
-      console.error("Error saving user:", error);
-      // Swal.fire("Error", "An unexpected error occurred.", "error");
+    } catch {
+      Swal.fire("Error", "An unexpected error occurred.", "error");
     }
   };
 
@@ -194,10 +201,16 @@ export default function UserManagement() {
         </div>
 
         <UserTable
-          users={filteredUsers}
+          users={users}
           onEdit={handleEditUser}
           onDelete={handleDeleteUser}
           loading={loading}
+        />
+
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
         />
 
         {isDialogOpen && (
@@ -214,10 +227,6 @@ export default function UserManagement() {
                   ...formData,
                   name: {
                     ...formData.name,
-                    first: "",
-                    middle: "",
-                    last: "",
-                    ...formData.name,
                     [key]: value,
                   },
                 });
@@ -227,9 +236,11 @@ export default function UserManagement() {
             }}
             onSave={handleSaveUser}
             onCancel={() => setIsDialogOpen(false)}
-            onImageUpload={(imageFile) => {
-              console.log("Image uploaded:", imageFile);
-              // Handle image upload logic here
+            onImageUpload={(imageUrl) => {
+              setFormData({
+                ...formData,
+                image_url: URL.createObjectURL(imageUrl),
+              });
             }}
           />
         )}

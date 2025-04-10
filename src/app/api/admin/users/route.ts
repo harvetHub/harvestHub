@@ -3,15 +3,51 @@ import { NextRequest, NextResponse } from "next/server";
 import { uploadImageToStorage } from "@/utils/uploadImageToStorage";
 import { supabaseServer } from "@/utils/supabase/server";
 
-// This route handles CRUD operations for users in the admin panel
-export async function GET() {
-  const { data, error } = await supabaseServer.from("users").select("*");
+// GET: Fetch users with pagination and filtering
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const page = parseInt(searchParams.get("page") || "1", 10); // Default to page 1
+  const limit = parseInt(searchParams.get("limit") || "10", 10); // Default to 10 items per page
+  const searchTerm = searchParams.get("search_term") || ""; // Search term for filtering
+  const offset = (page - 1) * limit; // Calculate the offset for pagination
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+  try {
+    // Base query
+    let query = supabaseServer
+      .from("users")
+      .select("*", { count: "exact" }) // Include total count for pagination
+      .range(offset, offset + limit - 1); // Fetch only the required range of data
+
+    // Apply search filter
+    if (searchTerm) {
+      query = query.ilike("name->>first", `%${searchTerm}%`); // Search by first name
+    }
+
+    // Execute query
+    const { data: users, count, error } = await query;
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    // Return paginated response
+    return NextResponse.json(
+      {
+        users,
+        totalItems: count, // Total number of items in the database
+        totalPages: Math.ceil((count ?? 0) / limit), // Total number of pages
+        currentPage: page, // Current page
+        limit, // Items per page
+      },
+      { status: 200 }
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "An unexpected error occurred." },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ users: data }, { status: 200 });
 }
 
 export async function POST(req: NextRequest) {
