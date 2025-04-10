@@ -56,7 +56,7 @@ export default function OrdersTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
+            <TableHead>#</TableHead>
             <TableHead>Customer Name</TableHead>
             <TableHead>Order Date & Time</TableHead>
             <TableHead>Total Amount</TableHead>
@@ -97,50 +97,56 @@ export default function OrdersTable({
                 </TableCell>
               </TableRow>
             ))
-          ) : orders.length > 0 ? (
-            orders.map((order) => {
-              const orderDate = new Date(order.order_date);
-              return (
-                <TableRow key={order.order_id}>
-                  <TableCell>{order.order_id}</TableCell>
-                  <TableCell>{toSentenceCase(order.customer_name)}</TableCell>
-                  <TableCell>
-                    {orderDate.toDateString()}
-                    {" -"}
-                    <span className="p-1 px-2 font-semibold rounded-md">
-                      {getRelativeTime(orderDate)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    ₱
-                    {new Intl.NumberFormat("en-US", {
-                      minimumFractionDigits: 2,
-                    }).format(order.total_amount)}
-                  </TableCell>
-                  <TableCell>{order.status}</TableCell>
-                  <TableCell>{order.shipping_method || "N/A"}</TableCell>
-                  <TableCell>{order.payment_status}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onCancelOrder(order.order_id)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => onManageOrder(order)}
-                      >
-                        Manage
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })
+          ) : !loading && orders.length > 0 ? (
+            orders
+              .sort(
+                (a, b) =>
+                  new Date(b.order_date).getTime() -
+                  new Date(a.order_date).getTime()
+              ) // Sort by date (latest first)
+              .map((order, index) => {
+                const orderDate = new Date(order.order_date);
+                return (
+                  <TableRow key={order.order_id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{toSentenceCase(order.customer_name)}</TableCell>
+                    <TableCell>
+                      {orderDate.toDateString()}
+                      {" -"}
+                      <span className="p-1 px-2 font-semibold rounded-md">
+                        {getRelativeTime(orderDate)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      ₱
+                      {new Intl.NumberFormat("en-US", {
+                        minimumFractionDigits: 2,
+                      }).format(order.total_amount)}
+                    </TableCell>
+                    <TableCell>{order.status}</TableCell>
+                    <TableCell>{order.shipping_method || "N/A"}</TableCell>
+                    <TableCell>{order.payment_status}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onCancelOrder(order.order_id)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => onManageOrder(order)}
+                        >
+                          Manage
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
           ) : (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-4">
