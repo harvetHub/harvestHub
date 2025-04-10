@@ -17,7 +17,7 @@ export default function ProductManagement() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Product>({
     product_id: 0,
     name: "",
     description: "",
@@ -75,12 +75,13 @@ export default function ProductManagement() {
     setErrors({ ...errors, [name]: "" }); // Clear error when user types
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const mockUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, image_url: mockUrl });
-    }
+  const handleImageUpload = (file: File) => {
+    // Set the file for backend processing
+    setFormData({ ...formData, image_url: file });
+
+    // Optionally, generate a preview URL for the frontend
+    const previewUrl = URL.createObjectURL(file);
+    setFormData((prev) => ({ ...prev, imagePreview: previewUrl }));
   };
 
   const handleAddProduct = () => {
@@ -105,7 +106,7 @@ export default function ProductManagement() {
       name: product.name,
       description: product.description,
       price: product.price,
-      image_url: product.image_url,
+      image_url: typeof product.image_url === "string" ? product.image_url : "",
       product_type: product.product_type,
       sku: product.sku || "",
     });
@@ -162,12 +163,28 @@ export default function ProductManagement() {
     }
 
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append(
+        "product_id",
+        (formData.product_id ?? 0).toString()
+      );
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("price", formData.price.toString());
+      formDataToSend.append("product_type", formData.product_type);
+      formDataToSend.append("sku", formData.sku || "");
+
+      // Append the image file if it exists
+      if (
+        typeof formData.image_url === "object" &&
+        formData.image_url instanceof File
+      ) {
+        formDataToSend.append("image_url", formData.image_url);
+      }
+
       const response = await fetch(`/api/admin/products`, {
         method: editingProduct ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend, // Use FormData
       });
 
       if (response.ok) {

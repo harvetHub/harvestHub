@@ -3,7 +3,7 @@ export type Product = {
   name: string;
   description: string;
   price: number;
-  image_url: string;
+  image_url: string | File;
   product_type: string;
   rating?: number;
   sku?: string;
