@@ -8,7 +8,7 @@ export default function useAuthCheck() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [load, setLoad] = useState(true);
 
   useEffect(() => {
     const checkAuthToken = async () => {
@@ -47,12 +47,12 @@ export default function useAuthCheck() {
         });
         router.push("/admin"); // Redirect to login on error
       } finally {
-        setLoading(false); // Stop loading once the check is complete
+        setLoad(false); // Stop loading once the check is complete
       }
     };
 
     checkAuthToken();
   }, [router, pathname]);
 
-  return { user, loading };
+  return { user, load };
 }

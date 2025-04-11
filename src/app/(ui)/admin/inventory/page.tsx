@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import Pagination from "@/components/Pagination";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
 import InventoryTable from "@/components/admin/inventory/InvenTable";
@@ -11,6 +10,8 @@ import InventoryTable from "@/components/admin/inventory/InvenTable";
 import { categories } from "@/lib/productsConfig";
 import Swal from "sweetalert2";
 import { InventoryType } from "@/lib/definitions";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 export default function InventoryManagement() {
   const [inventory, setInventory] = useState<InventoryType[]>([]);
@@ -181,6 +182,16 @@ export default function InventoryManagement() {
       }
     });
   };
+
+  const { user, load } = useAuthCheck(); // Use the updated hook
+
+  if (load) {
+    return <LoadingSpinner />; // Use the reusable loading component
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <AdminMainLayout>
