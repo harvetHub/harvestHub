@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/Pagination";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 export default function ProductManagement() {
@@ -223,15 +222,7 @@ export default function ProductManagement() {
   };
 
   // Check if the user is authenticated
-  const { user, load } = useAuthCheck();
-
-  if (load) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return null;
-  }
+  useAuthCheck();
 
   return (
     <AdminMainLayout>

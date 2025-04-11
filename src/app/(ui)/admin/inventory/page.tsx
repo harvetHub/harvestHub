@@ -184,15 +184,7 @@ export default function InventoryManagement() {
   };
 
   // Check if the user is authenticated
-  const { user, load } = useAuthCheck();
-
-  if (load) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return null;
-  }
+  useAuthCheck();
 
   return (
     <AdminMainLayout>

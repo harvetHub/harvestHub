@@ -14,7 +14,6 @@ import OrdersTable from "@/components/admin/order/OrderTable";
 import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
 import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 interface Order {
@@ -148,15 +147,7 @@ export default function OrdersManagement() {
   };
 
   // Check if the user is authenticated
-  const { user, load } = useAuthCheck();
-
-  if (load) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return null;
-  }
+  useAuthCheck();
 
   return (
     <AdminMainLayout>

@@ -25,10 +25,6 @@ const salesData = [
 export default function AdminDashboard() {
   const { user, load } = useAuthCheck(); // Use the updated hook
 
-  if (load) {
-    return <LoadingSpinner />; // Use the reusable loading component
-  }
-
   if (!user) {
     return null;
   }
@@ -36,6 +32,7 @@ export default function AdminDashboard() {
   return (
     <AdminMainLayout>
       {/* Main Content */}
+      {load && <LoadingSpinner />}
       <main className="flex-1 bg-gray-50 mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 

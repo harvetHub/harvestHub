@@ -9,7 +9,6 @@ import Pagination from "@/components/Pagination"; // Ensure you have a Paginatio
 import Swal from "sweetalert2";
 import { AdminMainLayout } from "@/layout/AdminMainLayout";
 import { User } from "@/lib/definitions";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 export default function UserManagement() {
@@ -199,15 +198,7 @@ export default function UserManagement() {
   };
 
   // Check if the user is authenticated
-  const { user, load } = useAuthCheck();
-
-  if (load) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return null;
-  }
+  useAuthCheck();
 
   return (
     <AdminMainLayout>
