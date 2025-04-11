@@ -23,11 +23,7 @@ const salesData = [
 ];
 
 export default function AdminDashboard() {
-  const { user, load } = useAuthCheck(); // Use the updated hook
-
-  if (!user) {
-    return null;
-  }
+  const { load } = useAuthCheck(); // Use the updated hook
 
   return (
     <AdminMainLayout>

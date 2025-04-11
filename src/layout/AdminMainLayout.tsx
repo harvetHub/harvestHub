@@ -11,7 +11,7 @@ export const AdminMainLayout: React.FC<DefaultLayoutTypes> = ({ children }) => {
     <div className="flex min-h-screen">
       <AdminSidebar />
       <div className="flex flex-col flex-1 overflow-hidden p-2">
-        <div className="hidden w-full lg:flex flex-col">
+        <div className="mb-4">
           <Header />
         </div>
 
