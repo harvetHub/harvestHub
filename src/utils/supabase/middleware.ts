@@ -1,51 +1,47 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { supabaseServer } from "./server";
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
-export const updateSession = async (request: NextRequest) => {
-  try {
-    const response = NextResponse.next();
+const JWT_SECRET = process.env.JWT_SECRET;
 
-    // Use the custom supabaseServer instance
-    const supabase = supabaseServer;
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get("auth-token");
 
-    // Refresh session if expired
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
+  // Define protected routes
+  const protectedRoutes = [
+    "/admin/dashboard",
+    "/admin/inventory",
+    "/admin/orders",
+    "/admin/products",
+    "/admin/users",
+  ];
 
-    console.log("Middleware session:", session); // Debugging session data
-    console.log("Middleware error:", error); // Debugging errors
-
-    // Define protected routes
-    const protectedRoutes = [
-      "/dashboard",
-      "/inventory",
-      "/orders",
-      "/products",
-      "/users",
-    ];
-
-    // Redirect to login if accessing a protected route without authentication
-    if (
-      protectedRoutes.some((route) =>
-        request.nextUrl.pathname.startsWith(route)
-      ) &&
-      (!session || error)
-    ) {
-      return NextResponse.redirect(new URL("/admin", request.url));
+  // Check if the route is protected
+  if (protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
 
-    // Redirect authenticated users from the login page to the dashboard
-    if (request.nextUrl.pathname === "/admin" && session) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+    try {
+      // Verify the JWT
+      if (!JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined");
+      }
+      jwt.verify(token?.value || "", JWT_SECRET);
+    } catch (err) {
+      console.error("Invalid token:", err);
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
-
-    return response;
-  } catch (err) {
-    console.error("Error in middleware:", err);
-
-    // Handle errors (e.g., missing environment variables)
-    return NextResponse.next();
   }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    "/admin/dashboard/:path*",
+    "/admin/inventory/:path*",
+    "/admin/orders/:path*",
+    "/admin/products/:path*",
+    "/admin/users/:path*",
+  ],
 };

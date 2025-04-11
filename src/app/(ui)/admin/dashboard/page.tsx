@@ -22,7 +22,7 @@ const salesData = [
 ];
 
 export default function AdminDashboard() {
-  const { session, loading } = useAuthCheck(); // Use the updated hook
+  const { user, loading } = useAuthCheck(); // Use the reusable hook
 
   if (loading) {
     return (
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
     ); // Show a loading spinner while checking
   }
 
-  if (!session) {
+  if (!user) {
     return null; // Prevent rendering if no session (redirect is handled in the hook)
   }
 

@@ -45,7 +45,7 @@ export default function AdminLogin() {
         const data = await response.json();
 
         if (response.ok) {
-          setToken(data.token); // Store the token in Zustand
+          setToken(data.token);
           Swal.fire({
             toast: true,
             position: "bottom-end",
@@ -95,7 +95,7 @@ export default function AdminLogin() {
 
   return (
     <div className="bg-white h-screen flex items-center justify-center">
-      <div className="container mx-auto px-4 py-8">
+      <div className="flex shadow-xl border rounded-2xl min-w-[300px] m-4 w-1/4 items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
         <div className="xl:w-full xl:max-w-sm 2xl:max-w-md xl:mx-auto">
           <h2 className="text-3xl font-bold text-center leading-tight text-black sm:text-4xl">
             Admin Login

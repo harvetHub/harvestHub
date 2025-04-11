@@ -1,61 +1,58 @@
 "use client";
 
-import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter, usePathname } from "next/navigation";
-import { supabase } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 export default function useAuthCheck() {
-  const session = useSession(); // Automatically reads session from cookies
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const pathname = usePathname();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const checkAccessToken = async () => {
+    const checkAuthToken = async () => {
       try {
         console.log("Checking session...");
-        console.log("Cookies:", document.cookie); // Log cookies for debugging
 
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+        // Fetch user data from an API route that validates the token
+        const response = await fetch("/api/auth/validate-token", {
+          method: "GET",
+          credentials: "include", // Ensure cookies are sent with the request
+        });
 
-        console.log("Session data:", session); // Log the session data
-        console.log("Session error:", error); // Log any errors
-
-        if (!session?.access_token) {
-          console.warn("No session found. Redirecting to login...");
-          Swal.fire({
-            icon: "warning",
-            title: "Unauthorized",
-            text: "You need to log in to access this page.",
-            showConfirmButton: false,
-            timer: 3000,
-            toast: true,
-            position: "top-end",
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener("mouseenter", Swal.stopTimer);
-              toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-          });
-          router.push("/admin");
-        } else {
-          console.log("Session found. User is authenticated.");
+        if (!response.ok) {
+          throw new Error("Invalid or expired token");
         }
+
+        const data = await response.json();
+        console.log("User data:", data); // Debugging
+
+        setUser(data.user);
       } catch (error) {
-        console.error("Error checking session:", error);
+        console.error("Error verifying auth token:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Session Expired",
+          text: "Your session has expired. Please log in again.",
+          showConfirmButton: false,
+          timer: 3000,
+          toast: true,
+          position: "top-end",
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
         router.push("/admin"); // Redirect to login on error
       } finally {
         setLoading(false); // Stop loading once the check is complete
       }
     };
 
-    checkAccessToken();
+    checkAuthToken();
   }, [router, pathname]);
 
-  return { session, loading };
+  return { user, loading };
 }
