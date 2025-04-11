@@ -1,5 +1,6 @@
 "use client";
 
+import useAuthCheck from "@/hooks/admin/useAuthCheck";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
@@ -21,6 +22,20 @@ const salesData = [
 ];
 
 export default function AdminDashboard() {
+  const { session, loading } = useAuthCheck(); // Use the updated hook
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    ); // Show a loading spinner while checking
+  }
+
+  if (!session) {
+    return null; // Prevent rendering if no session (redirect is handled in the hook)
+  }
+
   return (
     <AdminMainLayout>
       {/* Main Content */}

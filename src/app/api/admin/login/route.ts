@@ -23,12 +23,30 @@ export async function POST(req: NextRequest) {
   }
 
   // Check if the user has the admin role
-  const user = data.user;
+  const { user, session } = data;
   if (user && user.user_metadata.role === "admin") {
-    return NextResponse.json(
-      { message: "Admin logged in successfully", data },
+    const response = NextResponse.json(
+      { message: "Admin logged in successfully", user },
       { status: 200 }
     );
+
+    // Set session cookies
+    if (session) {
+      response.cookies.set("sb-access-token", session.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
+      response.cookies.set("sb-refresh-token", session.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
+    }
+
+    return response;
   }
 
   return NextResponse.json({ error: "Access denied" }, { status: 403 });
