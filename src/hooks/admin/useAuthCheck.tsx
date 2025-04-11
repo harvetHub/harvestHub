@@ -7,8 +7,8 @@ import Swal from "sweetalert2";
 export default function useAuthCheck() {
   const router = useRouter();
   const pathname = usePathname();
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuthToken = async () => {
