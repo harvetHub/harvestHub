@@ -14,6 +14,8 @@ import OrdersTable from "@/components/admin/order/OrderTable";
 import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
 import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 interface Order {
   order_id: number;
@@ -144,6 +146,17 @@ export default function OrdersManagement() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
+  // Check if the user is authenticated
+  const { user, load } = useAuthCheck();
+
+  if (load) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <AdminMainLayout>

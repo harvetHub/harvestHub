@@ -183,10 +183,11 @@ export default function InventoryManagement() {
     });
   };
 
-  const { user, load } = useAuthCheck(); // Use the updated hook
+  // Check if the user is authenticated
+  const { user, load } = useAuthCheck();
 
   if (load) {
-    return <LoadingSpinner />; // Use the reusable loading component
+    return <LoadingSpinner />;
   }
 
   if (!user) {
