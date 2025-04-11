@@ -3,18 +3,19 @@ import { supabaseServer } from "./server";
 
 export const updateSession = async (request: NextRequest) => {
   try {
-    // Create an unmodified response
-    const response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+    const response = NextResponse.next();
 
     // Use the custom supabaseServer instance
     const supabase = supabaseServer;
 
     // Refresh session if expired
-    const { error } = await supabase.auth.getUser();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    console.log("Middleware session:", session); // Debugging session data
+    console.log("Middleware error:", error); // Debugging errors
 
     // Define protected routes
     const protectedRoutes = [
@@ -30,13 +31,13 @@ export const updateSession = async (request: NextRequest) => {
       protectedRoutes.some((route) =>
         request.nextUrl.pathname.startsWith(route)
       ) &&
-      error
+      (!session || error)
     ) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
 
     // Redirect authenticated users from the login page to the dashboard
-    if (request.nextUrl.pathname === "/admin" && !error) {
+    if (request.nextUrl.pathname === "/admin" && session) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
@@ -45,10 +46,6 @@ export const updateSession = async (request: NextRequest) => {
     console.error("Error in middleware:", err);
 
     // Handle errors (e.g., missing environment variables)
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+    return NextResponse.next();
   }
 };

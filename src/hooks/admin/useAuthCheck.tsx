@@ -15,14 +15,19 @@ export default function useAuthCheck() {
   useEffect(() => {
     const checkAccessToken = async () => {
       try {
+        console.log("Checking session...");
+        console.log("Cookies:", document.cookie); // Log cookies for debugging
+
         const {
           data: { session },
+          error,
         } = await supabase.auth.getSession();
 
-        console.log("Session data:", session); // Log the session data for debugging
+        console.log("Session data:", session); // Log the session data
+        console.log("Session error:", error); // Log any errors
 
         if (!session?.access_token) {
-          // Redirect to login if no session
+          console.warn("No session found. Redirecting to login...");
           Swal.fire({
             icon: "warning",
             title: "Unauthorized",
