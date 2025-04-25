@@ -8,9 +8,7 @@ import RecommendedItemsSection from "@/components/dashboard/Recommended";
 export default function Dashboard() {
   return (
     <MainLayout>
-      <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold text-center mb-8">HarvestHub</h1>
-
+      <div className="myContainer mx-auto">
         <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
         <FeaturedProductCarousel />
 
