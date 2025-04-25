@@ -27,8 +27,8 @@ const FeaturedProductCarousel: FC = () => {
     <Carousel>
       <CarouselContent>
         {featuredProducts.map((product, index) => (
-          <CarouselItem key={product.id} className="md:basis-1/3 lg:basis-1/3 ">
-            <div className="relative w-full h-64 rounded-lg overflow-hidden">
+          <CarouselItem key={product.id} className=" md:basis-1/3 lg:basis-1/3">
+            <div className="relative w-full h-60 rounded-sm overflow-hidden">
               <Image
                 src={imageSrc[index]}
                 alt={product.name}
