@@ -28,16 +28,16 @@ const FeaturedProductCarousel: FC = () => {
       <CarouselContent>
         {featuredProducts.map((product, index) => (
           <CarouselItem key={product.id} className="md:basis-1/3 lg:basis-1/3 ">
-            <div className="relative w-full h-64 ">
+            <div className="relative w-full h-64 rounded-lg overflow-hidden">
               <Image
                 src={imageSrc[index]}
                 alt={product.name}
                 layout="fill"
                 objectFit="cover"
-                className="rounded-lg"
+                className=""
                 onError={() => handleImageError(index)}
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-black/30 rounded-lg bg-opacity-50 p-4 text-white">
+              <div className="absolute bottom-0 left-0 right-0 bg-black/30  bg-opacity-50 p-4 text-white">
                 <h3 className="text-lg font-bold">{product.name}</h3>
               </div>
             </div>

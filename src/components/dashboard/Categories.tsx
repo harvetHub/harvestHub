@@ -1,19 +1,26 @@
 import { FC } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { categories } from "@/lib/productsConfig";
 
 const CategoriesSection: FC = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5  gap-8">
+    <div className="flex gap-4 overflow-x-auto w-full py-4">
       {categories.map((category) => (
-        <Card key={category.id} className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-4xl">{category.icon}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <h3 className="text-lg font-bold">{category.name}</h3>
-          </CardContent>
-        </Card>
+        <div key={category.id} className="flex-shrink-0 w-32">
+          <Link href={`/products/${category.value}`} passHref>
+            <Card className="shadow-sm cursor-pointer h-full justify-start items-center">
+              <CardHeader>
+                <CardTitle className="text-4xl">{category.icon}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <h3 className="text-sm font-bold text-center">
+                  {category.name}
+                </h3>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       ))}
     </div>
   );
