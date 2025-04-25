@@ -5,11 +5,11 @@ import { categories } from "@/lib/productsConfig";
 
 const CategoriesSection: FC = () => {
   return (
-    <div className="flex gap-4 overflow-x-auto w-full py-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 py-4">
       {categories.map((category) => (
-        <div key={category.id} className="flex-shrink-0 w-32">
+        <div key={category.id}>
           <Link href={`/products/${category.value}`} passHref>
-            <Card className="shadow-sm cursor-pointer h-full justify-start items-center">
+            <Card className="shadow-sm rounded-none   hover:scale-105 cursor-pointer h-full justify-start items-center">
               <CardHeader>
                 <CardTitle className="text-4xl">{category.icon}</CardTitle>
               </CardHeader>
