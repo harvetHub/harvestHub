@@ -22,7 +22,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const addItem = useCartStore((state) => state.addItem);
 
   return (
-    <Card className="flex rounded-sm border-none flex-col justify-between">
+    <Card className="flex rounded-sm border-none flex-col justify-between cursor-pointer hover:scale-102">
       <CardHeader>
         <Image
           src={
@@ -33,24 +33,25 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           alt={product.name}
           width={150}
           height={150}
-          className="w-full h-48 object-cover"
+          className="w-full object-cover"
           onError={(e) => {
             e.currentTarget.src = fallbackImage;
           }}
         />
-        <CardTitle className="mt-4">{product.name}</CardTitle>
+        <CardTitle className="">{product.name}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="description overflow-hidden text-ellipsis">
           {product.description}
         </p>
-        <div className="mt-4">
+        <div className="">
           <p className="font-bold">₱{product.price.toFixed(2)}</p>
         </div>
       </CardContent>
       <CardFooter className="mt-auto">
         <Button
-          className="w-full"
+          className="w-full cursor-pointer"
+          variant={"default"}
           onClick={() =>
             addItem({
               productId: product.product_id?.toString() || "",
