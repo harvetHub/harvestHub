@@ -42,20 +42,33 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
 
       <h2 className="text-xl font-bold mt-8 mb-4 border-t pt-4">Price Range</h2>
       <div className="flex items-center space-x-2 mb-4">
-        <Input
-          type="number"
-          value={minPrice}
-          onChange={(e) => setMinPrice(Number(e.target.value))}
-          className="w-1/2"
-          placeholder="Min"
-        />
-        <Input
-          type="number"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
-          className="w-1/2"
-          placeholder="Max"
-        />
+        <div className="flex flex-col w-full items-start space-x-2">
+          <label className="opacity-70" htmlFor="minPrice">
+            min
+          </label>
+          <Input
+            type="number"
+            name="minPrice"
+            value={minPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
+            className="w-full"
+            placeholder="Min"
+          />
+        </div>
+
+        <div className="flex flex-col w-full items-end space-start">
+          <label className="opacity-70" htmlFor="maxPrice">
+            max
+          </label>
+          <Input
+            type="number"
+            name="maxPrice"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            className="w-full"
+            placeholder="Max"
+          />
+        </div>
       </div>
       <Slider
         min={0}
@@ -71,12 +84,12 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
         <span>₱{priceRange[1]}</span>
       </div>
       <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
-      <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
         <Button
           key="all"
           variant={filter === "All" ? "default" : "outline"}
           onClick={() => setFilter("All")}
-          className="w-full text-left"
+          className="w-full text-left truncate"
         >
           All
         </Button>
@@ -85,10 +98,10 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
             key={category.value}
             variant={filter === category.value ? "default" : "outline"}
             onClick={() => setFilter(category.value)}
-            className="w-full text-left flex items-center space-x-2"
+            className="w-full text-left flex items-center space-x-2 truncate"
           >
             <span>{category.icon}</span>
-            <span>{category.name}</span>
+            <span className="truncate">{category.name}</span>
           </Button>
         ))}
       </div>
