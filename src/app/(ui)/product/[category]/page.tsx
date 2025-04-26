@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { MainLayout } from "@/layout/MainLayout";
 import {
   Card,
@@ -24,15 +25,19 @@ const fallbackImage =
   "https://via.placeholder.com/150?text=Image+Not+Available";
 
 const Products = () => {
+  const router = useRouter();
+  const params = useParams();
+  const category = params?.category;
+
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [filter, setFilter] = useState("All");
+  const [filter, setFilter] = useState(category || "All"); // Default to "All" or the category from the URL
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
   const [page, setPage] = useState(1);
-  const [limit] = useState(13); // Ensure limit is set to 13
+  const [limit] = useState(13);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const addItem = useCartStore((state) => state.addItem);
@@ -43,8 +48,9 @@ const Products = () => {
       const query = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...(filter !== "All" && !searchTerm && { product_type: filter }),
-        ...(searchTerm && { search_term: searchTerm }),
+        ...(filter !== "All" &&
+          !searchTerm && { product_type: String(filter) }),
+        ...(searchTerm && { search_term: String(searchTerm) }),
       }).toString();
 
       const response = await fetch(`/api/products?${query}`);
@@ -71,6 +77,7 @@ const Products = () => {
 
   const handleFilterChange = (categoryValue: string) => {
     setFilter(categoryValue);
+    router.push(`/product/${categoryValue}`); // Update the URL dynamically
   };
 
   const handlePageChange = (newPage: number) => {
@@ -97,8 +104,8 @@ const Products = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto p-4 flex flex-col md:flex-row">
-        <div className="w-full md:w-1/4 p-4">
+      <div className="myContainer mx-auto flex flex-col md:flex-row">
+        <div className="w-full md:w-1/4">
           <h2 className="text-xl font-bold mt-8 mb-4">Search Products</h2>
           <Input
             type="text"
@@ -198,7 +205,13 @@ const Products = () => {
                 >
                   <CardHeader>
                     <Image
-                      src={product.image_url || fallbackImage}
+                      src={
+                        typeof product.image_url === "string"
+                          ? product.image_url
+                          : product.image_url instanceof File
+                          ? URL.createObjectURL(product.image_url)
+                          : fallbackImage
+                      }
                       alt={product.name}
                       width={150}
                       height={150}
@@ -227,7 +240,10 @@ const Products = () => {
                           name: product.name,
                           price: product.price,
                           quantity: 1,
-                          image_url: product.image_url || fallbackImage,
+                          image_url:
+                            typeof product.image_url === "string"
+                              ? product.image_url
+                              : fallbackImage,
                         })
                       }
                     >

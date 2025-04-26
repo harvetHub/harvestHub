@@ -36,9 +36,6 @@ const Header: FC = () => {
           <Link href="/dashboard">HarvestHub</Link>
         </h1>
         <nav className="flex items-center">
-          <Link href="/products" className="mr-4">
-            Products
-          </Link>
           <Link href="/cart" className="mr-4">
             <Button variant="ghost" className="text-white flex items-center">
               <ShoppingCartIcon className="w-5 h-5 mr-1" />({cartItems.length})
