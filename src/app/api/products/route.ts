@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+import { supabaseServer } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -7,17 +7,33 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "10");
   const productType = searchParams.get("product_type");
   const searchTerm = searchParams.get("search_term");
+  const isFeatured = searchParams.get("is_featured");
+  const isRecommended = searchParams.get("is_recommended");
   const offset = (page - 1) * limit;
 
-  let query = supabaseServerClient
+  let query = supabaseServer
     .from("products")
     .select("*", { count: "exact" })
     .range(offset, offset + limit - 1);
 
+  // Apply search term filter
   if (searchTerm) {
     query = query.ilike("name", `%${searchTerm}%`);
-  } else if (productType) {
+  }
+
+  // Apply product type filter
+  if (productType) {
     query = query.eq("product_type", productType);
+  }
+
+  // Apply is_featured filter
+  if (isFeatured) {
+    query = query.eq("is_featured", isFeatured === "true");
+  }
+
+  // Apply is_recommended filter
+  if (isRecommended) {
+    query = query.eq("is_recommended", isRecommended === "true");
   }
 
   const { data, error, count } = await query;

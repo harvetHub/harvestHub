@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
-import { ShoppingCartIcon, UserIcon, CogIcon } from "@heroicons/react/20/solid";
-
-import { LogOutIcon, HelpingHandIcon } from "lucide-react";
+import { ShoppingCartIcon, CogIcon } from "@heroicons/react/20/solid";
+import { LogOutIcon, HelpingHandIcon, UserIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header: FC = () => {
   const router = useRouter();
@@ -30,15 +30,12 @@ const Header: FC = () => {
   };
 
   return (
-    <header className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
+    <header className="bg-gray-800 text-white py-4 ">
+      <div className="myContainer mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">
           <Link href="/dashboard">HarvestHub</Link>
         </h1>
         <nav className="flex items-center">
-          <Link href="/products" className="mr-4">
-            Products
-          </Link>
           <Link href="/cart" className="mr-4">
             <Button variant="ghost" className="text-white flex items-center">
               <ShoppingCartIcon className="w-5 h-5 mr-1" />({cartItems.length})
@@ -46,9 +43,12 @@ const Header: FC = () => {
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-white flex items-center">
-                <UserIcon className="w-5 h-5" />
-              </Button>
+              <Avatar className="cursor-pointer">
+                <AvatarImage src="" alt="User Avatar" />
+                <AvatarFallback className="bg-gray-0">
+                  <UserIcon className="w-6 h-6" />
+                </AvatarFallback>
+              </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onSelect={() => router.push("/settings")}>

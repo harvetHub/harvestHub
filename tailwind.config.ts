@@ -44,6 +44,17 @@ module.exports = {
         lg: "var(--radius)",
         xl: "calc(var(--radius) + 4px)",
       },
+      myContainer: {
+        center: true, // Centers the container
+        padding: "1rem", // Adds padding to the container
+        screens: {
+          sm: "640px",
+          md: "768px",
+          lg: "1024px",
+          xl: "1280px",
+          "2xl": "1536px",
+        },
+      },
     },
   },
   plugins: [import("tailwindcss-animate")],

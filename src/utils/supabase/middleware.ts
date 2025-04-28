@@ -1,62 +1,47 @@
-import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
-export const updateSession = async (request: NextRequest) => {
-  // This `try/catch` block is only here for the interactive tutorial.
-  // Feel free to remove once you have Supabase connected.
-  try {
-    // Create an unmodified response
-    let response = NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
+const JWT_SECRET = process.env.JWT_SECRET;
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            );
-            response = NextResponse.next({
-              request,
-            });
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            );
-          },
-        },
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get("auth-token");
+
+  // Define protected routes
+  const protectedRoutes = [
+    "/admin/dashboard",
+    "/admin/inventory",
+    "/admin/orders",
+    "/admin/products",
+    "/admin/users",
+  ];
+
+  // Check if the route is protected
+  if (protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+
+    try {
+      // Verify the JWT
+      if (!JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined");
       }
-    );
-
-    // This will refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
-    const user = await supabase.auth.getUser();
-
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
-      return NextResponse.redirect(new URL("/", request.url));
+      jwt.verify(token?.value || "", JWT_SECRET);
+    } catch (err) {
+      console.error("Invalid token:", err);
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
-
-    if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/protected", request.url));
-    }
-
-    return response;
-  } catch {
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
   }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    "/admin/dashboard/:path*",
+    "/admin/inventory/:path*",
+    "/admin/orders/:path*",
+    "/admin/products/:path*",
+    "/admin/users/:path*",
+  ],
 };

@@ -1,54 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductTable from "@/components/admin/product/ProductTable";
 import ProductForm from "@/components/admin/product/ProductForm";
 import { validateProduct } from "@/utils/admin/product/formValidation";
 import { Product } from "@/lib/definitions";
 import { categories } from "@/lib/productsConfig";
-import AdminSidebar from "@/components/AdminSidebar";
 import Swal from "sweetalert2";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const mockProducts: Product[] = [
-  {
-    product_id: "1",
-    name: "Product A",
-    description: "Description for Product A",
-    price: 100,
-    image_url: "/placeholder.png",
-    product_type: "seeds",
-    sku: "SEEDS-001",
-    rating: 4.5,
-  },
-  {
-    product_id: "2",
-    name: "Product B",
-    description: "Description for Product B",
-    price: 200,
-    image_url: "/placeholder.png",
-    product_type: "fertilizers",
-    sku: "FERT-002",
-    rating: 4.0,
-  },
-];
+import Pagination from "@/components/Pagination";
+import { AdminMainLayout } from "@/layout/AdminMainLayout";
+import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 export default function ProductManagement() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [filteredProducts, setFilteredProducts] =
-    useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Product>({
+    product_id: 0,
     name: "",
     description: "",
     price: 0,
     image_url: "",
-    product_type: categories[0].value,
+    product_type: "",
     sku: "",
   });
   const [errors, setErrors] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total pages
+
+  // Fetch products from the API
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/products?page=${page}&limit=10&product_type=${selectedCategory}&search_term=${searchTerm}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setProducts(data.products);
+        setFilteredProducts(data.products);
+        setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages
+      } else {
+        Swal.fire("Error", data.error || "Failed to fetch products", "error");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      Swal.fire(
+        "Error",
+        `An unexpected error occurred: ${errorMessage}`,
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, selectedCategory, page]);
 
   const handleInputChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement
@@ -58,22 +76,24 @@ export default function ProductManagement() {
     setErrors({ ...errors, [name]: "" }); // Clear error when user types
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const mockUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, image_url: mockUrl });
-    }
+  const handleImageUpload = (file: File) => {
+    // Set the file for backend processing
+    setFormData({ ...formData, image_url: file });
+
+    // Optionally, generate a preview URL for the frontend
+    const previewUrl = URL.createObjectURL(file);
+    setFormData((prev) => ({ ...prev, imagePreview: previewUrl }));
   };
 
   const handleAddProduct = () => {
     setEditingProduct(null);
     setFormData({
+      product_id: 0,
       name: "",
       description: "",
       price: 0,
       image_url: "",
-      product_type: categories[0].value,
+      product_type: "",
       sku: "",
     });
     setErrors({});
@@ -83,10 +103,11 @@ export default function ProductManagement() {
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setFormData({
+      product_id: product.product_id ?? 0,
       name: product.name,
       description: product.description,
       price: product.price,
-      image_url: product.image_url,
+      image_url: typeof product.image_url === "string" ? product.image_url : "",
       product_type: product.product_type,
       sku: product.sku || "",
     });
@@ -94,7 +115,7 @@ export default function ProductManagement() {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = async (productId: string) => {
     Swal.fire({
       title: "Are you sure?",
       text: "This action cannot be undone!",
@@ -102,19 +123,36 @@ export default function ProductManagement() {
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "Cancel",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updatedProducts = products.filter(
-          (product) => product.product_id !== productId
-        );
-        setProducts(updatedProducts);
-        setFilteredProducts(updatedProducts);
-        Swal.fire("Deleted!", "The product has been deleted.", "success");
+        try {
+          const response = await fetch(
+            `/api/admin/products?product_id=${productId}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            Swal.fire("Deleted!", "The product has been deleted.", "success");
+            fetchProducts(); // Refresh the product list
+          } else {
+            Swal.fire(
+              "Error",
+              data.error || "Failed to delete product.",
+              "error"
+            );
+          }
+        } catch {
+          Swal.fire("Error", "An unexpected error occurred.", "error");
+        }
       }
     });
   };
 
-  const handleSaveProduct = () => {
+  const handleSaveProduct = async () => {
     const validationErrors = validateProduct(
       formData,
       products,
@@ -125,56 +163,108 @@ export default function ProductManagement() {
       return;
     }
 
-    if (editingProduct) {
-      // Update existing product
-      const updatedProducts = products.map((product) =>
-        product.product_id === editingProduct.product_id
-          ? {
-              ...editingProduct,
-              ...formData,
-              price: parseFloat(formData.price.toString()),
-            }
-          : product
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append(
+        "product_id",
+        (formData.product_id ?? 0).toString()
       );
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      Swal.fire("Success", "Product updated successfully.", "success");
-    } else {
-      // Add new product
-      const newProduct: Product = {
-        product_id: (products.length + 1).toString(),
-        ...formData,
-        price: parseFloat(formData.price.toString()),
-      };
-      const updatedProducts = [...products, newProduct];
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      Swal.fire("Success", "Product added successfully.", "success");
-    }
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("price", formData.price.toString());
+      formDataToSend.append("product_type", formData.product_type);
+      formDataToSend.append("sku", formData.sku || "");
 
-    setIsDialogOpen(false);
+      // Append the image file if it exists
+      if (
+        typeof formData.image_url === "object" &&
+        formData.image_url instanceof File
+      ) {
+        formDataToSend.append("image_url", formData.image_url);
+      }
+
+      const response = await fetch(`/api/admin/products`, {
+        method: editingProduct ? "PUT" : "POST",
+        body: formDataToSend, // Use FormData
+      });
+
+      if (response.ok) {
+        Swal.fire(
+          "Success",
+          editingProduct
+            ? "Product updated successfully."
+            : "Product added successfully.",
+          "success"
+        );
+        setIsDialogOpen(false);
+        fetchProducts(); // Refresh the product list
+      } else {
+        const data = await response.json();
+        Swal.fire("Error", data.error || "Failed to save product", "error");
+      }
+    } catch {
+      Swal.fire("Error", "An unexpected error occurred", "error");
+    }
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value.toLowerCase());
+    setPage(1); // Reset to the first page when searching
+  };
+
+  const handleCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+    setPage(1); // Reset to the first page when filtering by category
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  // Check if the user is authenticated
+  useAuthCheck();
+
   return (
-    <div className="flex min-h-screen">
-      <AdminSidebar />
-      <section className="container mx-auto py-10">
+    <AdminMainLayout>
+      <section className="mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Product Management</h1>
 
         <div className="flex items-center space-x-4 mb-4">
           <Input
             placeholder="Search products..."
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={searchTerm}
+            onChange={handleSearch}
           />
+          <select
+            value={selectedCategory}
+            onChange={handleCategoryFilter}
+            className="block w-1/3 min-w-fit py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All</option>
+            {categories.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.name}
+              </option>
+            ))}
+          </select>
           <Button onClick={handleAddProduct}>Add Product</Button>
         </div>
 
-        <ProductTable
-          products={filteredProducts}
-          onEdit={handleEditProduct}
-          onDelete={handleDeleteProduct}
-        />
+        <div className="flex m-4">
+          <ProductTable
+            products={filteredProducts}
+            onEdit={handleEditProduct}
+            onDelete={handleDeleteProduct}
+            loading={loading}
+          />
+        </div>
+        {filteredProducts.length > 0 && (
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
 
         {isDialogOpen && (
           <ProductForm
@@ -189,6 +279,6 @@ export default function ProductManagement() {
           />
         )}
       </section>
-    </div>
+    </AdminMainLayout>
   );
 }
