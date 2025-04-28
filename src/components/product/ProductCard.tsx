@@ -9,20 +9,46 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Product } from "@/lib/definitions";
-import { useCartStore } from "@/store/cartStore";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/hooks/admin/useCart";
 
 const fallbackImage =
-  "https://via.placeholder.com/150?text=Image+Not+Available";
+  "https://images.unsplash.com/photo-1540317700647-ec69694d70d0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
-  const addItem = useCartStore((state) => state.addItem);
+  const router = useRouter();
+  const { addToCartWithSwal } = useCart(); // Use the custom hook
+
+  const handleProductClick = (id: number) => {
+    router.push(`/product/details/${id}`);
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click event from propagating to the Card
+    addToCartWithSwal({
+      product_id: product.product_id,
+      name: product.name,
+      price: product.price,
+      image_url:
+        typeof product.image_url === "string"
+          ? product.image_url
+          : product.image_url instanceof File
+          ? URL.createObjectURL(product.image_url)
+          : null,
+    }); // Use the reusable hook
+  };
 
   return (
-    <Card className="flex rounded-sm border-none flex-col justify-between cursor-pointer hover:scale-102">
+    <Card
+      onClick={() =>
+        product.product_id && handleProductClick(product.product_id)
+      }
+      className="flex rounded-sm border-none flex-col justify-between cursor-pointer hover:scale-102"
+    >
       <CardHeader>
         <Image
           src={
@@ -52,18 +78,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
         <Button
           className="w-full cursor-pointer"
           variant={"default"}
-          onClick={() =>
-            addItem({
-              productId: product.product_id?.toString() || "",
-              name: product.name,
-              price: product.price,
-              quantity: 1,
-              image_url:
-                typeof product.image_url === "string"
-                  ? product.image_url
-                  : fallbackImage,
-            })
-          }
+          onClick={handleAddToCart}
         >
           Add to Cart
         </Button>

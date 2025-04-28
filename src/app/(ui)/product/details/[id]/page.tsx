@@ -36,7 +36,7 @@ const ProductDetailsPage = () => {
     <MainLayout>
       <ProductDetails product={product} loading={loading} />{" "}
       {/* <RecommendedItemsSection /> */}
-      <div className="myContainer mx-auto">
+      <div className="myContainer mx-auto mb-10">
         <h2 className="text-2xl font-bold mb-4">Recommended Items</h2>
         <RelatedProducts category={product?.product_type ?? null} />
       </div>

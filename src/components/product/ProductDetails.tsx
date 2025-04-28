@@ -2,7 +2,7 @@ import { FC } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCartStore } from "@/store/cartStore";
+import { useCart } from "@/hooks/admin/useCart"; // Import the custom hook
 import { Product } from "@/lib/definitions";
 
 const fallbackImage =
@@ -14,16 +14,20 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
-  const addItem = useCartStore((state) => state.addItem);
+  const { addToCartWithSwal } = useCart(); // Use the custom hook
 
   if (loading) {
     return (
-      <div className="myContainer mx-auto p-4">
-        <Skeleton className="w-full h-64 mb-4" />
-        <Skeleton className="h-8 w-1/2 mb-2" />
-        <Skeleton className="h-4 w-3/4 mb-4" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-1/2" />
+      <div className="myContainer grid grid-cols-2 lg:my-20 my-10 gap-8 mx-auto p-4">
+        <Skeleton className="w-full h-100 mb-4" />
+        <div>
+          <Skeleton className="h-8 w-3/4 mb-4" />
+          <Skeleton className="h-4 w-3/4 mb-4" />
+          <Skeleton className="h-4 w-3/4 mb-4" />
+          <Skeleton className="h-4 w-3/4 mb-4" />
+          <Skeleton className="h-4 w-1/4 mb-2" />
+          <Skeleton className="h-8 w-1/4" />
+        </div>
       </div>
     );
   }
@@ -61,11 +65,10 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
           <Button
             className="w-full md:w-auto cursor-pointer"
             onClick={() =>
-              addItem({
-                productId: (product.product_id ?? "").toString(),
+              addToCartWithSwal({
+                product_id: product.product_id,
                 name: product.name,
                 price: product.price,
-                quantity: 1,
                 image_url:
                   typeof product.image_url === "string"
                     ? product.image_url
