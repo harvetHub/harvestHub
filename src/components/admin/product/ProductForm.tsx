@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { categories } from "@/lib/productsConfig";
 import { Product } from "@/lib/definitions";
+import { useState } from "react";
 
 interface ProductFormProps {
   formData: Product;
@@ -16,7 +17,7 @@ interface ProductFormProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
-  onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImageUpload: (file: File) => void;
   onSave: () => void;
   onCancel: () => void;
   isOpen: boolean;
@@ -33,8 +34,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
   isOpen,
   onClose,
 }) => {
-  console.log("Categories:", categories); // Debug categories
-  console.log("Selected Product Type:", formData.product_type); // Debug selected product type
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    typeof formData.image_url === "string" ? formData.image_url : null
+  );
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Generate a preview URL for the new image
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+
+      // Pass the file to the parent component
+      onImageUpload(file);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -92,18 +106,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </label>
             <input
               type="file"
+              name="image"
               accept="image/*"
-              onChange={onImageUpload}
+              onChange={handleImageUpload}
               className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
-            {formData.image_url && (
-              <Image
-                src={formData.image_url}
-                width={100}
-                height={100}
-                alt="Uploaded"
-                className="mt-4 w-32 h-32 object-cover rounded-md"
-              />
+            {imagePreview && (
+              <div className="mt-4">
+                <Image
+                  src={imagePreview}
+                  width={100}
+                  height={100}
+                  alt="Uploaded"
+                  className="w-32 h-32 object-cover rounded-md"
+                />
+              </div>
             )}
             {errors.image_url && (
               <p className="text-red-500 text-sm">{errors.image_url}</p>

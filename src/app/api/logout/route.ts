@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+import { supabaseServer } from "@/utils/supabase/server";
 
 export async function POST() {
-  const { error } = await supabaseServerClient.auth.signOut();
+  const { error } = await supabaseServer.auth.signOut();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });

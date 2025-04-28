@@ -86,4 +86,20 @@ export const recommendedItems = [
     image:
       "https://images.unsplash.com/photo-1598965675045-45c5e72c7d05?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
+  {
+    id: 7,
+    name: "Free-Range Eggs",
+    description: "Fresh eggs from free-range chickens.",
+    price: "₱999.99/kg",
+    image:
+      "https://images.unsplash.com/photo-1598965675045-45c5e72c7d05?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: 9,
+    name: "Free-Range Eggs",
+    description: "Fresh eggs from free-range chickens.",
+    price: "₱999.99/kg",
+    image:
+      "https://images.unsplash.com/photo-1598965675045-45c5e72c7d05?q=80&w=1742&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
 ];

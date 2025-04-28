@@ -1,7 +1,8 @@
 "use client";
 
+import useAuthCheck from "@/hooks/admin/useAuthCheck";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AdminSidebar from "@/components/AdminSidebar";
 import {
   BarChart,
   Bar,
@@ -10,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { AdminMainLayout } from "@/layout/AdminMainLayout";
 
 const salesData = [
   { name: "Jan", sales: 400 },
@@ -21,13 +23,13 @@ const salesData = [
 ];
 
 export default function AdminDashboard() {
-  return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <AdminSidebar />
+  const { load } = useAuthCheck(); // Use the updated hook
 
+  return (
+    <AdminMainLayout>
       {/* Main Content */}
-      <main className="flex-1 bg-gray-50 p-6">
+      {load && <LoadingSpinner />}
+      <main className="flex-1 bg-gray-50 mx-auto p-6">
         <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
 
         {/* Analytics Section */}
@@ -79,6 +81,6 @@ export default function AdminDashboard() {
           </ResponsiveContainer>
         </div>
       </main>
-    </div>
+    </AdminMainLayout>
   );
 }

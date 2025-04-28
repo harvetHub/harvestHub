@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+import { supabaseServer } from "@/utils/supabase/server";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
-  // Perform server-side validation if needed
+  // Validate input
   if (!email || !password) {
     return NextResponse.json(
       { error: "Email and password are required" },
@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data, error } = await supabaseServerClient.auth.signInWithPassword({
+  // Authenticate the user
+  const { data, error } = await supabaseServer.auth.signInWithPassword({
     email,
     password,
   });
@@ -21,8 +22,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  // Set the session cookies
+  const { session } = data;
+  if (session) {
+    const response = NextResponse.json(
+      { message: "User logged in successfully", user: session.user },
+      { status: 200 }
+    );
+
+    // Set Supabase session cookies
+    supabaseServer.auth.setSession({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
+
+    return response;
+  }
+
   return NextResponse.json(
-    { message: "User logged in successfully", data },
-    { status: 200 }
+    { error: "Failed to create a session" },
+    { status: 500 }
   );
 }
