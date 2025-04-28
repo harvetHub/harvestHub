@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import ProductDetails from "@/components/product/ProductDetails";
 import { Product } from "@/lib/definitions";
 import { MainLayout } from "@/layout/MainLayout";
+import RelatedProducts from "@/components/product/RelatedProducts";
 
 const ProductDetailsPage = () => {
   const params = useParams();
@@ -35,9 +36,9 @@ const ProductDetailsPage = () => {
     <MainLayout>
       <ProductDetails product={product} loading={loading} />{" "}
       {/* <RecommendedItemsSection /> */}
-      <div className="myContainer mx-auto p-4">
+      <div className="myContainer mx-auto">
         <h2 className="text-2xl font-bold mb-4">Recommended Items</h2>
-        {/* <RecommendedItemsSection /> */}
+        <RelatedProducts category={product?.product_type ?? null} />
       </div>
     </MainLayout>
   );

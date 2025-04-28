@@ -3,7 +3,7 @@
 import { MainLayout } from "@/layout/MainLayout";
 import FeaturedProductCarousel from "@/components/dashboard/Featured";
 import CategoriesSection from "@/components/dashboard/Categories";
-import RecommendedItemsSection from "@/components/dashboard/Recommended";
+import RecommendedItemsSection from "@/components/dashboard/RecommendedItems";
 
 export default function Dashboard() {
   return (

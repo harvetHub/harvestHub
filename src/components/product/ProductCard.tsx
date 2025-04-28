@@ -33,7 +33,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           alt={product.name}
           width={150}
           height={150}
-          className="w-full object-cover"
+          className="w-full object-cover min-h-35 max-h-40"
           onError={(e) => {
             e.currentTarget.src = fallbackImage;
           }}
