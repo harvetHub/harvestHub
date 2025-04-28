@@ -18,7 +18,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="myContainer mx-auto p-4">
         <Skeleton className="w-full h-64 mb-4" />
         <Skeleton className="h-8 w-1/2 mb-2" />
         <Skeleton className="h-4 w-3/4 mb-4" />
@@ -33,7 +33,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="myContainer mx-auto p-4">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2">
           <div className="relative w-full h-64 md:h-96 rounded-sm overflow-hidden">

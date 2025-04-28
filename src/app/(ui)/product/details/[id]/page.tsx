@@ -35,7 +35,7 @@ const ProductDetailsPage = () => {
     <MainLayout>
       <ProductDetails product={product} loading={loading} />{" "}
       {/* <RecommendedItemsSection /> */}
-      <div className="container mx-auto p-4">
+      <div className="myContainer mx-auto p-4">
         <h2 className="text-2xl font-bold mb-4">Recommended Items</h2>
         {/* <RecommendedItemsSection /> */}
       </div>
