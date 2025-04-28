@@ -5,8 +5,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import Swal from "sweetalert2";
 import { loginFields } from "@/lib/loginConfig";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"; // Import shadcn carousel
+
+const carouselImages = [
+  { name: "image1", src: "/images/lm1.jpg" },
+  { name: "image2", src: "/images/lm2.jpg" },
+  { name: "image3", src: "/images/lm3.jpg" },
+  { name: "image4", src: "/images/lm4.jpg" },
+  { name: "image5", src: "/images/lm5.jpg" },
+  { name: "image6", src: "/images/lm6.jpg" },
+  { name: "image7", src: "/images/lm7.jpg" },
+].map((image) => image.src);
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -105,11 +123,36 @@ export default function Login() {
   return (
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
-        <div className="relative flex items-end px-4 pb-10 pt-60 sm:pb-16 md:justify-center lg:pb-24 bg-gray-50 sm:px-6 lg:px-8">
-          <div className="absolute inset-0"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        {/* Left Side with Carousel */}
+        <div className="left relative flex items-center justify-center">
+          <Carousel>
+            <CarouselContent>
+              {carouselImages.map((image, index) => (
+                <CarouselItem key={index} className="w-full h-full">
+                  <Image
+                    width={1000}
+                    height={800}
+                    src={image}
+                    alt={`Carousel Image ${index + 1}`}
+                    className="w-full h-screen object-cover"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious
+              variant={"default"}
+              size={"lg"}
+              className="ml-20 scale-130 hover:scale-150 cursor-pointer animate-pulse"
+            />
+            <CarouselNext
+              variant={"default"}
+              size={"lg"}
+              className="mr-20 scale-130 hover:scale-150 cursor-pointer animate-pulse"
+            />
+          </Carousel>
         </div>
 
+        {/* Right Side with Login Form */}
         <div className="flex items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
           <div className="xl:w-full xl:max-w-sm 2xl:max-w-md xl:mx-auto">
             <h2 className="text-3xl font-bold text-center leading-tight text-black sm:text-4xl">
