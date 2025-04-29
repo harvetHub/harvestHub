@@ -1,6 +1,5 @@
 import { FC } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,10 +35,15 @@ const Header: FC = () => {
           <Link href="/dashboard">HarvestHub</Link>
         </h1>
         <nav className="flex items-center">
-          <Link href="/cart" className="mr-4">
-            <Button variant="ghost" className="text-white flex items-center">
-              <ShoppingCartIcon className="w-5 h-5 mr-1" />({cartItems.length})
-            </Button>
+          <Link href="/cart" className="mr-4 relative">
+            <button className="text-white flex items-center hover:bg-none cursor-pointer bg-none">
+              <ShoppingCartIcon className="w-6 h-6"></ShoppingCartIcon>
+              {cartItems.length > 0 && (
+                <span className="h-fit absolute text-xs top-[-5px] right-[-7px] bg-red-500 rounded-full w-fit px-1">
+                  {cartItems.length}
+                </span>
+              )}
+            </button>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
