@@ -28,17 +28,20 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+
+      // Build the query parameters
       const query = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
         ...(filter !== "All" && {
           product_type: Array.isArray(filter) ? filter.join(",") : filter,
-        }),
-        ...(searchTerm && { search_term: searchTerm.toString() }),
+        }), // Ensure product_type is a string
+        ...(searchTerm && { search_term: searchTerm }),
       }).toString();
 
       const response = await fetch(`/api/products?${query}`);
       const data = await response.json();
+
       setProducts(data.products || []);
       setFilteredProducts(data.products || []);
       setTotal(data.total || 0);
@@ -59,7 +62,7 @@ const Products = () => {
   // Update the URL dynamically when the filter changes
   useEffect(() => {
     if (filter !== category) {
-      const newPath = filter === "All" ? "/product" : `/product/${filter}`;
+      const newPath = filter === "All" ? "/product/All" : `/product/${filter}`;
       router.push(newPath); // Update the URL dynamically
     }
   }, [filter, category, router]);
