@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // Import useRouter
 import { MainLayout } from "@/layout/MainLayout";
 import ProductList from "@/components/product/ProductList";
 import FilterSidebar from "@/components/product/FilterSidebar";
@@ -10,6 +10,7 @@ import { Product } from "@/lib/definitions";
 
 const Products = () => {
   const params = useParams();
+  const router = useRouter(); // Initialize useRouter
   const category = params?.category;
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,6 +55,14 @@ const Products = () => {
     );
     setFilteredProducts(filtered);
   }, [priceRange, products]);
+
+  // Update the URL dynamically when the filter changes
+  useEffect(() => {
+    if (filter !== category) {
+      const newPath = filter === "All" ? "/product" : `/product/${filter}`;
+      router.push(newPath); // Update the URL dynamically
+    }
+  }, [filter, category, router]);
 
   const totalPages = Math.ceil(total / limit);
 
