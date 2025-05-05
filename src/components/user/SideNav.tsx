@@ -34,9 +34,9 @@ const SideNav: React.FC = () => {
             </li>
             <li>
               <Link
-                href="/user/account/addresses"
+                href="/user/account/address"
                 className={`text-sm ${
-                  isActive("/user/account/addresses")
+                  isActive("/user/account/address")
                     ? "text-gray-800 font-semibold"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
