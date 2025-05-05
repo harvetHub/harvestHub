@@ -1,3 +1,5 @@
+"use client";
+
 import { FC } from "react";
 import Link from "next/link";
 import {
@@ -55,16 +57,25 @@ const Header: FC = () => {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => router.push("/settings")}>
-                <CogIcon className="w-5 h-5 mr-2" />
-                Settings
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => router.push("/user/account/profile")}
+              >
+                <CogIcon className="w-5 h-5 mr-2 " />
+                My Account
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => router.push("/support")}>
-                <HelpingHandIcon className="w-5 h-5 mr-2" />
-                Support
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={() => router.push("/user/purchase")}
+              >
+                <HelpingHandIcon className="w-5 h-5 mr-2 " />
+                My Purchase
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleLogout}>
-                <LogOutIcon className="w-5 h-5 mr-2" />
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={handleLogout}
+              >
+                <LogOutIcon className="w-5 h-5 mr-2 " />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
