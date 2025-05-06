@@ -94,7 +94,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
       {/* Region Dropdown */}
       <div>
-        <label className="mb-1 font-semibold text-gray-800">
+        <label className="mb-2 font-semibold text-gray-800">
           Region <span className="text-red-500">*</span>
         </label>
         <select
@@ -103,7 +103,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             handleChange("region", e.target.value)
           }
-          className="p-2 border border-gray-300 rounded text-gray-700 w-full"
+          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
         >
           <option value="">Select Region</option>
           {regions.map((region) => (
@@ -119,7 +119,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
 
       {/* Province Dropdown */}
       <div>
-        <label className="mb-1 font-semibold text-gray-800">
+        <label className="mb-2 font-semibold text-gray-800">
           Province <span className="text-red-500">*</span>
         </label>
         <select
@@ -128,7 +128,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             handleChange("province", e.target.value)
           }
-          className="p-2 border border-gray-300 rounded text-gray-700 w-full"
+          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
           disabled={!address.region.region_id}
         >
           <option value="">Select Province</option>
@@ -145,7 +145,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
 
       {/* City/Municipality Dropdown */}
       <div>
-        <label className="mb-1 font-semibold text-gray-800">
+        <label className="mb-2 font-semibold text-gray-800">
           City/Municipality <span className="text-red-500">*</span>
         </label>
         <select
@@ -154,7 +154,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             handleChange("cityMunicipality", e.target.value)
           }
-          className="p-2 border border-gray-300 rounded text-gray-700 w-full"
+          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
           disabled={!address.province.province_id}
         >
           <option value="">Select City/Municipality</option>
@@ -176,7 +176,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
 
       {/* Barangay Dropdown */}
       <div>
-        <label className="mb-1 font-semibold text-gray-800">
+        <label className="mb-2 font-semibold text-gray-800">
           Barangay <span className="text-red-500">*</span>
         </label>
         <select
@@ -185,7 +185,7 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             handleChange("barangay", e.target.value)
           }
-          className="p-2 border border-gray-300 rounded text-gray-700 w-full"
+          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
           disabled={!address.cityMunicipality.municipality_id}
         >
           <option value="">Select Barangay</option>

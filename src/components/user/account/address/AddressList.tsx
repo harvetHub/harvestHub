@@ -135,7 +135,7 @@ const AddressList: React.FC = () => {
       {/* Add New Address Button */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogTrigger asChild>
-          <Button>Add New Address</Button>
+          <Button className="cursor-pointer">Add New Address</Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -144,17 +144,20 @@ const AddressList: React.FC = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {formFields.map((field) => (
-              <Input
-                key={field.id}
-                type={field.type}
-                placeholder={field.placeholder}
-                value={String(newAddress[field.id as keyof Address] || "")}
-                onChange={(e) =>
-                  setNewAddress({ ...newAddress, [field.id]: e.target.value })
-                }
-              />
-            ))}
+            <div className="grid grid-cols-2 gap-4">
+              {formFields.map((field) => (
+                <Input
+                  className="border h-10 border-gray-300 rounded-md w-full"
+                  key={field.id}
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  value={String(newAddress[field.id as keyof Address] || "")}
+                  onChange={(e) =>
+                    setNewAddress({ ...newAddress, [field.id]: e.target.value })
+                  }
+                />
+              ))}
+            </div>
 
             {/* DropdownAddress Component */}
             <DropdownAddress
