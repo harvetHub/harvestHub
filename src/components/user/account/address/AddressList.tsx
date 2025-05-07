@@ -61,20 +61,61 @@ const AddressList: React.FC = () => {
       return;
     }
 
-    const newId =
-      addresses.length > 0 ? Math.max(...addresses.map((a) => a.id)) + 1 : 1;
-    setAddresses([
-      ...addresses,
-      {
-        ...newAddress,
-        id: newId,
-        isDefault: false,
-        isPickup: false,
-        isReturn: false,
-      } as Address,
-    ]);
-    setNewAddress(initialForm);
-    setIsModalOpen(false);
+    if (newAddress.id) {
+      // Update existing address
+      setAddresses((prevAddresses) =>
+        prevAddresses.map((address) =>
+          address.id === newAddress.id
+            ? {
+                ...address,
+                ...newAddress,
+                address: {
+                  region: {
+                    region_id: "",
+                    region_name: "",
+                    ...newAddress.address?.region,
+                  },
+                  province: {
+                    province_id: "",
+                    region_id: "",
+                    province_name: "",
+                    ...newAddress.address?.province,
+                  },
+                  cityMunicipality: {
+                    municipality_id: "",
+                    province_id: "",
+                    municipality_name: "",
+                    ...newAddress.address?.cityMunicipality,
+                  },
+                  barangay: {
+                    barangay_id: "",
+                    municipality_id: "",
+                    barangay_name: "",
+                    ...newAddress.address?.barangay,
+                  },
+                },
+              }
+            : address
+        )
+      );
+    } else {
+      // Add new address
+      const newId =
+        addresses.length > 0 ? Math.max(...addresses.map((a) => a.id)) + 1 : 1;
+      setAddresses([
+        ...addresses,
+        {
+          ...newAddress,
+          id: newId,
+          isDefault: false,
+          isPickup: false,
+          isReturn: false,
+        } as Address,
+      ]);
+    }
+
+    setNewAddress(initialForm); // Reset the form
+    setIsModalOpen(false); // Close the modal
   };
 
   const handleSetDefault = (id: number) => {
@@ -139,23 +180,35 @@ const AddressList: React.FC = () => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="border-b-1 broder-gray-500 pb-2 text-2xl">
               {newAddress.id ? "Edit Address" : "Add New Address"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               {formFields.map((field) => (
-                <Input
-                  className="border h-10 border-gray-300 rounded-md w-full"
-                  key={field.id}
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  value={String(newAddress[field.id as keyof Address] || "")}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, [field.id]: e.target.value })
-                  }
-                />
+                <div key={field.id} className="flex flex-col space-y-1">
+                  <label className="text-sm font-semibold text-gray-700">
+                    {field.label}
+                    {field.id !== "label" && (
+                      <span className="text-red-500">*</span>
+                    )}
+                  </label>
+
+                  <Input
+                    className="border h-10 border-gray-300 rounded-md w-full"
+                    key={field.id}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={String(newAddress[field.id as keyof Address] || "")}
+                    onChange={(e) =>
+                      setNewAddress({
+                        ...newAddress,
+                        [field.id]: e.target.value,
+                      })
+                    }
+                  />
+                </div>
               ))}
             </div>
 
@@ -189,30 +242,57 @@ const AddressList: React.FC = () => {
             />
 
             <div className="space-y-2">
-              <Checkbox
-                checked={newAddress.isDefault || false}
-                onCheckedChange={(checked) =>
-                  setNewAddress({ ...newAddress, isDefault: !!checked })
-                }
-              >
-                Set as Default Address
-              </Checkbox>
-              <Checkbox
-                checked={newAddress.isPickup || false}
-                onCheckedChange={(checked) =>
-                  setNewAddress({ ...newAddress, isPickup: !!checked })
-                }
-              >
-                Set as Pickup Address
-              </Checkbox>
-              <Checkbox
-                checked={newAddress.isReturn || false}
-                onCheckedChange={(checked) =>
-                  setNewAddress({ ...newAddress, isReturn: !!checked })
-                }
-              >
-                Set as Return Address
-              </Checkbox>
+              <div className="items-top flex space-x-2">
+                <Checkbox
+                  id="terms1"
+                  checked={newAddress.isDefault || false}
+                  onCheckedChange={(checked) =>
+                    setNewAddress({ ...newAddress, isDefault: !!checked })
+                  }
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="terms1"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Set as Default Address
+                  </label>
+                </div>
+              </div>
+              <div className="items-top flex space-x-2">
+                <Checkbox
+                  id="terms2"
+                  checked={newAddress.isPickup || false}
+                  onCheckedChange={(checked) =>
+                    setNewAddress({ ...newAddress, isPickup: !!checked })
+                  }
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="terms2"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Set as Pickup Address
+                  </label>
+                </div>
+              </div>
+              <div className="items-top flex space-x-2">
+                <Checkbox
+                  id="terms3"
+                  checked={newAddress.isReturn || false}
+                  onCheckedChange={(checked) =>
+                    setNewAddress({ ...newAddress, isReturn: !!checked })
+                  }
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="terms3"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Set as Return Address
+                  </label>
+                </div>
+              </div>
             </div>
             <Button onClick={handleAddAddress}>
               {newAddress.id ? "Update Address" : "Save Address"}

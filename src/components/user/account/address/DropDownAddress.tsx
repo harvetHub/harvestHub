@@ -6,6 +6,13 @@ import {
   Municipality,
   Barangay,
 } from "@/lib/definitions";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface DropdownAddressProps {
   address: {
@@ -90,115 +97,86 @@ const DropdownAddress: React.FC<DropdownAddressProps> = ({
     }
   };
 
+  // Dropdown configuration
+  const dropdowns = [
+    {
+      label: "Region",
+      type: "region" as keyof Address["address"],
+      options: regions,
+      value: address.region?.region_name,
+      keyField: "region_id",
+      nameField: "region_name",
+      disabled: false,
+      filteredOptions: regions,
+    },
+    {
+      label: "Province",
+      type: "province" as keyof Address["address"],
+      options: filteredProvinces,
+      value: address.province?.province_name,
+      keyField: "province_id",
+      nameField: "province_name",
+      disabled: !address.region.region_id,
+      filteredOptions: filteredProvinces,
+    },
+    {
+      label: "City/Municipality",
+      type: "cityMunicipality" as keyof Address["address"],
+      options: filteredMunicipalities,
+      value: address.cityMunicipality?.municipality_name,
+      keyField: "municipality_id",
+      nameField: "municipality_name",
+      disabled: !address.province.province_id,
+      filteredOptions: filteredMunicipalities,
+    },
+    {
+      label: "Barangay",
+      type: "barangay" as keyof Address["address"],
+      options: filteredBarangays,
+      value: address.barangay?.barangay_name,
+      keyField: "barangay_id",
+      nameField: "barangay_name",
+      disabled: !address.cityMunicipality.municipality_id,
+      filteredOptions: filteredBarangays,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
-      {/* Region Dropdown */}
-      <div>
-        <label className="mb-2 font-semibold text-gray-800">
-          Region <span className="text-red-500">*</span>
-        </label>
-        <select
-          name="region"
-          value={address.region?.region_id || ""}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            handleChange("region", e.target.value)
-          }
-          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
-        >
-          <option value="">Select Region</option>
-          {regions.map((region) => (
-            <option key={region.region_id} value={region.region_id}>
-              {region.region_name}
-            </option>
-          ))}
-        </select>
-        {errors["region"] && (
-          <span className="text-red-500 text-sm">{errors["region"]}</span>
-        )}
-      </div>
-
-      {/* Province Dropdown */}
-      <div>
-        <label className="mb-2 font-semibold text-gray-800">
-          Province <span className="text-red-500">*</span>
-        </label>
-        <select
-          name="province"
-          value={address.province?.province_id || ""}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            handleChange("province", e.target.value)
-          }
-          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
-          disabled={!address.region.region_id}
-        >
-          <option value="">Select Province</option>
-          {filteredProvinces.map((province) => (
-            <option key={province.province_id} value={province.province_id}>
-              {province.province_name}
-            </option>
-          ))}
-        </select>
-        {errors["province"] && (
-          <span className="text-red-500 text-sm">{errors["province"]}</span>
-        )}
-      </div>
-
-      {/* City/Municipality Dropdown */}
-      <div>
-        <label className="mb-2 font-semibold text-gray-800">
-          City/Municipality <span className="text-red-500">*</span>
-        </label>
-        <select
-          name="cityMunicipality"
-          value={address.cityMunicipality?.municipality_id || ""}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            handleChange("cityMunicipality", e.target.value)
-          }
-          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
-          disabled={!address.province.province_id}
-        >
-          <option value="">Select City/Municipality</option>
-          {filteredMunicipalities.map((municipality) => (
-            <option
-              key={municipality.municipality_id}
-              value={municipality.municipality_id}
-            >
-              {municipality.municipality_name}
-            </option>
-          ))}
-        </select>
-        {errors["cityMunicipality"] && (
-          <span className="text-red-500 text-sm">
-            {errors["cityMunicipality"]}
-          </span>
-        )}
-      </div>
-
-      {/* Barangay Dropdown */}
-      <div>
-        <label className="mb-2 font-semibold text-gray-800">
-          Barangay <span className="text-red-500">*</span>
-        </label>
-        <select
-          name="barangay"
-          value={address.barangay?.barangay_id || ""}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            handleChange("barangay", e.target.value)
-          }
-          className="p-2 border border-gray-300 rounded-md text-gray-700 w-full"
-          disabled={!address.cityMunicipality.municipality_id}
-        >
-          <option value="">Select Barangay</option>
-          {filteredBarangays.map((barangay) => (
-            <option key={barangay.barangay_id} value={barangay.barangay_id}>
-              {barangay.barangay_name}
-            </option>
-          ))}
-        </select>
-        {errors["barangay"] && (
-          <span className="text-red-500 text-sm">{errors["barangay"]}</span>
-        )}
-      </div>
+      {dropdowns.map((dropdown) => (
+        <div key={dropdown.type}>
+          <label className="mb-2 font-semibold text-gray-800">
+            {dropdown.label} <span className="text-red-500">*</span>
+          </label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="w-full text-left" disabled={dropdown.disabled}>
+                {dropdown.value || `Select ${dropdown.label}`}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-full">
+              {dropdown.filteredOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option[dropdown.keyField as keyof typeof option]}
+                  onClick={() =>
+                    handleChange(
+                      dropdown.type,
+                      option[dropdown.keyField as keyof typeof option] as string
+                    )
+                  }
+                >
+                  {option[dropdown.nameField as keyof typeof option]}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {errors[dropdown.type] && (
+            <span className="text-red-500 text-sm">
+              {errors[dropdown.type]}
+            </span>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
