@@ -10,7 +10,7 @@ const AddressPage: React.FC = () => {
         <SideNav />
 
         {/* Delivery Address */}
-        <div className="flex-1 bg-gray-50 p-8 rounded-sm shadow">
+        <div className="flex-1 p-8 bg-white rounded-sm shadow">
           <AddressList />
         </div>
       </div>

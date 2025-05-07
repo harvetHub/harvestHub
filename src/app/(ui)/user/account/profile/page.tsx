@@ -10,7 +10,7 @@ const ProfilePage: React.FC = () => {
         <SideNav />
 
         {/* Profile Form */}
-        <div className="flex-1 bg-gray-50 p-8 rounded-sm shadow">
+        <div className="flex-1 bg-white p-8 rounded-sm shadow">
           <ProfileForm />
         </div>
       </div>
