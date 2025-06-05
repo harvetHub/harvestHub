@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // Import useRouter
 import { MainLayout } from "@/layout/MainLayout";
 import ProductList from "@/components/product/ProductList";
 import FilterSidebar from "@/components/product/FilterSidebar";
@@ -10,6 +10,7 @@ import { Product } from "@/lib/definitions";
 
 const Products = () => {
   const params = useParams();
+  const router = useRouter(); // Initialize useRouter
   const category = params?.category;
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,17 +28,20 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+
+      // Build the query parameters
       const query = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
         ...(filter !== "All" && {
           product_type: Array.isArray(filter) ? filter.join(",") : filter,
-        }),
-        ...(searchTerm && { search_term: searchTerm.toString() }),
+        }), // Ensure product_type is a string
+        ...(searchTerm && { search_term: searchTerm }),
       }).toString();
 
       const response = await fetch(`/api/products?${query}`);
       const data = await response.json();
+
       setProducts(data.products || []);
       setFilteredProducts(data.products || []);
       setTotal(data.total || 0);
@@ -54,6 +58,14 @@ const Products = () => {
     );
     setFilteredProducts(filtered);
   }, [priceRange, products]);
+
+  // Update the URL dynamically when the filter changes
+  useEffect(() => {
+    if (filter !== category) {
+      const newPath = filter === "All" ? "/product/All" : `/product/${filter}`;
+      router.push(newPath); // Update the URL dynamically
+    }
+  }, [filter, category, router]);
 
   const totalPages = Math.ceil(total / limit);
 

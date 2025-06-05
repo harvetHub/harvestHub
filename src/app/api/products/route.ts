@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const isRecommended = searchParams.get("is_recommended");
   const offset = (page - 1) * limit;
 
+  // Initialize the query
   let query = supabaseServer
     .from("products")
     .select("*", { count: "exact" })
@@ -21,8 +22,8 @@ export async function GET(req: NextRequest) {
     query = query.ilike("name", `%${searchTerm}%`);
   }
 
-  // Apply product type filter
-  if (productType) {
+  // Apply product type filter (skip if "All" is selected)
+  if (productType && productType !== "All") {
     query = query.eq("product_type", productType);
   }
 
@@ -36,12 +37,15 @@ export async function GET(req: NextRequest) {
     query = query.eq("is_recommended", isRecommended === "true");
   }
 
+  // Execute the query
   const { data, error, count } = await query;
 
+  // Handle errors
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  // Return the response
   return NextResponse.json({
     products: data,
     total: count,

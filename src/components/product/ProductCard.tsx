@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/admin/useCart";
+import { FaStar, FaRegStar } from "react-icons/fa"; // Import star icons
 
 const fallbackImage =
   "https://images.unsplash.com/photo-1540317700647-ec69694d70d0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -42,6 +43,21 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
     }); // Use the reusable hook
   };
 
+  // Generate star rating
+  const renderStars = (rating: number) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        i <= rating ? (
+          <FaStar key={i} className="text-yellow-500" />
+        ) : (
+          <FaRegStar key={i} className="text-gray-300" />
+        )
+      );
+    }
+    return stars;
+  };
+
   return (
     <Card
       onClick={() =>
@@ -70,7 +86,12 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
         <p className="description overflow-hidden text-ellipsis">
           {product.description}
         </p>
-        <div className="">
+        <div className="flex items-center space-x-1 mt-2">
+          {renderStars(product.rating || 0)}{" "}
+          {/* Render stars based on rating */}
+          <span className="text-sm text-gray-500">({product.rating || 0})</span>
+        </div>
+        <div className="mt-2">
           <p className="font-bold">₱{product.price.toFixed(2)}</p>
         </div>
       </CardContent>
