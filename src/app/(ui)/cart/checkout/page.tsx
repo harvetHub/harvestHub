@@ -44,17 +44,17 @@ const Checkout = () => {
 
   return (
     <MainLayout>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+      <div className="myContainer mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
         <div className="flex flex-col w-fill h-full justify-center items-center">
           <Image
             src="/images/checkout.png"
             alt={""}
             width={1920}
             height={1080}
-            className="w-[80%] h-auto object-cover mr-4 "
+            className="w-full h-auto object-cover mr-4 "
           />
         </div>
-        <div className="container mx-auto p-8 h-full bg-white shadow-inner">
+        <div className="w-full p-8 h-full bg-white shadow-inner">
           <div>
             <h1 className="text-3xl font-bold mb-8">Checkout</h1>
             <ul className="h-96 overflow-y-auto shadow-inner border border-gray-200 p-4">
@@ -118,8 +118,10 @@ const Checkout = () => {
               <h2 className="text-xl font-bold mb-4">Total Cost</h2>
               <p className="text-lg font-bold">₱{totalCost.toFixed(2)}</p>
             </div>
-            <div className="mt-8">
-              <Button onClick={handlePlaceOrder}>Place Order</Button>
+            <div className="mt-8 w-full">
+              <Button className="w-full" onClick={handlePlaceOrder}>
+                Place Order
+              </Button>
             </div>
           </div>
         </div>

@@ -13,7 +13,7 @@ const OrderConfirmation = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto p-4 h-screen w-full flex flex-col justify-center items-center">
+      <div className="container mx-auto p-4 h-full w-fit flex flex-col justify-center items-center">
         <h1 className="text-3xl font-bold mb-8">Order Confirmation</h1>
         <p>Your order has been placed successfully!</p>
         <div className="mt-8">
