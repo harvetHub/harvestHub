@@ -53,7 +53,6 @@ const ChangePassPage: React.FC = () => {
 
     // If no errors, submit the form
     if (!Object.values(newErrors).some((error) => error)) {
-      console.log("Password changed successfully:", formData);
       alert("Password changed successfully!");
       setFormData({
         currentPassword: "",

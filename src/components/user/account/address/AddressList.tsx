@@ -137,7 +137,7 @@ const AddressList: React.FC = () => {
     type: keyof Address["address"],
     value: Address["address"][keyof Address["address"]] | null
   ) => {
-    console.log(`Updating ${type} with value:`, value);
+   
     setNewAddress((prev) => ({
       ...prev,
       address: {

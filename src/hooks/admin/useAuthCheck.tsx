@@ -13,8 +13,6 @@ export default function useAuthCheck() {
   useEffect(() => {
     const checkAuthToken = async () => {
       try {
-        console.log("Checking session...");
-
         // Fetch user data from an API route that validates the token
         const response = await fetch("/api/auth/validate-token", {
           method: "GET",
@@ -26,7 +24,6 @@ export default function useAuthCheck() {
         }
 
         const data = await response.json();
-        console.log("User data:", data); // Debugging
 
         setUser(data.user);
       } catch (error) {

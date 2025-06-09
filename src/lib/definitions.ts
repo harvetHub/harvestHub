@@ -83,6 +83,8 @@ export type User = {
   password?: string;
   password_confirmation?: string;
   image_url?: string | File;
+  gender?: string ;
+  birthDay?: string | null ;
 };
 
 export interface Order {
