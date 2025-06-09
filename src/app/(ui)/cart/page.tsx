@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MainLayout } from "@/layout/MainLayout";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-const fallbackImage = "/path/to/fallback/image.jpg";
+import { fallbackImage } from "@/lib/fallbackImg";
 
 const Cart = () => {
   const cartItems = useCartStore((state) => state.items);
