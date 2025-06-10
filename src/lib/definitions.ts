@@ -87,7 +87,7 @@ export type User = {
   birthDay?: string | null ;
 };
 
-export interface Order {
+export type Order = {
   order_id: number;
   customer_name: string;
   order_date: string;
@@ -96,3 +96,13 @@ export interface Order {
   shipping_method: string | null;
   payment_status: string;
 }
+
+
+export type CartItem = {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image_url: string;
+}
+
