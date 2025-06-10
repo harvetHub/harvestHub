@@ -6,32 +6,77 @@ import { MainLayout } from "@/layout/MainLayout";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { fallbackImage } from "@/lib/fallbackImg";
+import { useEffect } from "react";
+import { CartItem } from "@/lib/definitions";
 
 const Cart = () => {
   const cartItems = useCartStore((state) => state.items);
+  const setItems = useCartStore((state) => state.setItems); // Make sure setItems exists in your store
   const removeItem = useCartStore((state) => state.removeItem);
   const addItem = useCartStore((state) => state.addItem);
   const router = useRouter();
+
+  // Helper to sync cart after API call
+  const syncCart = async () => {
+    try {
+      const res = await fetch("/api/cart/list", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        // Transform data if needed to match your CartItem shape
+        setItems(
+          data.cart.map((item: CartItem) => ({
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image_url: item.image_url,
+          }))
+        );
+      }
+    } catch (err) {
+      console.error("Failed to sync cart from server", err);
+    }
+  };
+
+  // Optionally, sync cart on mount
+  useEffect(() => {
+    syncCart();
+    // eslint-disable-next-line
+  }, []);
 
   const handleCheckout = () => {
     router.push("/cart/checkout");
   };
 
-  const handleIncreaseQuantity = (item: {
+  const handleIncreaseQuantity = async (item: {
     productId: string;
     name: string;
     price: number;
     quantity: number;
     image_url?: string;
   }) => {
-    addItem({
-      ...item,
-      quantity: 1,
-      image_url: item.image_url || fallbackImage,
+    const res = await fetch("/api/cart/manage", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: item.productId,
+        action: "increase",
+        amount: 1,
+      }),
     });
+    if (res.ok) {
+      addItem({
+        ...item,
+        quantity: 1,
+        image_url: item.image_url || fallbackImage,
+      });
+    }
   };
 
-  const handleDecreaseQuantity = (item: {
+  const handleDecreaseQuantity = async (item: {
     productId: string;
     name: string;
     price: number;
@@ -39,11 +84,35 @@ const Cart = () => {
     image_url?: string;
   }) => {
     if (item.quantity > 1) {
-      addItem({
-        ...item,
-        quantity: -1,
-        image_url: item.image_url || fallbackImage,
+      const res = await fetch("/api/cart/manage", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: item.productId,
+          action: "deduct",
+        }),
       });
+      if (res.ok) {
+        addItem({
+          ...item,
+          quantity: -1,
+          image_url: item.image_url || fallbackImage,
+        });
+      }
+    }
+  };
+
+  const handleRemoveItem = async (productId: string) => {
+    const res = await fetch("/api/cart/manage", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product_id: productId,
+        action: "delete",
+      }),
+    });
+    if (res.ok) {
+      removeItem(productId);
     }
   };
 
@@ -118,7 +187,7 @@ const Cart = () => {
                       </div>
                       <Button
                         variant="outline"
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => handleRemoveItem(item.productId)}
                       >
                         Remove
                       </Button>

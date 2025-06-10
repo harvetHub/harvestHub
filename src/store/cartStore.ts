@@ -3,13 +3,16 @@ import { create } from "zustand";
 
 interface CartState {
   items: CartItem[];
+  setItems: (items: CartItem[]) => void;
   addItem: (item: CartItem) => Promise<void>;
-  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, action: "increase" | "deduct") => Promise<void>;
+  removeItem: (productId: string) => Promise<void>;
   clearCart: () => void;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
+  setItems: (items) => set({ items }),
   addItem: async (item: CartItem) => {
     // Optimistically update local store
     const state = get();
@@ -34,20 +37,88 @@ export const useCartStore = create<CartState>((set, get) => ({
         body: JSON.stringify({
           product_id: item.productId,
           quantity: item.quantity,
+          name: item.name,
+          price: item.price,
+          image_url: item.image_url,
+          added_at: new Date().toISOString(),
         }),
       });
       if (!res.ok) {
-        // Optionally: revert optimistic update or show error
-        // For now, just log error
         console.error("Failed to sync cart with server");
       }
     } catch (err) {
       console.error("Failed to sync cart with server", err);
     }
   },
-  removeItem: (productId: string) =>
+  updateQuantity: async (productId, action) => {
+    // Optimistically update local store
+    const state = get();
+    const item = state.items.find((i) => i.productId === productId);
+    if (!item) return;
+
+    if (action === "increase") {
+      set({
+        items: state.items.map((i) =>
+          i.productId === productId
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        ),
+      });
+    } else if (action === "deduct") {
+      if (item.quantity > 1) {
+        set({
+          items: state.items.map((i) =>
+            i.productId === productId
+              ? { ...i, quantity: i.quantity - 1 }
+              : i
+          ),
+        });
+      } else {
+        set({
+          items: state.items.filter((i) => i.productId !== productId),
+        });
+      }
+    }
+
+    // Sync with backend
+    try {
+      const res = await fetch("/api/cart/manage", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: productId,
+          action,
+        }),
+      });
+      if (!res.ok) {
+        console.error("Failed to update cart quantity on server");
+      }
+    } catch (err) {
+      console.error("Failed to update cart quantity on server", err);
+    }
+  },
+  removeItem: async (productId: string) => {
+    // Optimistically update local store
     set((state) => ({
       items: state.items.filter((item) => item.productId !== productId),
-    })),
+    }));
+
+    // Sync with backend
+    try {
+      const res = await fetch("/api/cart/manage", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: productId,
+          action: "delete",
+        }),
+      });
+      if (!res.ok) {
+        console.error("Failed to remove item from cart on server");
+      }
+    } catch (err) {
+      console.error("Failed to remove item from cart on server", err);
+    }
+  },
   clearCart: () => set({ items: [] }),
 }));
