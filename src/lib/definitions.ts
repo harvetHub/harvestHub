@@ -104,5 +104,6 @@ export type CartItem = {
   price: number;
   quantity: number;
   image_url: string;
+  stocks?: number;
 }
 

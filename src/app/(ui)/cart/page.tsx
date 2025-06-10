@@ -23,6 +23,8 @@ const Cart = () => {
     a.name.localeCompare(b.name)
   );
 
+  console.log("Cart items:", cartItems);
+
   // Helper to sync cart after API call
   const syncCart = async () => {
     try {
@@ -140,6 +142,14 @@ const Cart = () => {
                             >
                               +
                             </Button>
+                            {/* Show stocks count */}
+                            {item.stocks !== null && item.stocks !== 0 ? (
+                              <span className="ml-2 text-xs text-gray-500">
+                                ({item.stocks})
+                              </span>
+                            ) : (
+                              ""
+                            )}
                           </div>
                         </div>
                       </div>
