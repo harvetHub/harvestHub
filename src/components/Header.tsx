@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
+import { useCartCount } from "@/hooks/useCartCount";
 import { ShoppingCartIcon, CogIcon } from "@heroicons/react/20/solid";
 import { LogOutIcon, HelpingHandIcon, UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,6 +18,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Header: FC = () => {
   const router = useRouter();
   const cartItems = useCartStore((state) => state.items);
+  const { count: initialCount } = useCartCount();
+
+  // Use cartItems.length if available (client updates), otherwise fallback to initialCount from API
+  const cartCount =
+    typeof cartItems?.length === "number" && cartItems.length > 0
+      ? cartItems.length
+      : initialCount;
 
   const handleLogout = async () => {
     const response = await fetch("/api/logout", {
@@ -40,9 +48,9 @@ const Header: FC = () => {
           <Link href="/cart" className="mr-4 relative">
             <button className="text-white flex items-center hover:bg-none cursor-pointer bg-none">
               <ShoppingCartIcon className="w-6 h-6"></ShoppingCartIcon>
-              {cartItems.length > 0 && (
+              {cartCount > 0 && (
                 <span className="h-fit absolute text-xs top-[-5px] right-[-7px] bg-red-500 rounded-full w-fit px-1">
-                  {cartItems.length}
+                  {cartCount}
                 </span>
               )}
             </button>

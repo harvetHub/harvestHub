@@ -12,9 +12,16 @@ import { CartItem } from "@/lib/definitions";
 const Cart = () => {
   const cartItems = useCartStore((state) => state.items);
   const setItems = useCartStore((state) => state.setItems); // Make sure setItems exists in your store
-  const removeItem = useCartStore((state) => state.removeItem);
-  const addItem = useCartStore((state) => state.addItem);
+  const increaseQuantity = useCartStore((state) => state.increaseQuantity);
+  const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
+  const deleteItem = useCartStore((state) => state.deleteItem);
   const router = useRouter();
+
+  // Sort cart items A-Z by name, but keep their original order in state for UI stability
+  // Use a memoized sorted array for rendering only
+  const sortedCartItems = [...cartItems].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
   // Helper to sync cart after API call
   const syncCart = async () => {
@@ -28,7 +35,7 @@ const Cart = () => {
         // Transform data if needed to match your CartItem shape
         setItems(
           data.cart.map((item: CartItem) => ({
-            productId: item.productId,
+            product_id: item.product_id,
             name: item.name,
             price: item.price,
             quantity: item.quantity,
@@ -51,69 +58,16 @@ const Cart = () => {
     router.push("/cart/checkout");
   };
 
-  const handleIncreaseQuantity = async (item: {
-    productId: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image_url?: string;
-  }) => {
-    const res = await fetch("/api/cart/manage", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        product_id: item.productId,
-        action: "increase",
-        amount: 1,
-      }),
-    });
-    if (res.ok) {
-      addItem({
-        ...item,
-        quantity: 1,
-        image_url: item.image_url || fallbackImage,
-      });
-    }
+  const handleIncreaseQuantity = async (product_id: number) => {
+    await increaseQuantity(product_id);
   };
 
-  const handleDecreaseQuantity = async (item: {
-    productId: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image_url?: string;
-  }) => {
-    if (item.quantity > 1) {
-      const res = await fetch("/api/cart/manage", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product_id: item.productId,
-          action: "deduct",
-        }),
-      });
-      if (res.ok) {
-        addItem({
-          ...item,
-          quantity: -1,
-          image_url: item.image_url || fallbackImage,
-        });
-      }
-    }
+  const handleDecreaseQuantity = async (product_id: number) => {
+    await decreaseQuantity(product_id);
   };
 
-  const handleRemoveItem = async (productId: string) => {
-    const res = await fetch("/api/cart/manage", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        product_id: productId,
-        action: "delete",
-      }),
-    });
-    if (res.ok) {
-      removeItem(productId);
-    }
+  const handleRemoveItem = async (product_id: number) => {
+    await deleteItem(product_id);
   };
 
   return (
@@ -146,11 +100,11 @@ const Cart = () => {
             <div>
               <h1 className="text-3xl font-bold mb-8">Cart</h1>
               <ul className="h-full max-h-[600px] overflow-y-auto shadow-inner border border-gray-200 p-4">
-                {cartItems.map((item, index) => (
+                {sortedCartItems.map((item, index) => (
                   <li
-                    key={item.productId}
+                    key={item.product_id}
                     className={`mb-4 pb-4 ${
-                      index === cartItems.length - 1 ? "" : "border-b"
+                      index === sortedCartItems.length - 1 ? "" : "border-b"
                     }`}
                   >
                     <div className="flex justify-between items-center">
@@ -169,7 +123,9 @@ const Cart = () => {
                           <div className="flex items-center mt-2">
                             <Button
                               variant="outline"
-                              onClick={() => handleDecreaseQuantity(item)}
+                              onClick={() =>
+                                handleDecreaseQuantity(item.product_id)
+                              }
                               className="mr-2"
                             >
                               -
@@ -177,7 +133,9 @@ const Cart = () => {
                             <span>{item.quantity}</span>
                             <Button
                               variant="outline"
-                              onClick={() => handleIncreaseQuantity(item)}
+                              onClick={() =>
+                                handleIncreaseQuantity(item.product_id)
+                              }
                               className="ml-2"
                             >
                               +
@@ -187,7 +145,7 @@ const Cart = () => {
                       </div>
                       <Button
                         variant="outline"
-                        onClick={() => handleRemoveItem(item.productId)}
+                        onClick={() => handleRemoveItem(item.product_id)}
                       >
                         Remove
                       </Button>
