@@ -11,7 +11,7 @@ interface ProductListProps {
 const ProductList: FC<ProductListProps> = ({ products, loading }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {[...Array(13)].map((_, index) => (
           <div key={index} className="shadow-lg p-8">
             <Skeleton className="w-full h-30" />
@@ -30,7 +30,7 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
       {products.map((product) => (
         <ProductCard key={product.product_id} product={product} />
       ))}

@@ -83,9 +83,11 @@ export type User = {
   password?: string;
   password_confirmation?: string;
   image_url?: string | File;
+  gender?: string ;
+  birthDay?: string | null ;
 };
 
-export interface Order {
+export type Order = {
   order_id: number;
   customer_name: string;
   order_date: string;
@@ -94,3 +96,13 @@ export interface Order {
   shipping_method: string | null;
   payment_status: string;
 }
+
+
+export type CartItem = {
+  product_id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image_url: string;
+}
+

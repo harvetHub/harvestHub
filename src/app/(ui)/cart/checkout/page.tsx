@@ -8,8 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Swal from "sweetalert2";
-
-const fallbackImage = "/path/to/fallback/image.jpg";
+import { fallbackImage } from "@/lib/fallbackImg";
 
 const Checkout = () => {
   const cartItems = useCartStore((state) => state.items);

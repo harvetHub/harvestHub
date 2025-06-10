@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,18 +12,73 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { User } from "@/lib/definitions";
+import { formFields } from "@/lib/profileConfig";
+import Swal from "sweetalert2";
 
-const ProfileForm: React.FC = () => {
+interface ProfileFormProps {
+  profile?: User;
+}
+
+const ProfileForm: React.FC<ProfileFormProps> = ({ profile }) => {
   const [formData, setFormData] = useState({
-    username: "",
-    name: "",
-    email: "",
-    phone: "",
-    gender: "",
-    birthDay: "",
+    username: profile?.username || "",
+    name:
+      [profile?.name?.first, profile?.name?.middle, profile?.name?.last]
+        .filter(Boolean)
+        .join(" ") ||
+      (typeof profile?.name === "string" ? profile?.name : "") ||
+      "",
+    email: profile?.email || "",
+    mobile_number: profile?.mobile_number || "",
+    gender: profile?.gender || "",
+    birthDay: profile?.birthDay
+      ? new Date(profile?.birthDay).toISOString().slice(0, 10)
+      : "",
   });
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isChanged, setIsChanged] = useState(false);
+
+  // Populate form data from profile prop
+  useEffect(() => {
+    if (profile) {
+      if (typeof profile.image_url === "string")
+        setProfileImage(profile.image_url);
+    }
+  }, [profile]);
+
+  // Track changes to formData compared to initial profile
+  useEffect(() => {
+    if (!profile) {
+      setIsChanged(false);
+      return;
+    }
+    const initial = {
+      username: profile.username || "",
+      name:
+        [profile.name?.first, profile.name?.middle, profile.name?.last]
+          .filter(Boolean)
+          .join(" ") ||
+        (typeof profile.name === "string" ? profile.name : "") ||
+        "",
+      email: profile.email || "",
+      mobile_number: profile.mobile_number || "",
+      gender: profile.gender || "",
+      birthDay: profile.birthDay
+        ? new Date(profile.birthDay).toISOString().slice(0, 10)
+        : "",
+      image_url: typeof profile.image_url === "string" ? profile.image_url : "",
+    };
+    const current = { ...formData, image_url: profileImage || "" };
+    setIsChanged(
+      Object.keys(initial).some(
+        (key) =>
+          initial[key as keyof typeof initial] !==
+          current[key as keyof typeof current]
+      )
+    );
+  }, [formData, profileImage, profile]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -51,31 +106,47 @@ const ProfileForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    console.log("Profile Image:", profileImage);
-    // Add your form submission logic here
+    // Optionally handle image upload here
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...formData,
+        image_url: profileImage,
+      }),
+    });
+    if (res.ok) {
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        icon: "success",
+        title: "Profile details successfully updated!",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener("mouseenter", Swal.stopTimer);
+          toast.addEventListener("mouseleave", Swal.resumeTimer);
+        },
+      });
+    } else {
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        icon: "error",
+        title: "Updating profile failed. Please try again.",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener("mouseenter", Swal.stopTimer);
+          toast.addEventListener("mouseleave", Swal.resumeTimer);
+        },
+      });
+    }
   };
-
-  const formFields = [
-    { id: "username", label: "Username", type: "text", required: true },
-    { id: "name", label: "Name", type: "text", required: true },
-    { id: "email", label: "Email", type: "email", required: true },
-    { id: "phone", label: "Phone Number", type: "tel", required: true },
-    {
-      id: "gender",
-      label: "Gender",
-      type: "select",
-      options: [
-        { value: "male", label: "Male" },
-        { value: "female", label: "Female" },
-        { value: "other", label: "Other" },
-      ],
-      required: true,
-    },
-    { id: "birthDay", label: "Birthday", type: "date", required: true },
-  ];
 
   return (
     <div>
@@ -117,14 +188,18 @@ const ProfileForm: React.FC = () => {
                   type={field.type}
                   id={field.id}
                   name={field.id}
-                  value={formData[field.id as keyof typeof formData]}
+                  value={formData[field.id as keyof typeof formData] || ""}
                   onChange={handleChange}
                   required={field.required}
                 />
               )}
             </div>
           ))}
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={!isChanged}
+          >
             Save
           </Button>
         </form>
