@@ -25,13 +25,21 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
     );
   }
 
-  if (products.length === 0) {
+  // Filter out products with stocks null or 0
+  const filteredProducts = products.filter(
+    (product) =>
+      product.stocks !== undefined &&
+      product.stocks !== null &&
+      product.stocks > 0
+  );
+
+  if (filteredProducts.length === 0) {
     return <p className="text-center text-xl">No products found.</p>;
   }
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-      {products.map((product) => (
+      {filteredProducts.map((product) => (
         <ProductCard key={product.product_id} product={product} />
       ))}
     </div>

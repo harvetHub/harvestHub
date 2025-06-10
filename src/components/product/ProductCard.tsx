@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/hooks/admin/useCart";
+import { useCart } from "@/hooks/useCart";
 import { FaStar, FaRegStar } from "react-icons/fa"; // Import star icons
 import { fallbackImage } from "@/lib/fallbackImg";
 
@@ -29,7 +29,8 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the click event from propagating to the Card
     addToCartWithSwal({
-      product_id: product.product_id,
+      product_id: product.product_id ?? 0,
+      stocks: product.stocks ?? 0,
       name: product.name,
       price: product.price,
       image_url:
