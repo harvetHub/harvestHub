@@ -70,7 +70,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 <TableCell>{product.product_id}</TableCell>
                 <TableCell>
                   <Image
-                    src={product.image_url || "/placeholder.png"}
+                    src={
+                      typeof product.image_url === "string"
+                        ? product.image_url
+                        : "/placeholder.png"
+                    }
                     alt={product.name}
                     width={50}
                     height={50}
