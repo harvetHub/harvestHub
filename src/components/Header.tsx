@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useCartCount } from "@/hooks/useCartCount";
+import { useClearCart } from "@/hooks/useClearCart";
 import { ShoppingCartIcon, CogIcon } from "@heroicons/react/20/solid";
 import { LogOutIcon, HelpingHandIcon, UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Header: FC = () => {
   const router = useRouter();
   const cartItems = useCartStore((state) => state.items);
+  const clearCart = useClearCart();
   const { count: initialCount } = useCartCount();
 
   // Use cartItems.length if available (client updates), otherwise fallback to initialCount from API
@@ -32,6 +34,7 @@ const Header: FC = () => {
     });
 
     if (response.ok) {
+      clearCart();
       router.push("/");
     } else {
       console.error("Failed to log out");

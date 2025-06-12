@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
 import jwt from "jsonwebtoken";
 
+
 const JWT_SECRET = process.env.JWT_SECRET; // Ensure this is set in your environment variables
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET environment variable is not set");
