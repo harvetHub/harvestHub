@@ -41,6 +41,7 @@ const Cart = () => {
             price: item.price,
             quantity: item.quantity,
             image_url: item.image_url,
+            stocks: item.stocks, // <-- add this line
           }))
         );
       }
@@ -138,17 +139,19 @@ const Cart = () => {
                                 handleIncreaseQuantity(item.product_id)
                               }
                               className="ml-2 cursor-pointer"
+                              disabled={item.quantity >= (item.stocks ?? 0)} // Disable if at max stock
+                              title={
+                                item.quantity >= (item.stocks ?? 0)
+                                  ? "Reached maximum available stock"
+                                  : undefined
+                              }
                             >
                               +
                             </Button>
                             {/* Show stocks count */}
-                            {item.stocks !== null && item.stocks !== 0 ? (
-                              <span className="ml-2 text-xs text-gray-500">
-                                ({item.stocks})
-                              </span>
-                            ) : (
-                              ""
-                            )}
+                            <span className="ml-2 text-xs text-gray-500">
+                              ({item.stocks})
+                            </span>
                           </div>
                         </div>
                       </div>
