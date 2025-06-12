@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/hooks/useCart";
+import { useCart } from "@/hooks/cart/useCart";
 import { FaStar, FaRegStar } from "react-icons/fa"; // Import star icons
 import { fallbackImage } from "@/lib/fallbackImg";
 

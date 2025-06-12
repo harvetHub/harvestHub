@@ -2,7 +2,7 @@ import { FC } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCart } from "@/hooks/useCart"; // Import the custom hook
+import { useCart } from "@/hooks/cart/useCart"; // Import the custom hook
 import { Product } from "@/lib/definitions";
 import { fallbackImage } from "@/lib/fallbackImg";
 

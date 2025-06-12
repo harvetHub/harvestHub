@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
-import { useCartCount } from "@/hooks/useCartCount";
-import { useClearCart } from "@/hooks/useClearCart";
+import { useCartCount } from "@/hooks/cart/useCartSync";
+import { useClearCart } from "@/hooks/cart/useClearCart";
 import { ShoppingCartIcon, CogIcon } from "@heroicons/react/20/solid";
 import { LogOutIcon, HelpingHandIcon, UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
