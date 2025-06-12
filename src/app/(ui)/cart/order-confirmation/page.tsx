@@ -8,7 +8,7 @@ const OrderConfirmation = () => {
   const router = useRouter();
 
   const handleContinueShopping = () => {
-    router.push("/products");
+    router.push("/home");
   };
 
   return (
@@ -17,7 +17,9 @@ const OrderConfirmation = () => {
         <h1 className="text-3xl font-bold mb-8">Order Confirmation</h1>
         <p>Your order has been placed successfully!</p>
         <div className="mt-8">
-          <Button onClick={handleContinueShopping}>Continue Shopping</Button>
+          <Button className="cursor-pointer" onClick={handleContinueShopping}>
+            Continue Shopping
+          </Button>
         </div>
       </div>
     </MainLayout>

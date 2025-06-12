@@ -146,7 +146,10 @@ const Checkout = () => {
               <p className="text-lg font-bold">₱{totalCost.toFixed(2)}</p>
             </div>
             <div className="mt-8 w-full">
-              <Button className="w-full" onClick={handlePlaceOrder}>
+              <Button
+                className="w-full cursor-pointer"
+                onClick={handlePlaceOrder}
+              >
                 Place Order
               </Button>
             </div>

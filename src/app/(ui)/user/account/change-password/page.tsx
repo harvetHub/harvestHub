@@ -129,7 +129,7 @@ const ChangePassPage: React.FC = () => {
               ))}
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full cursor-pointer">
                 Change Password
               </Button>
             </form>

@@ -51,6 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({
       <Button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
+        className="cursor-pointer"
       >
         Previous
       </Button>
@@ -58,6 +59,7 @@ const Pagination: React.FC<PaginationProps> = ({
         typeof page === "number" ? (
           <Button
             key={index}
+            className="cursor-pointer"
             onClick={() => onPageChange(page)}
             variant={currentPage === page ? "default" : "outline"}
           >
@@ -70,6 +72,7 @@ const Pagination: React.FC<PaginationProps> = ({
         )
       )}
       <Button
+        className="cursor-pointer"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >

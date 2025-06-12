@@ -211,7 +211,9 @@ export default function UserManagement() {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Button onClick={handleAddUser}>Add User</Button>
+          <Button className="cursor-pointer" onClick={handleAddUser}>
+            Add User
+          </Button>
         </div>
 
         <UserTable

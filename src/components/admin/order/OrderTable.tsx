@@ -130,6 +130,7 @@ export default function OrdersTable({
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"
+                          className="cursor-pointer"
                           size="sm"
                           onClick={() => onCancelOrder(order.order_id)}
                         >
@@ -138,6 +139,7 @@ export default function OrdersTable({
                         <Button
                           variant="default"
                           size="sm"
+                          className="cursor-pointer"
                           onClick={() => onManageOrder(order)}
                         >
                           Manage

@@ -126,7 +126,7 @@ const Cart = () => {
                               onClick={() =>
                                 handleDecreaseQuantity(item.product_id)
                               }
-                              className="mr-2"
+                              className="mr-2 cursor-pointer"
                             >
                               -
                             </Button>
@@ -136,7 +136,7 @@ const Cart = () => {
                               onClick={() =>
                                 handleIncreaseQuantity(item.product_id)
                               }
-                              className="ml-2"
+                              className="ml-2 cursor-pointer"
                             >
                               +
                             </Button>
@@ -152,6 +152,7 @@ const Cart = () => {
                         </div>
                       </div>
                       <Button
+                        className="cursor-pointer"
                         variant="outline"
                         onClick={() => handleRemoveItem(item.product_id)}
                       >
@@ -161,8 +162,11 @@ const Cart = () => {
                   </li>
                 ))}
               </ul>
-              <div className="flex justify-end mt-8">
-                <Button className="w-full" onClick={handleCheckout}>
+              <div className="flex justify-end mt-8 cursor-pointer">
+                <Button
+                  className="w-full cursor-pointer"
+                  onClick={handleCheckout}
+                >
                   Proceed to Checkout
                 </Button>
               </div>

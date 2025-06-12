@@ -89,7 +89,7 @@ export default function Login() {
               toast.addEventListener("mouseleave", Swal.resumeTimer);
             },
           });
-          router.push("/dashboard");
+          router.push("/home");
         } else {
           Swal.fire({
             toast: true,
@@ -211,7 +211,7 @@ export default function Login() {
 
                 <Button
                   type="submit"
-                  className="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 cursor-pointer border-transparent rounded-md bg-gradient-to-r from-green-400 to-blue-500 focus:outline-none hover:opacity-80 focus:opacity-80"
+                  className="inline-flex  items-center justify-center w-full px-4 py-4 text-base  font-semibold text-white transition-all duration-200 cursor-pointer border-transparent rounded-md bg-gradient-to-r from-green-400 to-blue-500 focus:outline-none hover:opacity-80 focus:opacity-80"
                 >
                   Log in
                 </Button>

@@ -93,6 +93,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                   <div className="flex space-x-2">
                     <Button
                       variant="default"
+                      className="cursor-pointer"
                       size="sm"
                       onClick={() => onAddStock(item)}
                     >
@@ -100,6 +101,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                     </Button>
                     <Button
                       variant="outline"
+                      className="cursor-pointer"
                       size="sm"
                       onClick={() => onReduceStock(item)}
                     >
