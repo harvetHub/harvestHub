@@ -1,16 +1,10 @@
 import { FC } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { formatSoldCount } from "@/utils/formatSoldCount";
+
 import { Product } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/hooks/cart/useCart";
 import { FaStar, FaRegStar } from "react-icons/fa"; // Import star icons
 import { fallbackImage } from "@/lib/fallbackImg";
 import { formatPrice } from "@/utils/formatPrice";
@@ -21,26 +15,9 @@ interface ProductCardProps {
 
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const router = useRouter();
-  const { addToCartWithSwal } = useCart(); // Use the custom hook
 
   const handleProductClick = (id: number) => {
     router.push(`/product/details/${id}`);
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the click event from propagating to the Card
-    addToCartWithSwal({
-      product_id: product.product_id ?? 0,
-      stocks: product.stocks ?? 0,
-      name: product.name,
-      price: product.price,
-      image_url:
-        typeof product.image_url === "string"
-          ? product.image_url
-          : product.image_url instanceof File
-          ? URL.createObjectURL(product.image_url)
-          : null,
-    }); // Use the reusable hook
   };
 
   // Generate star rating
@@ -72,7 +49,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
               ? product.image_url
               : fallbackImage
           }
-          alt={product.name}
+          alt={product.name ?? "Product image"}
           width={150}
           height={150}
           className="w-full object-cover min-h-35 max-h-40"
@@ -80,30 +57,21 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
             e.currentTarget.src = fallbackImage;
           }}
         />
-        <CardTitle className="">{product.name}</CardTitle>
+        <CardTitle className="mt-2">{product.name}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="description overflow-hidden text-ellipsis">
-          {product.description}
-        </p>
-        <div className="flex items-center space-x-1 mt-2">
+        <div className="flex items-center space-x-1 -mt-4">
           {renderStars(product.rating || 0)}{" "}
           {/* Render stars based on rating */}
           <span className="text-sm text-gray-500">({product.rating || 0})</span>
         </div>
-        <div className="mt-2">
-          <p className="font-bold">{formatPrice(product.price)}</p>
+        <div className="flex mt-4 justify-between items-center">
+          <p className="font-bold">{formatPrice(product.price ?? 0)}</p>
+          <p className="font-normal text-xs">
+            {formatSoldCount(product.sold ?? 0)} sold
+          </p>
         </div>
       </CardContent>
-      <CardFooter className="mt-auto">
-        <Button
-          className="w-full cursor-pointer"
-          variant={"default"}
-          onClick={handleAddToCart}
-        >
-          Add to Cart
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

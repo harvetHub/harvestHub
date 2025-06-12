@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
 
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get("page") || "1");
@@ -38,16 +39,40 @@ export async function GET(req: NextRequest) {
   }
 
   // Execute the query
-  const { data, error, count } = await query;
+  const { data: products, error, count } = await query;
 
-  // Handle errors
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  // Return the response
+  // Get all product_ids from the current page
+  const productIds = products.map((p) => p.product_id);
+
+  // Fetch sold counts for these products from order_items
+  const soldMap: Record<string, number> = {};
+  if (productIds.length > 0) {
+    const { data: soldData, error: soldError } = await supabaseServer
+      .from("order_items")
+      .select("product_id, quantity");
+
+    if (!soldError && soldData) {
+      // Sum quantities per product_id
+      soldData.forEach((item) => {
+        if (productIds.includes(item.product_id)) {
+          soldMap[item.product_id] = (soldMap[item.product_id] || 0) + item.quantity;
+        }
+      });
+    }
+  }
+
+  // Append sold count to each product
+  const productsWithSold = products.map((product) => ({
+    ...product,
+    sold: soldMap[product.product_id] || 0,
+  }));
+
   return NextResponse.json({
-    products: data,
+    products: productsWithSold,
     total: count,
     page,
     limit,

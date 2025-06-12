@@ -11,6 +11,9 @@ export type Product = {
   reorder_level?: number;
   created_at?: string;
   updated_at?: string;
+  sold?: number;
+  is_featured?: boolean;
+  is_recommended?: boolean;
 };
 
 export type InventoryType = {
