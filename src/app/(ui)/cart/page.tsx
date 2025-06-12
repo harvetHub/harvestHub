@@ -11,7 +11,7 @@ import { CartItem } from "@/lib/definitions";
 
 const Cart = () => {
   const cartItems = useCartStore((state) => state.items);
-  const setItems = useCartStore((state) => state.setItems); // Make sure setItems exists in your store
+  const setItems = useCartStore((state) => state.setItems);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
   const deleteItem = useCartStore((state) => state.deleteItem);
@@ -22,8 +22,6 @@ const Cart = () => {
   const sortedCartItems = [...cartItems].sort((a, b) =>
     a.name.localeCompare(b.name)
   );
-
-  console.log("Cart items:", cartItems);
 
   // Helper to sync cart after API call
   const syncCart = async () => {
