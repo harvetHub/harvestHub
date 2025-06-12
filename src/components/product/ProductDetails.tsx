@@ -49,9 +49,9 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
                   : fallbackImage
               }
               alt={product.name}
-              layout="fill"
-              objectFit="cover"
-              className=""
+              width={600}
+              height={500}
+              className="w-full h-full object-cover"
               priority
             />
           </div>
