@@ -107,3 +107,11 @@ export type CartItem = {
   stocks?: number;
 }
 
+
+export type OrderItem = {
+  product_id: number; 
+  quantity: number; 
+  price:number; 
+}
+
+

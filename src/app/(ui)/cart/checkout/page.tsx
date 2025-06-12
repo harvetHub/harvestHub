@@ -16,24 +16,52 @@ const Checkout = () => {
   const router = useRouter();
   const [deliveryOption, setDeliveryOption] = useState("pickup");
 
-  const handlePlaceOrder = () => {
-    // Implement place order logic here
+  const handlePlaceOrder = async () => {
+    if (cartItems.length === 0) return;
 
-    clearCart();
-    Swal.fire({
-      toast: true,
-      position: "bottom-end",
-      icon: "success",
-      title: "Order placed successfully",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener("mouseenter", Swal.stopTimer);
-        toast.addEventListener("mouseleave", Swal.resumeTimer);
-      },
-    });
-    router.push("/cart/order-confirmation");
+    try {
+      const res = await fetch("/api/cart/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartItems,
+          deliveryOption,
+          totalCost,
+        }),
+      });
+
+      if (res.ok) {
+        clearCart();
+        Swal.fire({
+          toast: true,
+          position: "bottom-end",
+          icon: "success",
+          title: "Order placed successfully",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+        router.push("/cart/order-confirmation");
+      } else {
+        const data = await res.json();
+        Swal.fire({
+          icon: "error",
+          title: "Failed to place order",
+          text: data.message || "Something went wrong.",
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to place order",
+        text: "Something went wrong.",
+      });
+    }
   };
 
   const totalCost = cartItems.reduce(
@@ -59,7 +87,7 @@ const Checkout = () => {
             <ul className="h-96 overflow-y-auto shadow-inner border border-gray-200 p-4">
               {cartItems.map((item, index) => (
                 <li
-                  key={item.productId}
+                  key={item.product_id}
                   className={`mb-4 pb-4 ${
                     index === cartItems.length - 1 ? "" : "border-b"
                   }`}
