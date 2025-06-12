@@ -62,6 +62,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           onError={(e) => {
             e.currentTarget.src = fallbackImage;
           }}
+          priority
         />
         <CardTitle className="ml-2 mt-2">{product.name}</CardTitle>
       </CardHeader>

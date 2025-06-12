@@ -52,6 +52,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
               layout="fill"
               objectFit="cover"
               className=""
+              priority
             />
           </div>
         </div>
@@ -68,6 +69,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
                 product_id: product.product_id ?? 0,
                 stocks: product.stocks ?? 0,
                 name: product.name,
+
                 price: product.price,
                 image_url:
                   typeof product.image_url === "string"

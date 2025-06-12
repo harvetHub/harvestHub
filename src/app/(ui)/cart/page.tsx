@@ -116,6 +116,7 @@ const Cart = () => {
                           src={item.image_url || fallbackImage}
                           alt={item.name}
                           width={100}
+                          priority
                           height={100}
                           className="w-24 h-24 object-cover mr-4 rounded-xl shadow-md"
                         />

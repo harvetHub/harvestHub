@@ -5,7 +5,7 @@ import { supabaseServer } from "@/utils/supabase/server";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "10");
+  const limit = parseInt(searchParams.get("limit") || "12");
   const productType = searchParams.get("product_type");
   const searchTerm = searchParams.get("search_term");
   const isFeatured = searchParams.get("is_featured");
