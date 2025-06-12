@@ -14,14 +14,14 @@ const CategoriesSection: FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 py-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 py-4 ">
       {categories.map((category) => (
         <div
           key={category.id}
           onClick={() => handleCategoryClick(category.value)} // Handle click event
-          className="cursor-pointer"
+          className="cursor-pointer "
         >
-          <Card className="shadow-sm rounded-none hover:scale-105 h-full justify-start items-center">
+          <Card className="shadow-sm py-4 rounded-none gap-4 hover:scale-105 h-full justify-start items-center">
             <CardHeader>
               <CardTitle className="text-4xl">{category.icon}</CardTitle>
             </CardHeader>

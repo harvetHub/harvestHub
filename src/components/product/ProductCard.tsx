@@ -1,5 +1,11 @@
 import { FC } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Image from "next/image";
 import { formatSoldCount } from "@/utils/formatSoldCount";
 
@@ -52,26 +58,28 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           alt={product.name ?? "Product image"}
           width={150}
           height={150}
-          className="w-full object-cover min-h-35 max-h-40"
+          className="w-full object-cover  h-30  md:h-40 lg:h-40 xl:h-40"
           onError={(e) => {
             e.currentTarget.src = fallbackImage;
           }}
         />
-        <CardTitle className="mt-2">{product.name}</CardTitle>
+        <CardTitle className="ml-2 mt-2">{product.name}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow">
+
+      <CardContent className="w-full flex-grow">
         <div className="flex items-center space-x-1 -mt-4">
           {renderStars(product.rating || 0)}{" "}
           {/* Render stars based on rating */}
           <span className="text-sm text-gray-500">({product.rating || 0})</span>
         </div>
-        <div className="flex mt-4 justify-between items-center">
-          <p className="font-bold">{formatPrice(product.price ?? 0)}</p>
-          <p className="font-normal text-xs">
-            {formatSoldCount(product.sold ?? 0)} sold
-          </p>
-        </div>
       </CardContent>
+
+      <CardFooter className="flex justify-between pb-4 -mt-4 w-full   ">
+        <p className="font-bold">{formatPrice(product.price ?? 0)}</p>
+        <p className="font-normal text-xs">
+          {formatSoldCount(product.sold ?? 0)} sold
+        </p>
+      </CardFooter>
     </Card>
   );
 };
