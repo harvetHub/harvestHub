@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/hooks/cart/useCart"; // Import the custom hook
 import { Product } from "@/lib/definitions";
 import { fallbackImage } from "@/lib/fallbackImg";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface ProductDetailsProps {
   product: Product | null;
@@ -58,7 +59,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
           <p className="text-lg text-gray-700 mb-4">{product.description}</p>
           <p className="text-2xl font-bold text-green-600 mb-4">
-            ₱{product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </p>
           <Button
             className="w-full md:w-auto cursor-pointer"

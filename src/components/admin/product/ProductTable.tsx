@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import { categories } from "@/lib/productsConfig";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface ProductTableProps {
   products: Product[];
@@ -89,12 +90,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       ?.name
                   }
                 </TableCell>
-                <TableCell>
-                  ₱
-                  {new Intl.NumberFormat("en-US", {
-                    minimumFractionDigits: 2,
-                  }).format(product.price)}
-                </TableCell>
+                <TableCell>{formatPrice(product.price)}</TableCell>
 
                 <TableCell>
                   <div className="flex space-x-2">

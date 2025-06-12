@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { InventoryType } from "@/lib/definitions";
 import Image from "next/image";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface InventoryTableProps {
   inventory: InventoryType[];
@@ -83,12 +84,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                 <TableCell>
                   <span className="font-bold ">{item.stocks}</span>
                 </TableCell>
-                <TableCell>
-                  ₱
-                  {new Intl.NumberFormat("en-US", {
-                    minimumFractionDigits: 2,
-                  }).format(item.price)}
-                </TableCell>
+                <TableCell>{formatPrice(item.price)}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button

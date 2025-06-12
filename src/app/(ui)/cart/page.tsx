@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { fallbackImage } from "@/lib/fallbackImg";
 import { useEffect } from "react";
 import { CartItem } from "@/lib/definitions";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Cart = () => {
   const cartItems = useCartStore((state) => state.items);
@@ -119,7 +120,7 @@ const Cart = () => {
                         />
                         <div>
                           <h2 className="text-xl font-bold">{item.name}</h2>
-                          <p>Price: ₱{item.price.toFixed(2)}</p>
+                          <p>Price: {formatPrice(item.price)} </p>
                           <div className="flex items-center mt-2">
                             <Button
                               variant="outline"

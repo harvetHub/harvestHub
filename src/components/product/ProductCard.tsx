@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/cart/useCart";
 import { FaStar, FaRegStar } from "react-icons/fa"; // Import star icons
 import { fallbackImage } from "@/lib/fallbackImg";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface ProductCardProps {
   product: Product;
@@ -91,7 +92,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           <span className="text-sm text-gray-500">({product.rating || 0})</span>
         </div>
         <div className="mt-2">
-          <p className="font-bold">₱{product.price.toFixed(2)}</p>
+          <p className="font-bold">{formatPrice(product.price)}</p>
         </div>
       </CardContent>
       <CardFooter className="mt-auto">

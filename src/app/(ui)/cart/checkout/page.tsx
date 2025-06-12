@@ -9,6 +9,7 @@ import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Swal from "sweetalert2";
 import { fallbackImage } from "@/lib/fallbackImg";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Checkout = () => {
   const cartItems = useCartStore((state) => state.items);
@@ -105,10 +106,10 @@ const Checkout = () => {
                       <div>
                         <h2 className="text-xl font-bold">{item.name}</h2>
                         <p>
-                          Price: ₱{item.price.toFixed(2)} <span>x</span>{" "}
+                          Price: {formatPrice(item.price)} <span>x</span>{" "}
                           <span>{item.quantity}</span> <span>=</span>{" "}
                           <span className="font-semibold">
-                            ₱{(+item.price * item.quantity).toFixed(2)}
+                            {formatPrice(+item.price * item.quantity)}
                           </span>
                         </p>
                         <p>
@@ -143,7 +144,7 @@ const Checkout = () => {
             </div>
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Total Cost</h2>
-              <p className="text-lg font-bold">₱{totalCost.toFixed(2)}</p>
+              <p className="text-lg font-bold">{formatPrice(totalCost)} </p>
             </div>
             <div className="mt-8 w-full">
               <Button
