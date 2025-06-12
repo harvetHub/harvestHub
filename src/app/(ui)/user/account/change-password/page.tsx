@@ -97,7 +97,7 @@ const ChangePassPage: React.FC = () => {
         <SideNav />
 
         {/* Change Password Form */}
-        <Card className="flex-1 bg-white px-4 py-8 rounded-sm shadow border-0">
+        <Card className="flex-1 bg-white px-4 py-8 rounded-sm shadow border-0 p-6">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">
               Change Password

@@ -21,7 +21,7 @@ const CategoriesSection: FC = () => {
           onClick={() => handleCategoryClick(category.value)} // Handle click event
           className="cursor-pointer "
         >
-          <Card className="shadow-sm py-4 rounded-none gap-4 hover:scale-105 h-full justify-start items-center">
+          <Card className="shadow-sm p-6 rounded-none gap-4 hover:scale-105 h-full justify-start items-center">
             <CardHeader>
               <CardTitle className="text-4xl">{category.icon}</CardTitle>
             </CardHeader>

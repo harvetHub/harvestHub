@@ -137,7 +137,6 @@ const AddressList: React.FC = () => {
     type: keyof Address["address"],
     value: Address["address"][keyof Address["address"]] | null
   ) => {
-   
     setNewAddress((prev) => ({
       ...prev,
       address: {
@@ -304,7 +303,7 @@ const AddressList: React.FC = () => {
       {/* Address List */}
       <div className="space-y-4">
         {addresses.map((address) => (
-          <Card key={address.id} className="shadow-sm">
+          <Card key={address.id} className="shadow-sm p-6">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">
                 {address.name}{" "}
