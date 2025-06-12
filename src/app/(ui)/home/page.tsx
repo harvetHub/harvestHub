@@ -8,7 +8,7 @@ import RecommendedItemsSection from "@/components/home/RecommendedItems";
 export default function Home() {
   return (
     <MainLayout>
-      <div className="myContainer mx-auto">
+      <div className="myContainer mx-auto mb-8">
         <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
         <FeaturedProductCarousel />
 
