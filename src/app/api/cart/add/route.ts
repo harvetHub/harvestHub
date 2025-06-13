@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const { product_id, quantity, price, name, image_url } = await req.json();
+  const { product_id, quantity } = await req.json();
 
   if (!product_id || !quantity) {
     return NextResponse.json({ message: "Product ID and quantity are required." }, { status: 400 });
@@ -21,9 +21,6 @@ export async function POST(req: NextRequest) {
       {
         user_id: userId,
         product_id,
-        name,
-        price,
-        image_url: image_url || null, // Allow null for image_url
         quantity,
         added_at: new Date().toISOString(),
         

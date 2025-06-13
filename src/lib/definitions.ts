@@ -11,6 +11,9 @@ export type Product = {
   reorder_level?: number;
   created_at?: string;
   updated_at?: string;
+  sold?: number;
+  is_featured?: boolean;
+  is_recommended?: boolean;
 };
 
 export type InventoryType = {
@@ -104,5 +107,14 @@ export type CartItem = {
   price: number;
   quantity: number;
   image_url: string;
+  stocks?: number;
 }
+
+
+export type OrderItem = {
+  product_id: number; 
+  quantity: number; 
+  price:number; 
+}
+
 

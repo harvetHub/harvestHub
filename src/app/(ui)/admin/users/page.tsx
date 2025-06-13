@@ -164,7 +164,12 @@ export default function UserManagement() {
       formDataToSend.append("name", JSON.stringify(formData.name));
       formDataToSend.append("username", formData.username);
       formDataToSend.append("email", formData.email);
-      formDataToSend.append("address", formData.address || "");
+      formDataToSend.append(
+        "address",
+        typeof formData.address === "string"
+          ? formData.address
+          : JSON.stringify(formData.address || "")
+      );
       formDataToSend.append("mobile_number", formData.mobile_number || "");
 
       // Append the image file if it exists
@@ -211,7 +216,9 @@ export default function UserManagement() {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Button onClick={handleAddUser}>Add User</Button>
+          <Button className="cursor-pointer" onClick={handleAddUser}>
+            Add User
+          </Button>
         </div>
 
         <UserTable

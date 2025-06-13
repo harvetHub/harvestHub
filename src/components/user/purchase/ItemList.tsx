@@ -91,7 +91,7 @@ const ItemList: React.FC = () => {
       <div className="space-y-4">
         {filteredPurchases.length > 0 ? (
           filteredPurchases.map((purchase) => (
-            <Card key={purchase.id} className="shadow-sm rounded-sm">
+            <Card key={purchase.id} className="shadow-sm rounded-sm p-6">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold border-b-1 border-gray-200 pb-2">
                   {purchase.name}
