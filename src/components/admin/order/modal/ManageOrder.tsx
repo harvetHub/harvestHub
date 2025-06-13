@@ -4,15 +4,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-interface Order {
-  order_id: number;
-  customer_name: string;
-  total_amount: number;
-  status: string;
-}
+import { Order } from "@/lib/definitions";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface ManageOrderModalProps {
   order: Order;
@@ -29,39 +25,29 @@ export default function ManageOrderModal({
     <Dialog open={!!order} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Manage Order</DialogTitle>
+          <DialogTitle>{order.customer_name} Order</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <p>
-            <strong>Order ID:</strong> {order.order_id}
-          </p>
-          <p>
-            <strong>Customer Name:</strong> {order.customer_name}
-          </p>
-          <p>
-            <strong>Status:</strong> {order.status}
-          </p>
-          <p>
-            <strong>Total Amount:</strong> ₱
-            {new Intl.NumberFormat("en-US", {
-              minimumFractionDigits: 2,
-            }).format(order.total_amount)}
-          </p>
-        </div>
+
+        <DialogDescription className="space-y-4">
+          Total Amount:{" "}
+          <span className="text-md font-bold">
+            {formatPrice(order.total_amount)}
+          </span>
+        </DialogDescription>
         <DialogFooter>
           <Button
             variant="default"
             onClick={() => onUpdateStatus("Ready for Pickup")}
             className="cursor-pointer"
           >
-            Mark as Ready for Pickup
+            Ready for Pickup
           </Button>
           <Button
             className="cursor-pointer"
             variant="default"
             onClick={() => onUpdateStatus("Released")}
           >
-            Mark as Released
+            Paid & Released
           </Button>
         </DialogFooter>
       </DialogContent>

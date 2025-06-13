@@ -15,17 +15,7 @@ import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
 import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
-
-interface Order {
-  order_id: number;
-  user_id: string;
-  customer_name: string;
-  order_date: string;
-  total_amount: number;
-  status: string;
-  shipping_method: string | null;
-  payment_status: string;
-}
+import { Order } from "@/lib/definitions";
 
 export default function OrdersManagement() {
   const [orders, setOrders] = useState<Order[]>([]);
