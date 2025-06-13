@@ -9,16 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { toSentenceCase } from "@/utils/toSentenceCase";
 import { formatPrice } from "@/utils/formatPrice";
-
-interface Order {
-  order_id: number;
-  customer_name: string;
-  order_date: string;
-  total_amount: number;
-  status: string;
-  shipping_method: string | null;
-  payment_status: string;
-}
+import OrderTableSkeleton from "../skeletonLoad/orderTableSL";
+import { Order } from "@/lib/definitions";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -69,35 +61,7 @@ export default function OrdersTable({
         </TableHeader>
         <TableBody>
           {loading ? (
-            // Skeleton Loader
-            Array.from({ length: 10 }).map((_, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-              </TableRow>
-            ))
+            <OrderTableSkeleton />
           ) : !loading && orders.length > 0 ? (
             orders
               .sort(
@@ -119,9 +83,13 @@ export default function OrdersTable({
                       </span>
                     </TableCell>
                     <TableCell>{formatPrice(order.total_amount)}</TableCell>
-                    <TableCell>{order.status}</TableCell>
-                    <TableCell>{order.shipping_method || "N/A"}</TableCell>
-                    <TableCell>{order.payment_status}</TableCell>
+                    <TableCell>{toSentenceCase(order.status)}</TableCell>
+                    <TableCell>
+                      {toSentenceCase(order.shipping_method ?? "N/A")}
+                    </TableCell>
+                    <TableCell>
+                      {toSentenceCase(order.payment_status)}
+                    </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button

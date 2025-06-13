@@ -32,16 +32,44 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    // Get all unique user_ids from orders
+    const userIds = [...new Set(orders.map((order) => order.user_id))];
+
+    // Fetch all user names in one query
+    const { data: usersData, error: usersError } = await supabaseServer
+      .from("users")
+      .select("user_id, name")
+      .in("user_id", userIds);
+
+    if (usersError) {
+      return NextResponse.json({ error: usersError.message }, { status: 400 });
+    }
+
+    // Create a map for quick lookup
+    const userMap = new Map(
+      (usersData || []).map((user) => [user.user_id, user.name])
+    );
+
     // Map orders to include the full customer name
     const ordersWithCustomerNames = orders.map((order) => {
-      const name = order.users?.name || {};
-      const customerName = `${name.first || ""} ${name.middle || ""} ${
-        name.last || ""
-      }`.trim();
+      const name = userMap.get(order.user_id);
+
+      let customerName = "N/A";
+      if (typeof name === "string") {
+        customerName = name;
+      } else if (name && typeof name === "object") {
+        // Join available parts, filter out empty strings
+        customerName = [name.first, name.middle, name.last]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
+        // If all are missing, fallback to N/A
+        if (!customerName) customerName = "N/A";
+      }
 
       return {
         ...order,
-        customer_name: customerName || "N/A",
+        customer_name: customerName,
       };
     });
 
