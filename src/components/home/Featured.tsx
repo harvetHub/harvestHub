@@ -3,9 +3,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { fallbackImage } from "@/lib/fallbackImg";
@@ -52,6 +54,8 @@ const FeaturedProductCarousel: FC = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
       </Carousel>
     );
   }
@@ -77,7 +81,7 @@ const FeaturedProductCarousel: FC = () => {
                   typeof product.image_url === "string"
                     ? product.image_url
                     : fallbackImage
-                } // Prioritize product.image, fallback to fallbackImage
+                }
                 alt={product.name}
                 width={300}
                 height={200}
@@ -91,6 +95,8 @@ const FeaturedProductCarousel: FC = () => {
           </CarouselItem>
         ))}
       </CarouselContent>
+      <CarouselPrevious className="ml-18" />
+      <CarouselNext className="mr-18" />
     </Carousel>
   );
 };

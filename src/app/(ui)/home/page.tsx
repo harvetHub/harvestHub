@@ -12,7 +12,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
         <FeaturedProductCarousel />
 
-        <h2 className="text-2xl font-bold mt-8 mb-4">Categories</h2>
+        <h2 className="text-2xl font-bold mt-8">Categories</h2>
         <CategoriesSection />
 
         <h2 className="text-2xl font-bold mt-8 mb-4">Recommended Items</h2>
