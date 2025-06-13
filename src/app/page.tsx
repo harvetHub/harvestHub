@@ -24,6 +24,9 @@ const carouselImages = [
   { name: "image5", src: "/images/lm5.jpg" },
   { name: "image6", src: "/images/lm6.jpg" },
   { name: "image7", src: "/images/lm7.jpg" },
+  { name: "image8", src: "/images/lm8.jpg" },
+  { name: "image9", src: "/images/lm9.jpg" },
+  { name: "image10", src: "/images/lm10.jpg" },
 ].map((image) => image.src);
 
 export default function Login() {
@@ -86,7 +89,7 @@ export default function Login() {
               toast.addEventListener("mouseleave", Swal.resumeTimer);
             },
           });
-          router.push("/dashboard");
+          router.push("/home");
         } else {
           Swal.fire({
             toast: true,
@@ -124,8 +127,8 @@ export default function Login() {
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
         {/* Left Side with Carousel */}
-        <div className="left relative flex items-center justify-center">
-          <Carousel>
+        <div className="relative flex items-center justify-center bg-gradient-to-r">
+          <Carousel className="w-full h-full">
             <CarouselContent>
               {carouselImages.map((image, index) => (
                 <CarouselItem key={index} className="w-full h-full">
@@ -142,12 +145,12 @@ export default function Login() {
             <CarouselPrevious
               variant={"default"}
               size={"lg"}
-              className="ml-20 scale-130 hover:scale-150 cursor-pointer animate-pulse"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 scale-125 hover:scale-150 cursor-pointer animate-pulse"
             />
             <CarouselNext
               variant={"default"}
               size={"lg"}
-              className="mr-20 scale-130 hover:scale-150 cursor-pointer animate-pulse"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 scale-125 hover:scale-150 cursor-pointer animate-pulse"
             />
           </Carousel>
         </div>
@@ -208,7 +211,7 @@ export default function Login() {
 
                 <Button
                   type="submit"
-                  className="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 cursor-pointer border-transparent rounded-md bg-gradient-to-r from-green-400 to-blue-500 focus:outline-none hover:opacity-80 focus:opacity-80"
+                  className="inline-flex  items-center justify-center w-full px-4 py-4 text-base  font-semibold text-white transition-all duration-200 cursor-pointer border-transparent rounded-md bg-gradient-to-r from-green-400 to-blue-500 focus:outline-none hover:opacity-80 focus:opacity-80"
                 >
                   Log in
                 </Button>

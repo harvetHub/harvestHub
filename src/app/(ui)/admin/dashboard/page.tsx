@@ -34,7 +34,7 @@ export default function AdminDashboard() {
 
         {/* Analytics Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="p-6">
             <CardHeader>
               <CardTitle>Total Sales</CardTitle>
             </CardHeader>
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
               <p className="text-2xl font-bold">₱120,000</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="p-6">
             <CardHeader>
               <CardTitle>Total Orders</CardTitle>
             </CardHeader>
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
               <p className="text-2xl font-bold">1,245</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="p-6">
             <CardHeader>
               <CardTitle>Total Products</CardTitle>
             </CardHeader>
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
               <p className="text-2xl font-bold">320</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="p-6">
             <CardHeader>
               <CardTitle>Total Users</CardTitle>
             </CardHeader>

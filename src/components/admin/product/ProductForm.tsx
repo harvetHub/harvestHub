@@ -157,10 +157,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
           {/* Actions */}
           <div className="mt-4 flex justify-end space-x-2">
-            <Button variant="outline" onClick={onCancel}>
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              onClick={onCancel}
+            >
               Cancel
             </Button>
-            <Button onClick={onSave}>Save</Button>
+            <Button className="cursor-pointer" onClick={onSave}>
+              Save
+            </Button>
           </div>
         </div>
       </DialogContent>

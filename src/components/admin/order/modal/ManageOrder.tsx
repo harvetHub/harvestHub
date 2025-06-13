@@ -52,10 +52,15 @@ export default function ManageOrderModal({
           <Button
             variant="default"
             onClick={() => onUpdateStatus("Ready for Pickup")}
+            className="cursor-pointer"
           >
             Mark as Ready for Pickup
           </Button>
-          <Button variant="default" onClick={() => onUpdateStatus("Released")}>
+          <Button
+            className="cursor-pointer"
+            variant="default"
+            onClick={() => onUpdateStatus("Released")}
+          >
             Mark as Released
           </Button>
         </DialogFooter>

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toSentenceCase } from "@/utils/toSentenceCase";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface Order {
   order_id: number;
@@ -117,12 +118,7 @@ export default function OrdersTable({
                         {getRelativeTime(orderDate)}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      ₱
-                      {new Intl.NumberFormat("en-US", {
-                        minimumFractionDigits: 2,
-                      }).format(order.total_amount)}
-                    </TableCell>
+                    <TableCell>{formatPrice(order.total_amount)}</TableCell>
                     <TableCell>{order.status}</TableCell>
                     <TableCell>{order.shipping_method || "N/A"}</TableCell>
                     <TableCell>{order.payment_status}</TableCell>
@@ -130,6 +126,7 @@ export default function OrdersTable({
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"
+                          className="cursor-pointer"
                           size="sm"
                           onClick={() => onCancelOrder(order.order_id)}
                         >
@@ -138,6 +135,7 @@ export default function OrdersTable({
                         <Button
                           variant="default"
                           size="sm"
+                          className="cursor-pointer"
                           onClick={() => onManageOrder(order)}
                         >
                           Manage

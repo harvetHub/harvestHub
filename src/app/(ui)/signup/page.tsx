@@ -7,7 +7,28 @@ import { inputFieldsConfig } from "@/lib/signupConfig";
 import { InputField } from "@/components/signup/InputField";
 import { validateSignupFormData } from "@/utils/validation/signupValidationFields";
 import Swal from "sweetalert2";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+const carouselImages = [
+  { name: "image1", src: "/images/lm1.jpg" },
+  { name: "image2", src: "/images/lm2.jpg" },
+  { name: "image3", src: "/images/lm3.jpg" },
+  { name: "image4", src: "/images/lm4.jpg" },
+  { name: "image5", src: "/images/lm5.jpg" },
+  { name: "image6", src: "/images/lm6.jpg" },
+  { name: "image7", src: "/images/lm7.jpg" },
+  { name: "image8", src: "/images/lm8.jpg" },
+  { name: "image9", src: "/images/lm9.jpg" },
+  { name: "image10", src: "/images/lm10.jpg" },
+].map((image) => image.src);
 
 export default function Signup() {
   type FormDataKeys =
@@ -105,9 +126,33 @@ export default function Signup() {
   return (
     <section className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
-        <div className="relative flex items-end px-4 pb-10 pt-60 sm:pb-16 md:justify-center lg:pb-24 bg-gray-50 sm:px-6 lg:px-8">
-          <div className="absolute inset-0"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        {/* Left Side with Carousel */}
+        <div className="relative flex items-center justify-center bg-gradient-to-r">
+          <Carousel className="w-full h-full">
+            <CarouselContent>
+              {carouselImages.map((image, index) => (
+                <CarouselItem key={index} className="w-full h-full">
+                  <Image
+                    width={1000}
+                    height={800}
+                    src={image}
+                    alt={`Carousel Image ${index + 1}`}
+                    className="w-full h-screen object-cover"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious
+              variant={"default"}
+              size={"lg"}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 scale-125 hover:scale-150 cursor-pointer animate-pulse"
+            />
+            <CarouselNext
+              variant={"default"}
+              size={"lg"}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 scale-125 hover:scale-150 cursor-pointer animate-pulse"
+            />
+          </Carousel>
         </div>
 
         <div className="flex items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
