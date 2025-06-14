@@ -22,7 +22,6 @@ interface OrdersTableProps {
 export default function OrdersTable({
   orders,
   loading,
-  onCancelOrder,
   onManageOrder,
 }: OrdersTableProps) {
   const getRelativeTime = (date: Date) => {
@@ -92,14 +91,6 @@ export default function OrdersTable({
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          className="cursor-pointer"
-                          size="sm"
-                          onClick={() => onCancelOrder(order.order_id)}
-                        >
-                          Cancel
-                        </Button>
                         <Button
                           variant="default"
                           size="sm"

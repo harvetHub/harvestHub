@@ -38,8 +38,6 @@ export default function OrdersManagement() {
       );
       const data = await response.json();
 
-      console.log("Fetched orders:", data);
-
       if (response.ok) {
         setOrders(data.orders);
         setTotalPages(data.totalPages);
