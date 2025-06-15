@@ -95,7 +95,7 @@ export default function AdminLogin() {
 
   return (
     <div className="bg-white h-screen flex items-center justify-center">
-      <div className="flex shadow-xl border rounded-2xl min-w-[300px] m-4 w-1/4 items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
+      <div className="flex shadow-xl border rounded-2xl min-w-[400px] m-4 w-1/4 items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
         <div className="xl:w-full xl:max-w-sm 2xl:max-w-md xl:mx-auto">
           <h2 className="text-3xl font-bold text-center leading-tight text-black sm:text-4xl">
             Admin Login
@@ -108,7 +108,7 @@ export default function AdminLogin() {
                   htmlFor="email"
                   className="text-base font-medium text-gray-900"
                 >
-                  Email address
+                  Email
                 </label>
                 <div className="mt-2.5 relative text-gray-400 focus-within:text-gray-600">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 h-9 pointer-events-none">

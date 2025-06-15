@@ -70,12 +70,12 @@ const FeaturedProductCarousel: FC = () => {
         {featuredProducts.map((product, index) => (
           <CarouselItem
             key={index}
-            className="md:basis-1/3 lg:basis-1/3 cursor-pointer"
+            className="md:basis-1/3 lg:basis-1/3 cursor-pointer py-2"
             onClick={() =>
               product.product_id && handleProductClick(product.product_id)
             }
           >
-            <div className="relative w-full h-60 rounded-sm overflow-hidden">
+            <div className="relative w-full h-80 rounded-sm overflow-hidden  bg-white shadow border">
               <Image
                 src={
                   typeof product.image_url === "string"
@@ -83,12 +83,12 @@ const FeaturedProductCarousel: FC = () => {
                     : fallbackImage
                 }
                 alt={product.name}
-                width={300}
-                height={200}
-                className="w-full h-full object-cover"
+                width={400}
+                height={300}
+                className="w-full h-full object-fit"
                 priority
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-black/30 bg-opacity-50 p-4 text-white">
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 bg-opacity-50 p-4 text-white">
                 <h3 className="text-lg font-bold">{product.name}</h3>
               </div>
             </div>

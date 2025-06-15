@@ -92,13 +92,15 @@ export type User = {
 
 export type Order = {
   order_id: number;
+  user_id?: string;
   customer_name: string;
   order_date: string;
   total_amount: number;
   status: string;
-  shipping_method: string | null;
-  payment_status: string;
+  shipping_method: 'pickup' | 'cod';
+  payment_status: 'paid' | 'unpaid';
 }
+
 
 
 export type CartItem = {
