@@ -70,17 +70,19 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <TableRow key={product.product_id}>
                 <TableCell>{product.product_id}</TableCell>
                 <TableCell>
-                  <Image
-                    src={
-                      typeof product.image_url === "string"
-                        ? product.image_url
-                        : "/placeholder.png"
-                    }
-                    alt={product.name}
-                    width={50}
-                    height={50}
-                    className="rounded-md"
-                  />
+                  <div className="bg-white w-fit rounded">
+                    <Image
+                      src={
+                        typeof product.image_url === "string"
+                          ? product.image_url
+                          : "/placeholder.png"
+                      }
+                      alt={product.name}
+                      width={50}
+                      height={50}
+                      className="h-12 object-contain"
+                    />
+                  </div>
                 </TableCell>
                 <TableCell>{product.sku}</TableCell>
                 <TableCell>{product.name}</TableCell>
