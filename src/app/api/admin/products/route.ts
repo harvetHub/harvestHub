@@ -81,7 +81,7 @@ export async function PUT(req: NextRequest) {
     const price = parseFloat(formData.get("price") as string);
     const product_type = formData.get("product_type") as string;
     const sku = formData.get("sku") as string;
-    const stocks = parseInt(formData.get("stocks") as string, 10);
+    // const stocks = parseInt(formData.get("stocks") as string, 10);
     const imageBlob = formData.get("image_url") as Blob;
 
     // Validate required fields
@@ -118,7 +118,6 @@ export async function PUT(req: NextRequest) {
         ...(image_url && { image_url }), // Only update image_url if a new image was uploaded
         product_type,
         sku,
-        stocks,
         updated_at: new Date().toISOString(),
       })
       .eq("product_id", +product_id);
