@@ -58,7 +58,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           alt={product.name ?? "Product image"}
           width={150}
           height={150}
-          className="w-full object-cover  h-30  md:h-40 lg:h-40 xl:h-40"
+          className="w-full object-fit  h-30  md:h-40 lg:h-40 xl:h-40"
           onError={(e) => {
             e.currentTarget.src = fallbackImage;
           }}
