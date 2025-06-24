@@ -108,9 +108,8 @@ export default function ManageOrderModal({
                   variant="default"
                   onClick={() => onUpdateStatus("prepairing")}
                   className="cursor-pointer bg-green-600 hover:bg-green-500 w-full"
-                >
-                  Accept & Prepare
-                </Button>
+                ></Button>
+                Accept & Prepare
                 <Button
                   variant="default"
                   onClick={() => onUpdateStatus("rejected")}
@@ -135,7 +134,7 @@ export default function ManageOrderModal({
           )}
 
           {/* Show Release if status is ready for pickup */}
-          {order.status.toLowerCase() === "ready for pickup" && (
+          {order.status.toLowerCase() === " " && (
             <Button
               className="cursor-pointer bg-green-600 hover:bg-green-500"
               variant="default"
@@ -149,4 +148,3 @@ export default function ManageOrderModal({
     </Dialog>
   );
 }
- 

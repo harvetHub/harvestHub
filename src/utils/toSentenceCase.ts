@@ -1,6 +1,6 @@
-export const toSentenceCase = (str: string) => {
-  if (!str || str.trim() === "") {
-    return str; // Return empty or undefined values as is
+export const toSentenceCase = (str: unknown): string => {
+  if (typeof str !== "string" || str.trim() === "") {
+    return ""; // Always return a string
   }
 
   return str

@@ -73,7 +73,13 @@ const UserTable: React.FC<UserTableProps> = ({
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.mobile_number}</TableCell>
-                <TableCell>{user.address}</TableCell>
+                <TableCell>
+                  {typeof user.address === "string"
+                    ? user.address
+                    : user.address
+                    ? JSON.stringify(user.address)
+                    : "N/A"}
+                </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button variant="outline" onClick={() => onEdit(user)}>
