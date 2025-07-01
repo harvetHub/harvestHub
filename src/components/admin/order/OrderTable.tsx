@@ -82,7 +82,28 @@ export default function OrdersTable({
                       </span>
                     </TableCell>
                     <TableCell>{formatPrice(order.total_amount)}</TableCell>
-                    <TableCell>{toSentenceCase(order.status)}</TableCell>
+                    <TableCell>
+                      <span
+                        className={
+                          "px-3 py-1 rounded-xl border border-gray-100 font-semibold " +
+                          (order.status?.toLowerCase() === "released"
+                            ? "bg-green-100 text-green-700"
+                            : order.status?.toLowerCase() === "prepairing"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : order.status?.toLowerCase() ===
+                                "ready_for_pickup" ||
+                              order.status?.toLowerCase() === "ready for pickup"
+                            ? "bg-blue-100 text-blue-700"
+                            : order.status?.toLowerCase() === "rejected"
+                            ? "bg-red-100 text-red-700"
+                            : order.status?.toLowerCase() === "pending"
+                            ? "bg-gray-200 text-gray-700"
+                            : "bg-gray-100 text-gray-700")
+                        }
+                      >
+                        {toSentenceCase(order.status)}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       {toSentenceCase(order.shipping_method ?? "N/A")}
                     </TableCell>
