@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
 
@@ -5,7 +6,7 @@ import { supabaseServer } from "@/utils/supabase/server";
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { order_id, total_amount, shipping_method, status, payment_status } = body;
+    const { order_id, total_amount, shipping_method, status, payment_status, updated_by } = body;
 
     if (!order_id) {
       return NextResponse.json(
@@ -20,6 +21,7 @@ export async function PUT(req: NextRequest) {
       newPaymentStatus = "paid";
     }
 
+    // Update the order
     const { data, error } = await supabaseServer
       .from("orders")
       .update({
@@ -34,11 +36,26 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    const { error: logError } = await supabaseServer
+      .from("order_status_logs")
+      .insert([
+        {
+          order_id,
+          status,
+          payment_status: newPaymentStatus,
+          created_at: new Date().toISOString(),
+          updated_by: updated_by ?? null,
+        },
+      ]);
+
+    if (logError) {
+      return NextResponse.json({ error: logError.message }, { status: 400 });
+    }
+
     return NextResponse.json(
       { message: "Order updated successfully.", order: data },
       { status: 200 }
     );
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

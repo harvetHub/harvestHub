@@ -100,48 +100,54 @@ export default function ManageOrderModal({
         </DialogDescription>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-2">
-          {/* Show Accept & Prepare if not yet preparing */}
-          {order.status.toLowerCase() !== "prepairing" ||
-            (order.status.toLowerCase() !== "pickup" && (
-              <div className="flex w-full gap-2">
+          {/* Hide all buttons if status is released */}
+          {order.status !== "released" && (
+            <>
+              {/* Show Accept & Prepare if not yet preparing or ready for pickup */}
+              {order.status !== "prepairing" &&
+                order.status !== "ready_for_pickup" && (
+                  <div className="flex w-full gap-2">
+                    <Button
+                      variant="default"
+                      onClick={() => onUpdateStatus("prepairing")}
+                      className="cursor-pointer bg-green-600 hover:bg-green-500 w-full"
+                    >
+                      Accept & Prepare
+                    </Button>
+                    <Button
+                      variant="default"
+                      onClick={() => onUpdateStatus("rejected")}
+                      className="cursor-pointer w-full opacity-30 hover:bg-red-500 hover:opacity-100"
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                )}
+
+              {/* Show Ready for Pickup if status is prepairing */}
+              {order.status === "prepairing" && (
+                <div className="flex w-full gap-2">
+                  <Button
+                    variant="default"
+                    onClick={() => onUpdateStatus("ready_for_pickup")}
+                    className="cursor-pointer bg-green-600 hover:bg-green-500 w-full"
+                  >
+                    Ready for Pickup
+                  </Button>
+                </div>
+              )}
+
+              {/* Show Release if status is ready for pickup */}
+              {order.status === "ready_for_pickup" && (
                 <Button
+                  className="cursor-pointer bg-green-600 hover:bg-green-500"
                   variant="default"
-                  onClick={() => onUpdateStatus("prepairing")}
-                  className="cursor-pointer bg-green-600 hover:bg-green-500 w-full"
-                ></Button>
-                Accept & Prepare
-                <Button
-                  variant="default"
-                  onClick={() => onUpdateStatus("rejected")}
-                  className="cursor-pointer w-full opacity-30 hover:bg-red-500 hover:opacity-100"
+                  onClick={() => onUpdateStatus("released")}
                 >
-                  Reject
+                  Release
                 </Button>
-              </div>
-            ))}
-
-          {/* Show Ready for Pickup if status is prepairing */}
-          {order.status.toLowerCase() === "prepairing" && (
-            <div className="flex w-full gap-2">
-              <Button
-                variant="default"
-                onClick={() => onUpdateStatus("ready for pickup")}
-                className="cursor-pointer bg-green-600 hover:bg-green-500 w-full"
-              >
-                Ready for Pickup
-              </Button>
-            </div>
-          )}
-
-          {/* Show Release if status is ready for pickup */}
-          {order.status.toLowerCase() === " " && (
-            <Button
-              className="cursor-pointer bg-green-600 hover:bg-green-500"
-              variant="default"
-              onClick={() => onUpdateStatus("released")}
-            >
-              Release
-            </Button>
+              )}
+            </>
           )}
         </div>
       </DialogContent>
