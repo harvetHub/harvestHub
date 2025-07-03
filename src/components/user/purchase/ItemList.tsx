@@ -6,8 +6,18 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/utils/formatPrice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRelativeTime } from "@/utils/getRelativeTime";
+import Image from "next/image";
+
+interface ProductItem {
+  id: number;
+  name: string;
+  image_url?: string;
+  quantity: number;
+  price: number;
+}
 
 interface PurchaseItem {
+  productList: ProductItem[];
   id: number;
   name: string;
   status: string;
@@ -65,7 +75,7 @@ const ItemList: React.FC = () => {
             <Card key={purchase.id} className="shadow-sm rounded-sm p-6">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold border-b-1 border-gray-200 pb-2">
-                  {purchase.name}
+                  {purchase.productList[0]?.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -84,6 +94,47 @@ const ItemList: React.FC = () => {
                     ? getRelativeTime(purchase.order_date)
                     : ""}
                 </p>
+                {/* Product List */}
+                {purchase.productList && purchase.productList.length > 0 && (
+                  <div className="mt-4">
+                    <div className="font-semibold mb-2">Items:</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {purchase.productList.map((item: ProductItem) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-4 bg-gray-50 rounded p-2 border"
+                        >
+                          {item.image_url ? (
+                            <Image
+                              width={48}
+                              height={48}
+                              src={item.image_url}
+                              alt={item.name}
+                              className="w-12 h-12 object-cover rounded shadow"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400">
+                              N/A
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="font-medium text-base">
+                              {item.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Qty:{" "}
+                              <span className="font-semibold">
+                                {item.quantity}
+                              </span>
+                              {" · "}
+                              <span>{formatPrice(item.price)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))
