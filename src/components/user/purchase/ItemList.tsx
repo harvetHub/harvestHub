@@ -1,70 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toSentenceCase } from "@/utils/toSentenceCase";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/utils/formatPrice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getRelativeTime } from "@/utils/getRelativeTime";
+
+interface PurchaseItem {
+  id: number;
+  name: string;
+  status: string;
+  total_amount: number;
+  order_date: string;
+}
 
 const ItemList: React.FC = () => {
   const [filter, setFilter] = useState("All");
+  const [purchases, setPurchases] = useState<PurchaseItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Sample purchase data
-  const purchases = [
-    {
-      id: 1,
-      name: "Product 1",
-      status: "Completed",
-      price: 100,
-      date: "2025-05-01",
-    },
-    {
-      id: 2,
-      name: "Product 2",
-      status: "Canceled",
-      price: 200,
-      date: "2025-04-15",
-    },
-    {
-      id: 3,
-      name: "Product 3",
-      status: "Return & Refund",
-      price: 150,
-      date: "2025-04-20",
-    },
-    {
-      id: 4,
-      name: "Product 4",
-      status: "Completed",
-      price: 300,
-      date: "2025-03-10",
-    },
-    {
-      id: 5,
-      name: "Product 4",
-      status: "Completed",
-      price: 300,
-      date: "2025-03-10",
-    },
-    {
-      id: 6,
-      name: "Product 4",
-      status: "Completed",
-      price: 300,
-      date: "2025-03-10",
-    },
-    {
-      id: 7,
-      name: "Product 4",
-      status: "Completed",
-      price: 300,
-      date: "2025-03-10",
-    },
-  ];
-
-  // Filter purchases based on the selected filter
-  const filteredPurchases =
-    filter === "All"
-      ? purchases
-      : purchases.filter((purchase) => purchase.status === filter);
+  useEffect(() => {
+    const fetchPurchases = async () => {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (filter !== "All") params.append("status", filter);
+      params.append("limit", "50");
+      const res = await fetch(`/api/purchase?${params.toString()}`);
+      const data = await res.json();
+      console.log("Fetched purchases:", data.items);
+      setPurchases(data.items || []);
+      setLoading(false);
+    };
+    fetchPurchases();
+  }, [filter]);
 
   return (
     <div className="myContainer mx-auto p-4 space-y-4">
@@ -89,8 +58,10 @@ const ItemList: React.FC = () => {
 
       {/* Purchase List */}
       <div className="space-y-4">
-        {filteredPurchases.length > 0 ? (
-          filteredPurchases.map((purchase) => (
+        {loading ? (
+          <p className="text-center text-gray-500">Loading...</p>
+        ) : purchases.length > 0 ? (
+          purchases.map((purchase) => (
             <Card key={purchase.id} className="shadow-sm rounded-sm p-6">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold border-b-1 border-gray-200 pb-2">
@@ -99,13 +70,19 @@ const ItemList: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600">
-                  Status: <span className="font-medium">{purchase.status}</span>
+                  Status:{" "}
+                  <span className="font-medium">
+                    {toSentenceCase(purchase.status)}
+                  </span>
                 </p>
                 <p className="text-sm text-gray-600">
-                  Price: ₱{purchase.price.toFixed(2)}
+                  Amount: {formatPrice(purchase.total_amount)}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Date: {new Date(purchase.date).toLocaleDateString()}
+                  Date:{" "}
+                  {purchase.order_date
+                    ? getRelativeTime(purchase.order_date)
+                    : ""}
                 </p>
               </CardContent>
             </Card>
