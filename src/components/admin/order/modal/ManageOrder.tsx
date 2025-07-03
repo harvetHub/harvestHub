@@ -100,8 +100,22 @@ export default function ManageOrderModal({
         </DialogDescription>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-2">
-          {/* Hide all buttons if status is released */}
-          {order.status !== "released" && (
+          {/* Show message if status is rejected */}
+          {order.status === "rejected" && (
+            <div className="col-span-full text-center text-red-600 font-semibold py-4">
+              This order has been rejected.
+            </div>
+          )}
+
+          {/* Show message if status is released */}
+          {order.status === "released" && (
+            <div className="col-span-full text-center text-green-700 font-semibold py-4">
+              This order has been released and completed.
+            </div>
+          )}
+
+          {/* Show action buttons only if not rejected or released */}
+          {order.status !== "rejected" && order.status !== "released" && (
             <>
               {/* Show Accept & Prepare if not yet preparing or ready for pickup */}
               {order.status !== "prepairing" &&
