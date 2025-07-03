@@ -3,11 +3,12 @@ import { supabaseServer } from "@/utils/supabase/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { order_id: string } }
+  context: { params: { order_id: string } }
 ) {
-  const { order_id } = params;
+  // Await params in case it's a Promise (for Next.js 14+ compatibility)
+  const { order_id } = await context.params;
 
-  if (!order_id) {
+  if (!order_id || typeof order_id !== "string" || order_id.trim() === "") {
     return NextResponse.json({ error: "Order ID is required." }, { status: 400 });
   }
 

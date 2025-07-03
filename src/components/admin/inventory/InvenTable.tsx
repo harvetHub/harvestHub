@@ -70,13 +70,15 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
               <TableRow key={item.id}>
                 <TableCell>{item.id}</TableCell>
                 <TableCell>
-                  <Image
-                    src={item.image_url || "/placeholder.png"}
-                    alt={""}
-                    width={50}
-                    height={50}
-                    className="rounded-md"
-                  />
+                  <div className="bg-white w-fit rounded">
+                    <Image
+                      src={item.image_url || "/placeholder.png"}
+                      alt={""}
+                      width={50}
+                      height={50}
+                      className="h-12 object-contain"
+                    />
+                  </div>
                 </TableCell>
                 <TableCell>{item.sku}</TableCell>
                 <TableCell>{item.name}</TableCell>
