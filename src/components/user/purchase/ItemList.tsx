@@ -71,73 +71,89 @@ const ItemList: React.FC = () => {
         {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : purchases.length > 0 ? (
-          purchases.map((purchase) => (
-            <Card key={purchase.id} className="shadow-sm rounded-sm p-6">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold border-b-1 border-gray-200 pb-2">
-                  {purchase.productList[0]?.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600">
-                  Status:{" "}
-                  <span className="font-medium">
-                    {toSentenceCase(purchase.status)}
-                  </span>
-                </p>
-                <p className="text-sm text-gray-600">
-                  Amount: {formatPrice(purchase.total_amount)}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Date:{" "}
-                  {purchase.order_date
-                    ? getRelativeTime(purchase.order_date)
-                    : ""}
-                </p>
-                {/* Product List */}
-                {purchase.productList && purchase.productList.length > 0 && (
-                  <div className="mt-4">
-                    <div className="font-semibold mb-2">Items:</div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {purchase.productList.map((item: ProductItem) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-4 bg-gray-50 rounded p-2 border"
-                        >
-                          {item.image_url ? (
-                            <Image
-                              width={48}
-                              height={48}
-                              src={item.image_url}
-                              alt={item.name}
-                              className="w-12 h-12 object-cover rounded shadow"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                              N/A
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <div className="font-medium text-base">
-                              {item.name}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              Qty:{" "}
-                              <span className="font-semibold">
-                                {item.quantity}
-                              </span>
-                              {" · "}
-                              <span>{formatPrice(item.price)}</span>
+          purchases
+            .slice() // create a shallow copy to avoid mutating state
+            .sort(
+              (a, b) =>
+                new Date(b.order_date).getTime() -
+                new Date(a.order_date).getTime()
+            )
+            .map((purchase) => (
+              <Card key={purchase.id} className="shadow-sm rounded-sm p-6">
+                <CardHeader className="flex flex-row justify-between space-y-2 border-b-1 border-gray-200">
+                  <CardTitle className="text-lg font-semibold ">
+                    {purchase.productList[0]?.name}
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    {purchase.order_date
+                      ? getRelativeTime(purchase.order_date)
+                      : ""}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">
+                    Status:{" "}
+                    <span className="font-medium">
+                      {toSentenceCase(purchase.status)}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-600 ">
+                    Amount:{" "}
+                    <span className="font-medium">
+                      {formatPrice(purchase.total_amount)}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Date Purchased:{" "}
+                    {purchase.order_date
+                      ? new Date(purchase.order_date).toDateString()
+                      : ""}
+                  </p>
+
+                  {/* Product List */}
+                  {purchase.productList && purchase.productList.length > 0 && (
+                    <div className="mt-4">
+                      <div className="font-semibold mb-2">Items:</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {purchase.productList.map((item: ProductItem) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center gap-4 bg-gray-50 rounded p-2 border"
+                          >
+                            {item.image_url ? (
+                              <Image
+                                width={48}
+                                height={48}
+                                src={item.image_url}
+                                alt={item.name}
+                                className="w-12 h-12 object-cover rounded shadow"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400">
+                                N/A
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <div className="font-medium text-base">
+                                {item.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                Qty:{" "}
+                                <span className="font-semibold">
+                                  {item.quantity}
+                                </span>
+                                {" · "}
+                                <span>{formatPrice(item.price)}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))
+                  )}
+                </CardContent>
+              </Card>
+            ))
         ) : (
           <p className="text-center text-gray-500">No purchases found.</p>
         )}
