@@ -25,37 +25,63 @@ interface PurchaseItem {
   order_date: string;
 }
 
+const statusMap: Record<string, string | undefined> = {
+  All: undefined,
+  Pending: "pending",
+  Preparing: "preparing",
+  "Ready to Pickup": "ready_for_pickup",
+  Completed: "released",
+  Canceled: "rejected",
+};
+
+const cancelOptions = [
+  "Changed my mind",
+  "Found a better price",
+  "Ordered by mistake",
+  "Other",
+];
+
 const ItemList: React.FC = () => {
   const [filter, setFilter] = useState("All");
   const [purchases, setPurchases] = useState<PurchaseItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showCancel, setShowCancel] = useState<number | null>(null);
+  const [cancelReason, setCancelReason] = useState<string>("");
+
+  const fetchPurchases = async (statusKey: string) => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    const mappedStatus = statusMap[statusKey];
+    if (mappedStatus) params.append("status", mappedStatus);
+    params.append("limit", "50");
+    const res = await fetch(`/api/purchase?${params.toString()}`);
+    const data = await res.json();
+    setPurchases(data.items || []);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchPurchases = async () => {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (filter !== "All") params.append("status", filter);
-      params.append("limit", "50");
-      const res = await fetch(`/api/purchase?${params.toString()}`);
-      const data = await res.json();
-      console.log("Fetched purchases:", data.items);
-      setPurchases(data.items || []);
-      setLoading(false);
-    };
-    fetchPurchases();
+    fetchPurchases(filter);
   }, [filter]);
+
+  const handleCancel = async (orderId: number) => {
+    const res = await fetch("/api/purchase/manage/cancel", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order_id: orderId, reasons: [cancelReason] }),
+    });
+    if (res.ok) {
+      fetchPurchases(filter);
+    }
+    setShowCancel(null);
+    setCancelReason("");
+  };
 
   return (
     <div className="myContainer mx-auto p-4 space-y-4">
       {/* Filter Section */}
       <div className="flex space-x-4 bg-white p-4 rounded-md shadow-sm mb-4 overflow-auto">
-        {[
-          "All",
-          "Ready to Pickup",
-          "Completed",
-          "Canceled",
-          "Return & Refund",
-        ].map((status) => (
+        {Object.keys(statusMap).map((status) => (
           <Button
             key={status}
             variant={filter === status ? "default" : "outline"}
@@ -152,6 +178,56 @@ const ItemList: React.FC = () => {
                     </div>
                   )}
                 </CardContent>
+
+                {/* Cancel Order Section */}
+                {purchase.status === "pending" && (
+                  <div className="mt-4">
+                    {showCancel === purchase.id ? (
+                      <div className="bg-red-50 p-3 rounded border mb-2">
+                        <div className="mb-2 font-semibold">
+                          Select cancellation reason:
+                        </div>
+                        <div className="flex flex-col gap-1 mb-2">
+                          {cancelOptions.map((option) => (
+                            <label
+                              key={option}
+                              className="flex items-center gap-2"
+                            >
+                              <input
+                                type="radio"
+                                name={`cancel-reason-${purchase.id}`}
+                                checked={cancelReason === option}
+                                onChange={() => setCancelReason(option)}
+                              />
+                              <span>{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <Button
+                          variant="destructive"
+                          disabled={!cancelReason}
+                          onClick={() => handleCancel(purchase.id)}
+                        >
+                          Confirm Cancel
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="ml-2"
+                          onClick={() => setShowCancel(null)}
+                        >
+                          Close
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowCancel(purchase.id)}
+                      >
+                        Cancel Order
+                      </Button>
+                    )}
+                  </div>
+                )}
               </Card>
             ))
         ) : (
