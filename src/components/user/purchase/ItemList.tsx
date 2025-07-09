@@ -252,6 +252,7 @@ const ItemList: React.FC = () => {
           onPageChange={handlePageChange}
         />
       )}
+      <div className="mb-8"></div>
     </div>
   );
 };
