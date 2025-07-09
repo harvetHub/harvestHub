@@ -7,6 +7,7 @@ import { formatPrice } from "@/utils/formatPrice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRelativeTime } from "@/utils/getRelativeTime";
 import Image from "next/image";
+import Pagination from "@/components/Pagination"; // adjust the import path as needed
 
 interface ProductItem {
   id: number;
@@ -47,22 +48,30 @@ const ItemList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showCancel, setShowCancel] = useState<number | null>(null);
   const [cancelReason, setCancelReason] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10; // or any value you want
 
-  const fetchPurchases = async (statusKey: string) => {
+  const fetchPurchases = async (statusKey: string, page = 1) => {
     setLoading(true);
     const params = new URLSearchParams();
     const mappedStatus = statusMap[statusKey];
     if (mappedStatus) params.append("status", mappedStatus);
-    params.append("limit", "50");
+    params.append("limit", itemsPerPage.toString());
+    params.append("page", page.toString());
     const res = await fetch(`/api/purchase?${params.toString()}`);
     const data = await res.json();
     setPurchases(data.items || []);
+    setTotalPages(data.totalPages || 1); // Make sure your API returns totalPages
     setLoading(false);
   };
-
   useEffect(() => {
-    fetchPurchases(filter);
-  }, [filter]);
+    fetchPurchases(filter, currentPage);
+  }, [filter, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleCancel = async (orderId: number) => {
     const res = await fetch("/api/purchase/manage/cancel", {
@@ -234,6 +243,15 @@ const ItemList: React.FC = () => {
           <p className="text-center text-gray-500">No purchases found.</p>
         )}
       </div>
+
+      {/* Pagination */}
+      {purchases.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 };
