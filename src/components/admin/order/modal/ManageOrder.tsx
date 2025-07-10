@@ -118,12 +118,12 @@ export default function ManageOrderModal({
           {order.status !== "rejected" && order.status !== "released" && (
             <>
               {/* Show Accept & Prepare if not yet preparing or ready for pickup */}
-              {order.status !== "prepairing" &&
+              {order.status !== "preparing" &&
                 order.status !== "ready_for_pickup" && (
                   <div className="flex w-full gap-2">
                     <Button
                       variant="default"
-                      onClick={() => onUpdateStatus("prepairing")}
+                      onClick={() => onUpdateStatus("preparing")}
                       className="cursor-pointer bg-green-600 hover:bg-green-500 w-full"
                     >
                       Accept & Prepare
@@ -138,8 +138,8 @@ export default function ManageOrderModal({
                   </div>
                 )}
 
-              {/* Show Ready for Pickup if status is prepairing */}
-              {order.status === "prepairing" && (
+              {/* Show Ready for Pickup if status is preparing */}
+              {order.status === "preparing" && (
                 <div className="flex w-full gap-2">
                   <Button
                     variant="default"
