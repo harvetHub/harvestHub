@@ -88,7 +88,7 @@ export default function OrdersTable({
                           "px-3 py-1 rounded-xl border border-gray-100 font-semibold " +
                           (order.status?.toLowerCase() === "released"
                             ? "bg-green-100 text-green-700"
-                            : order.status?.toLowerCase() === "prepairing"
+                            : order.status?.toLowerCase() === "preparing"
                             ? "bg-yellow-100 text-yellow-700"
                             : order.status?.toLowerCase() ===
                                 "ready_for_pickup" ||

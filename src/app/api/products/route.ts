@@ -2,8 +2,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
 
 
+// PRODUCTS GET HANDLER
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  // Check if this is an orders request (by presence of "status" param)
+  const status = searchParams.get("status");
+  if (status !== null) {
+    // Handle orders logic
+    const limit = parseInt(searchParams.get("limit") || "10");
+
+    let query = supabaseServer
+      .from("orders")
+      .select("*")
+      .limit(limit);
+
+    // Only filter if status is set and not "All"
+    if (status && status.toLowerCase() !== "all") {
+      query = query.eq("status", status);
+    }
+
+    const { data: orders, error } = await query;
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ items: orders }, { status: 200 });
+  }
+
+  // Otherwise, handle products logic
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "12");
   const productType = searchParams.get("product_type");
