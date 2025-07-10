@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-        const token = jwt.sign(
+    // Store your custom JWT (if you still need it for your own logic)
+    const token = jwt.sign(
       {
         id: user.id,
         email: user.email,
@@ -47,13 +48,21 @@ export async function POST(req: NextRequest) {
       JWT_SECRET as string,
       { expiresIn: "1h" } // Token expires in 1 hour
     );
-
     response.cookies.set("auth-token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
       maxAge: 3600, // 1 hour
+    });
+
+    // ✅ Store the Supabase access token for Supabase-authenticated API routes
+    response.cookies.set("supabase-access-token", session.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: session.expires_in || 3600,
     });
 
     return response;

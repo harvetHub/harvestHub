@@ -20,20 +20,25 @@ const ChangePassPage: React.FC = () => {
     confirmPassword: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [apiError, setApiError] = useState("");
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Reset errors
     setErrors({
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     });
+    setApiError("");
+    setSuccessMsg("");
 
     // Validation
     const newErrors: typeof errors = { ...errors };
@@ -51,18 +56,36 @@ const ChangePassPage: React.FC = () => {
 
     setErrors(newErrors);
 
-    // If no errors, submit the form
     if (!Object.values(newErrors).some((error) => error)) {
-      alert("Password changed successfully!");
-      setFormData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      setLoading(true);
+      try {
+        const res = await fetch("/api/auth/change-pass", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            currentPassword: formData.currentPassword,
+            newPassword: formData.newPassword,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSuccessMsg("Password changed successfully!");
+          setFormData({
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+        } else {
+          setApiError(data.error || "Failed to change password.");
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        setApiError("Something went wrong. Please try again.");
+      }
+      setLoading(false);
     }
   };
 
-  // Form fields configuration
   const formFields = [
     {
       id: "currentPassword",
@@ -128,9 +151,20 @@ const ChangePassPage: React.FC = () => {
                 </div>
               ))}
 
+              {apiError && (
+                <div className="text-red-600 text-sm">{apiError}</div>
+              )}
+              {successMsg && (
+                <div className="text-green-600 text-sm">{successMsg}</div>
+              )}
+
               {/* Submit Button */}
-              <Button type="submit" className="w-full cursor-pointer">
-                Change Password
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={loading}
+              >
+                {loading ? "Changing..." : "Change Password"}
               </Button>
             </form>
           </CardContent>
