@@ -19,7 +19,7 @@ interface ProductItem {
 
 interface PurchaseItem {
   productList: ProductItem[];
-  id: number;
+  order_id: number;
   name: string;
   status: string;
   total_amount: number;
@@ -50,6 +50,7 @@ const ItemList: React.FC = () => {
   const [cancelReason, setCancelReason] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
   const itemsPerPage = 10; // or any value you want
 
   const fetchPurchases = async (statusKey: string, page = 1) => {
@@ -61,6 +62,7 @@ const ItemList: React.FC = () => {
     params.append("page", page.toString());
     const res = await fetch(`/api/purchase?${params.toString()}`);
     const data = await res.json();
+    console.log("Fetched purchases:", data);
     setPurchases(data.items || []);
     setTotalPages(data.totalPages || 1); // Make sure your API returns totalPages
     setLoading(false);
@@ -69,18 +71,47 @@ const ItemList: React.FC = () => {
     fetchPurchases(filter, currentPage);
   }, [filter, currentPage]);
 
+  const fetchStatusCounts = async () => {
+    const statuses = Object.keys(statusMap).filter((s) => s !== "All");
+    const counts: Record<string, number> = {};
+
+    await Promise.all(
+      statuses.map(async (tab) => {
+        const mappedStatus = statusMap[tab];
+        const params = new URLSearchParams();
+        if (mappedStatus) params.append("status", mappedStatus);
+        params.append("limit", "1"); // Only need count, not data
+        params.append("count", "exact"); // Make sure your API supports this
+
+        const res = await fetch(`/api/purchase?${params.toString()}`);
+        const data = await res.json();
+        counts[tab] = data.totalCount || 0; // Make sure your API returns totalCount
+      })
+    );
+
+    // For "All" tab, sum all counts
+    counts["All"] = Object.values(counts).reduce((a, b) => a + b, 0);
+    setStatusCounts(counts);
+  };
+
+  useEffect(() => {
+    fetchStatusCounts();
+  }, []);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
   const handleCancel = async (orderId: number) => {
+    console.log({ order_id: orderId, reasons: [cancelReason] });
+    if (!cancelReason) return;
     const res = await fetch("/api/purchase/manage/cancel", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ order_id: orderId, reasons: [cancelReason] }),
     });
     if (res.ok) {
-      fetchPurchases(filter);
+      fetchPurchases(filter, currentPage);
     }
     setShowCancel(null);
     setCancelReason("");
@@ -91,13 +122,19 @@ const ItemList: React.FC = () => {
       {/* Filter Section */}
       <div className="flex space-x-4 bg-white p-4 rounded-md shadow-sm mb-4 overflow-auto">
         {Object.keys(statusMap).map((status) => (
-          <Button
-            key={status}
-            variant={filter === status ? "default" : "outline"}
-            onClick={() => setFilter(status)}
-          >
-            {status}
-          </Button>
+          <div key={status} className="relative">
+            <Button
+              variant={filter === status ? "default" : "outline"}
+              onClick={() => setFilter(status)}
+            >
+              {status}
+            </Button>
+            {statusCounts[status] ? (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                {statusCounts[status]}
+              </span>
+            ) : null}
+          </div>
         ))}
       </div>
 
@@ -113,8 +150,8 @@ const ItemList: React.FC = () => {
                 new Date(b.order_date).getTime() -
                 new Date(a.order_date).getTime()
             )
-            .map((purchase) => (
-              <Card key={purchase.id} className="shadow-sm rounded-sm p-6">
+            .map((purchase, index) => (
+              <Card key={index} className="shadow-sm rounded-sm p-6">
                 <CardHeader className="flex flex-row justify-between space-y-2 border-b-1 border-gray-200">
                   <CardTitle className="text-lg font-semibold ">
                     {purchase.productList[0]?.name}
@@ -191,20 +228,20 @@ const ItemList: React.FC = () => {
                 {/* Cancel Order Section */}
                 {purchase.status === "pending" && (
                   <div className="mt-4">
-                    {showCancel === purchase.id ? (
+                    {showCancel === purchase.order_id ? (
                       <div className="bg-red-50 p-3 rounded border mb-2">
                         <div className="mb-2 font-semibold">
                           Select cancellation reason:
                         </div>
                         <div className="flex flex-col gap-1 mb-2">
-                          {cancelOptions.map((option) => (
+                          {cancelOptions.map((option, index) => (
                             <label
-                              key={option}
+                              key={index}
                               className="flex items-center gap-2"
                             >
                               <input
                                 type="radio"
-                                name={`cancel-reason-${purchase.id}`}
+                                name={`cancel-reason-${purchase.order_id}`}
                                 checked={cancelReason === option}
                                 onChange={() => setCancelReason(option)}
                               />
@@ -215,7 +252,7 @@ const ItemList: React.FC = () => {
                         <Button
                           variant="destructive"
                           disabled={!cancelReason}
-                          onClick={() => handleCancel(purchase.id)}
+                          onClick={() => handleCancel(purchase.order_id)}
                         >
                           Confirm Cancel
                         </Button>
@@ -230,7 +267,7 @@ const ItemList: React.FC = () => {
                     ) : (
                       <Button
                         variant="destructive"
-                        onClick={() => setShowCancel(purchase.id)}
+                        onClick={() => setShowCancel(purchase.order_id)}
                       >
                         Cancel Order
                       </Button>

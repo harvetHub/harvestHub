@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
 
-// PATCH /api/purchase/cancel
+// PATCH /api/purchase/manage/cancel
 export async function PATCH(req: NextRequest) {
   try {
     const { order_id, reasons } = await req.json();
@@ -13,12 +13,15 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Update the order status to 'rejected' and store reasons as JSONB (if you have a column for it)
+    // Join reasons array into a single string for text column
+    const reasonsText = reasons.join(", ");
+
+    // Update the order status to 'rejected' and store reasons as text
     const { error } = await supabaseServer
       .from("orders")
       .update({
         status: "rejected",
-        cancel_reasons: reasons, // Make sure you have a 'cancel_reasons' JSONB column in your orders table
+        cancel_reason: reasonsText, // Make sure you have a 'cancel_reason' TEXT column in your orders table
       })
       .eq("order_id", order_id);
 

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   // Fetch orders with filters
   let query = supabaseServer
     .from("orders")
-    .select("*")
+    .select("*", { count: "exact" }) // get count for pagination
     .limit(limit);
 
   if (status) {
@@ -26,14 +26,14 @@ export async function GET(req: NextRequest) {
     query = query.lte("created_at", dateTo);
   }
 
-  const { data: orders, error } = await query;
+  const { data: orders, error, count } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
   if (!orders || orders.length === 0) {
-    return NextResponse.json({ items: [] }, { status: 200 });
+    return NextResponse.json({ items: [], totalCount: 0, totalPages: 1 }, { status: 200 });
   }
 
   // Fetch all order_items for the fetched orders
@@ -82,5 +82,12 @@ export async function GET(req: NextRequest) {
     productList: itemsByOrderId[order.order_id] || [],
   }));
 
-  return NextResponse.json({ items: ordersWithItems }, { status: 200 });
+  // Calculate totalPages for pagination
+  const totalCount = count || 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
+  return NextResponse.json(
+    { items: ordersWithItems, totalCount, totalPages },
+    { status: 200 }
+  );
 }
