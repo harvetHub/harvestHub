@@ -14,7 +14,9 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"; // Import shadcn carousel
+} from "@/components/ui/carousel";
+import { ShieldCheck, User } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 const carouselImages = [
   { name: "image1", src: "/images/lm1.jpg" },
@@ -38,20 +40,24 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [token, setToken] = useState("");
   const router = useRouter();
 
+  // Handle input change for both user and admin login
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: "" }); // Clear the error for the field being updated
+    setErrors({ ...errors, [name]: "" });
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // User login handler
+  const handleUserLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     let valid = true;
     const newErrors = { email: "", password: "" };
 
-    // Validate fields
     if (!formData.email) {
       newErrors.email = "Email is required";
       valid = false;
@@ -90,6 +96,87 @@ export default function Login() {
             },
           });
           router.push("/home");
+        } else {
+          Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            icon: "error",
+            title: data.error,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+        }
+      } catch {
+        Swal.fire({
+          toast: true,
+          position: "bottom-end",
+          icon: "error",
+          title: "An unexpected error occurred. Please try again later.",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+      }
+    }
+  };
+
+  // Admin login handler
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    let valid = true;
+    const newErrors = { email: "", password: "" };
+
+    if (!formData.email) {
+      newErrors.email = "Admin email is required";
+      valid = false;
+    }
+    if (!formData.password) {
+      newErrors.password = "Admin password is required";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (valid) {
+      try {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setToken(data.token);
+          Swal.fire({
+            toast: true,
+            position: "bottom-end",
+            icon: "success",
+            title: "Admin logged in successfully",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener("mouseenter", Swal.stopTimer);
+              toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+          });
+          router.push("/admin/dashboard");
         } else {
           Swal.fire({
             toast: true,
@@ -165,8 +252,35 @@ export default function Login() {
             <h3 className="my-4 font-semibold opacity-80 text-center">
               Integrated Online Agricultural Marketplace
             </h3>
+            {/* Admin Management Button */}
+            <div className="flex justify-center mb-6 w-full">
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={isAdminLogin}
+                  onCheckedChange={setIsAdminLogin}
+                  className="data-[state=checked]:bg-blue-600 data-[state=unchecked]:bg-gray-300 transition-colors duration-300"
+                  aria-label="Toggle admin login"
+                />
+                <span className="flex items-center gap-2 font-medium transition-all duration-300">
+                  {isAdminLogin ? (
+                    <>
+                      <ShieldCheck className="w-5 h-5 text-blue-600 transition-all duration-300" />
+                      Admin Login
+                    </>
+                  ) : (
+                    <>
+                      <User className="w-5 h-5 text-gray-600 transition-all duration-300" />
+                      User Login
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
 
-            <form onSubmit={handleLogin} className="mt-8">
+            <form
+              onSubmit={isAdminLogin ? handleAdminLogin : handleUserLogin}
+              className="mt-8"
+            >
               <div className="space-y-5">
                 {loginFields.map((field) => (
                   <div key={field.name}>
@@ -211,9 +325,9 @@ export default function Login() {
 
                 <Button
                   type="submit"
-                  className="inline-flex  items-center justify-center w-full px-4 py-4 text-base  font-semibold text-white transition-all duration-200 cursor-pointer border-transparent rounded-md bg-gradient-to-r from-green-400 to-blue-500 focus:outline-none hover:opacity-80 focus:opacity-80"
+                  className="inline-flex items-center justify-center w-full px-4 py-4 text-base font-semibold text-white transition-all duration-200 cursor-pointer border-transparent rounded-md bg-gradient-to-r from-green-400 to-blue-500 focus:outline-none hover:opacity-80 focus:opacity-80"
                 >
-                  Log in
+                  {isAdminLogin ? "Log in as Admin" : "Log in"}
                 </Button>
               </div>
             </form>
