@@ -11,6 +11,9 @@ export type Product = {
   reorder_level?: number;
   created_at?: string;
   updated_at?: string;
+  sold?: number;
+  is_featured?: boolean;
+  is_recommended?: boolean;
 };
 
 export type InventoryType = {
@@ -89,13 +92,15 @@ export type User = {
 
 export type Order = {
   order_id: number;
+  user_id?: string;
   customer_name: string;
   order_date: string;
   total_amount: number;
   status: string;
-  shipping_method: string | null;
-  payment_status: string;
+  shipping_method: 'pickup' | 'cod';
+  payment_status: 'paid' | 'unpaid';
 }
+
 
 
 export type CartItem = {
@@ -104,5 +109,14 @@ export type CartItem = {
   price: number;
   quantity: number;
   image_url: string;
+  stocks?: number;
 }
+
+
+export type OrderItem = {
+  product_id: number; 
+  quantity: number; 
+  price:number; 
+}
+
 

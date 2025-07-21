@@ -15,6 +15,7 @@ export const useCart = () => {
     name: string;
     price: number;
     image_url: string | null;
+    stocks: number | null;
   }) => {
     // Check if the item is already in the cart
     const isAlreadyInCart = cartItems.some(

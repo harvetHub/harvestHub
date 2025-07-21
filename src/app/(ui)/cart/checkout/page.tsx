@@ -9,6 +9,7 @@ import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Swal from "sweetalert2";
 import { fallbackImage } from "@/lib/fallbackImg";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Checkout = () => {
   const cartItems = useCartStore((state) => state.items);
@@ -16,24 +17,52 @@ const Checkout = () => {
   const router = useRouter();
   const [deliveryOption, setDeliveryOption] = useState("pickup");
 
-  const handlePlaceOrder = () => {
-    // Implement place order logic here
+  const handlePlaceOrder = async () => {
+    if (cartItems.length === 0) return;
 
-    clearCart();
-    Swal.fire({
-      toast: true,
-      position: "bottom-end",
-      icon: "success",
-      title: "Order placed successfully",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener("mouseenter", Swal.stopTimer);
-        toast.addEventListener("mouseleave", Swal.resumeTimer);
-      },
-    });
-    router.push("/cart/order-confirmation");
+    try {
+      const res = await fetch("/api/cart/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartItems,
+          deliveryOption,
+          totalCost,
+        }),
+      });
+
+      if (res.ok) {
+        clearCart();
+        Swal.fire({
+          toast: true,
+          position: "bottom-end",
+          icon: "success",
+          title: "Order placed successfully",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+        router.push("/cart/order-confirmation");
+      } else {
+        const data = await res.json();
+        Swal.fire({
+          icon: "error",
+          title: "Failed to place order",
+          text: data.message || "Something went wrong.",
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to place order",
+        text: "Something went wrong.",
+      });
+    }
   };
 
   const totalCost = cartItems.reduce(
@@ -59,7 +88,7 @@ const Checkout = () => {
             <ul className="h-96 overflow-y-auto shadow-inner border border-gray-200 p-4">
               {cartItems.map((item, index) => (
                 <li
-                  key={item.productId}
+                  key={item.product_id}
                   className={`mb-4 pb-4 ${
                     index === cartItems.length - 1 ? "" : "border-b"
                   }`}
@@ -77,10 +106,10 @@ const Checkout = () => {
                       <div>
                         <h2 className="text-xl font-bold">{item.name}</h2>
                         <p>
-                          Price: ₱{item.price.toFixed(2)} <span>x</span>{" "}
+                          Price: {formatPrice(item.price)} <span>x</span>{" "}
                           <span>{item.quantity}</span> <span>=</span>{" "}
                           <span className="font-semibold">
-                            ₱{(+item.price * item.quantity).toFixed(2)}
+                            {formatPrice(+item.price * item.quantity)}
                           </span>
                         </p>
                         <p>
@@ -115,10 +144,13 @@ const Checkout = () => {
             </div>
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Total Cost</h2>
-              <p className="text-lg font-bold">₱{totalCost.toFixed(2)}</p>
+              <p className="text-lg font-bold">{formatPrice(totalCost)} </p>
             </div>
             <div className="mt-8 w-full">
-              <Button className="w-full" onClick={handlePlaceOrder}>
+              <Button
+                className="w-full cursor-pointer"
+                onClick={handlePlaceOrder}
+              >
                 Place Order
               </Button>
             </div>

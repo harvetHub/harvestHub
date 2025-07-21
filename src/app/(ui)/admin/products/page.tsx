@@ -247,7 +247,9 @@ export default function ProductManagement() {
               </option>
             ))}
           </select>
-          <Button onClick={handleAddProduct}>Add Product</Button>
+          <Button className="cursor-pointer" onClick={handleAddProduct}>
+            Add Product
+          </Button>
         </div>
 
         <div className="flex m-4">

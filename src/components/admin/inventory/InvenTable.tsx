@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { InventoryType } from "@/lib/definitions";
 import Image from "next/image";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface InventoryTableProps {
   inventory: InventoryType[];
@@ -69,13 +70,15 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
               <TableRow key={item.id}>
                 <TableCell>{item.id}</TableCell>
                 <TableCell>
-                  <Image
-                    src={item.image_url || "/placeholder.png"}
-                    alt={""}
-                    width={50}
-                    height={50}
-                    className="rounded-md"
-                  />
+                  <div className="bg-white w-fit rounded">
+                    <Image
+                      src={item.image_url || "/placeholder.png"}
+                      alt={""}
+                      width={50}
+                      height={50}
+                      className="h-12 object-contain"
+                    />
+                  </div>
                 </TableCell>
                 <TableCell>{item.sku}</TableCell>
                 <TableCell>{item.name}</TableCell>
@@ -83,16 +86,12 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                 <TableCell>
                   <span className="font-bold ">{item.stocks}</span>
                 </TableCell>
-                <TableCell>
-                  ₱
-                  {new Intl.NumberFormat("en-US", {
-                    minimumFractionDigits: 2,
-                  }).format(item.price)}
-                </TableCell>
+                <TableCell>{formatPrice(item.price)}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button
                       variant="default"
+                      className="cursor-pointer"
                       size="sm"
                       onClick={() => onAddStock(item)}
                     >
@@ -100,6 +99,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                     </Button>
                     <Button
                       variant="outline"
+                      className="cursor-pointer"
                       size="sm"
                       onClick={() => onReduceStock(item)}
                     >

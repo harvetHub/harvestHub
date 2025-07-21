@@ -15,17 +15,7 @@ import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
 import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
-
-interface Order {
-  order_id: number;
-  user_id: string;
-  customer_name: string;
-  order_date: string;
-  total_amount: number;
-  status: string;
-  shipping_method: string | null;
-  payment_status: string;
-}
+import { Order } from "@/lib/definitions";
 
 export default function OrdersManagement() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -44,7 +34,7 @@ export default function OrdersManagement() {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/admin/orders?page=${currentPage}&limit=${itemsPerPage}&status=${statusType}&search_term=${searchTerm}`
+        `/api/admin/orders/fetch?page=${currentPage}&limit=${itemsPerPage}&status=${statusType}&search_term=${searchTerm}`
       );
       const data = await response.json();
 
@@ -93,7 +83,7 @@ export default function OrdersManagement() {
       if (result.isConfirmed) {
         try {
           const response = await fetch(
-            `/api/admin/orders?order_id=${orderId}`,
+            `/api/admin/orders/delete?order_id=${orderId}`,
             {
               method: "DELETE",
             }
@@ -121,7 +111,7 @@ export default function OrdersManagement() {
     if (!selectedOrder) return;
 
     try {
-      const response = await fetch(`/api/admin/orders`, {
+      const response = await fetch(`/api/admin/orders/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

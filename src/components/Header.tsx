@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
-import { useCartCount } from "@/hooks/useCartCount";
+import { useCartCount } from "@/hooks/cart/useCartSync";
+import { useClearCart } from "@/hooks/cart/useClearCart";
 import { ShoppingCartIcon, CogIcon } from "@heroicons/react/20/solid";
 import { LogOutIcon, HelpingHandIcon, UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Header: FC = () => {
   const router = useRouter();
   const cartItems = useCartStore((state) => state.items);
+  const clearCart = useClearCart();
   const { count: initialCount } = useCartCount();
 
   // Use cartItems.length if available (client updates), otherwise fallback to initialCount from API
@@ -32,6 +34,7 @@ const Header: FC = () => {
     });
 
     if (response.ok) {
+      clearCart();
       router.push("/");
     } else {
       console.error("Failed to log out");
@@ -39,10 +42,10 @@ const Header: FC = () => {
   };
 
   return (
-    <header className="bg-gray-800 text-white py-4 ">
+    <header className="bg-gray-800 text-white py-4 fixed top-0 w-full z-50 ">
       <div className="myContainer mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">
-          <Link href="/dashboard">HarvestHub</Link>
+          <Link href="/home">HarvestHub</Link>
         </h1>
         <nav className="flex items-center">
           <Link href="/cart" className="mr-4 relative">

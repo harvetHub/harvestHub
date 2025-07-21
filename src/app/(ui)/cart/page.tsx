@@ -8,10 +8,11 @@ import { useRouter } from "next/navigation";
 import { fallbackImage } from "@/lib/fallbackImg";
 import { useEffect } from "react";
 import { CartItem } from "@/lib/definitions";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Cart = () => {
   const cartItems = useCartStore((state) => state.items);
-  const setItems = useCartStore((state) => state.setItems); // Make sure setItems exists in your store
+  const setItems = useCartStore((state) => state.setItems);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
   const deleteItem = useCartStore((state) => state.deleteItem);
@@ -40,6 +41,7 @@ const Cart = () => {
             price: item.price,
             quantity: item.quantity,
             image_url: item.image_url,
+            stocks: item.stocks, // <-- add this line
           }))
         );
       }
@@ -114,19 +116,20 @@ const Cart = () => {
                           src={item.image_url || fallbackImage}
                           alt={item.name}
                           width={100}
+                          priority
                           height={100}
                           className="w-24 h-24 object-cover mr-4 rounded-xl shadow-md"
                         />
                         <div>
                           <h2 className="text-xl font-bold">{item.name}</h2>
-                          <p>Price: ₱{item.price.toFixed(2)}</p>
+                          <p>Price: {formatPrice(item.price)} </p>
                           <div className="flex items-center mt-2">
                             <Button
                               variant="outline"
                               onClick={() =>
                                 handleDecreaseQuantity(item.product_id)
                               }
-                              className="mr-2"
+                              className="mr-2 cursor-pointer"
                             >
                               -
                             </Button>
@@ -136,14 +139,25 @@ const Cart = () => {
                               onClick={() =>
                                 handleIncreaseQuantity(item.product_id)
                               }
-                              className="ml-2"
+                              className="ml-2 cursor-pointer"
+                              disabled={item.quantity >= (item.stocks ?? 0)} // Disable if at max stock
+                              title={
+                                item.quantity >= (item.stocks ?? 0)
+                                  ? "Reached maximum available stock"
+                                  : undefined
+                              }
                             >
                               +
                             </Button>
+                            {/* Show stocks count */}
+                            <span className="ml-2 text-xs text-gray-500">
+                              ({item.stocks})
+                            </span>
                           </div>
                         </div>
                       </div>
                       <Button
+                        className="cursor-pointer"
                         variant="outline"
                         onClick={() => handleRemoveItem(item.product_id)}
                       >
@@ -153,8 +167,11 @@ const Cart = () => {
                   </li>
                 ))}
               </ul>
-              <div className="flex justify-end mt-8">
-                <Button className="w-full" onClick={handleCheckout}>
+              <div className="flex justify-end mt-8 cursor-pointer">
+                <Button
+                  className="w-full cursor-pointer"
+                  onClick={handleCheckout}
+                >
                   Proceed to Checkout
                 </Button>
               </div>

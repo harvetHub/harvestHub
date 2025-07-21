@@ -23,7 +23,7 @@ const AdminSidebar = () => {
       <nav className="space-y-4">
         <Button
           variant="ghost"
-          className={`w-full text-left flex justify-start items-center space-x-2 ${
+          className={`w-full cursor-pointer text-left flex justify-start items-center space-x-2 ${
             isActive("/admin/dashboard") ? "bg-gray-700 text-blue-400" : ""
           }`}
           onClick={() => navigateTo("/admin/dashboard")}
@@ -37,7 +37,7 @@ const AdminSidebar = () => {
         </p>
         <Button
           variant="ghost"
-          className={`w-full text-left flex justify-start items-center space-x-2 ${
+          className={`w-full cursor-pointer text-left flex justify-start items-center space-x-2 ${
             isActive("/admin/products") ? "bg-gray-700 text-blue-400" : ""
           }`}
           onClick={() => navigateTo("/admin/products")}
@@ -47,7 +47,7 @@ const AdminSidebar = () => {
         </Button>
         <Button
           variant="ghost"
-          className={`w-full text-left flex justify-start items-center space-x-2 ${
+          className={`w-full text-left cursor-pointer flex justify-start items-center space-x-2 ${
             isActive("/admin/orders") ? "bg-gray-700 text-blue-400" : ""
           }`}
           onClick={() => navigateTo("/admin/orders")}
@@ -57,7 +57,7 @@ const AdminSidebar = () => {
         </Button>
         <Button
           variant="ghost"
-          className={`w-full text-left flex justify-start items-center space-x-2 ${
+          className={`w-full text-left cursor-pointer flex justify-start items-center space-x-2 ${
             isActive("/admin/users") ? "bg-gray-700 text-blue-400" : ""
           }`}
           onClick={() => navigateTo("/admin/users")}
@@ -67,7 +67,7 @@ const AdminSidebar = () => {
         </Button>
         <Button
           variant="ghost"
-          className={`w-full text-left flex justify-start items-center space-x-2 ${
+          className={`w-full text-left cursor-pointer flex justify-start items-center space-x-2 ${
             isActive("/admin/inventory") ? "bg-gray-700 text-blue-400" : ""
           }`}
           onClick={() => navigateTo("/admin/inventory")}

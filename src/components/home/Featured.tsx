@@ -3,9 +3,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/lib/definitions";
 import { useRouter } from "next/navigation";
 import { fallbackImage } from "@/lib/fallbackImg";
@@ -52,6 +54,8 @@ const FeaturedProductCarousel: FC = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
       </Carousel>
     );
   }
@@ -66,30 +70,33 @@ const FeaturedProductCarousel: FC = () => {
         {featuredProducts.map((product, index) => (
           <CarouselItem
             key={index}
-            className="md:basis-1/3 lg:basis-1/3 cursor-pointer"
+            className="md:basis-1/3 lg:basis-1/3 cursor-pointer py-2"
             onClick={() =>
               product.product_id && handleProductClick(product.product_id)
             }
           >
-            <div className="relative w-full h-60 rounded-sm overflow-hidden">
+            <div className="relative w-full h-80 rounded-sm overflow-hidden  bg-white shadow border">
               <Image
                 src={
                   typeof product.image_url === "string"
                     ? product.image_url
                     : fallbackImage
-                } // Prioritize product.image, fallback to fallbackImage
+                }
                 alt={product.name}
-                layout="fill"
-                objectFit="cover"
-                className=""
+                width={400}
+                height={300}
+                className="w-full h-full object-fit"
+                priority
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-black/30 bg-opacity-50 p-4 text-white">
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 bg-opacity-50 p-4 text-white">
                 <h3 className="text-lg font-bold">{product.name}</h3>
               </div>
             </div>
           </CarouselItem>
         ))}
       </CarouselContent>
+      <CarouselPrevious className="ml-18" />
+      <CarouselNext className="mr-18" />
     </Carousel>
   );
 };

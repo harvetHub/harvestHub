@@ -8,16 +8,9 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toSentenceCase } from "@/utils/toSentenceCase";
-
-interface Order {
-  order_id: number;
-  customer_name: string;
-  order_date: string;
-  total_amount: number;
-  status: string;
-  shipping_method: string | null;
-  payment_status: string;
-}
+import { formatPrice } from "@/utils/formatPrice";
+import OrderTableSkeleton from "../skeletonLoad/orderTableSL";
+import { Order } from "@/lib/definitions";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -29,7 +22,6 @@ interface OrdersTableProps {
 export default function OrdersTable({
   orders,
   loading,
-  onCancelOrder,
   onManageOrder,
 }: OrdersTableProps) {
   const getRelativeTime = (date: Date) => {
@@ -68,35 +60,7 @@ export default function OrdersTable({
         </TableHeader>
         <TableBody>
           {loading ? (
-            // Skeleton Loader
-            Array.from({ length: 10 }).map((_, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-                <TableCell>
-                  <div className="h-4 my-2 bg-gray-200 rounded animate-pulse w-1/2 "></div>
-                </TableCell>
-              </TableRow>
-            ))
+            <OrderTableSkeleton />
           ) : !loading && orders.length > 0 ? (
             orders
               .sort(
@@ -117,27 +81,41 @@ export default function OrdersTable({
                         {getRelativeTime(orderDate)}
                       </span>
                     </TableCell>
+                    <TableCell>{formatPrice(order.total_amount)}</TableCell>
                     <TableCell>
-                      ₱
-                      {new Intl.NumberFormat("en-US", {
-                        minimumFractionDigits: 2,
-                      }).format(order.total_amount)}
+                      <span
+                        className={
+                          "px-3 py-1 rounded-xl border border-gray-100 font-semibold " +
+                          (order.status?.toLowerCase() === "released"
+                            ? "bg-green-100 text-green-700"
+                            : order.status?.toLowerCase() === "preparing"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : order.status?.toLowerCase() ===
+                                "ready_for_pickup" ||
+                              order.status?.toLowerCase() === "ready for pickup"
+                            ? "bg-blue-100 text-blue-700"
+                            : order.status?.toLowerCase() === "rejected"
+                            ? "bg-red-100 text-red-700"
+                            : order.status?.toLowerCase() === "pending"
+                            ? "bg-gray-200 text-gray-700"
+                            : "bg-gray-100 text-gray-700")
+                        }
+                      >
+                        {toSentenceCase(order.status)}
+                      </span>
                     </TableCell>
-                    <TableCell>{order.status}</TableCell>
-                    <TableCell>{order.shipping_method || "N/A"}</TableCell>
-                    <TableCell>{order.payment_status}</TableCell>
+                    <TableCell>
+                      {toSentenceCase(order.shipping_method ?? "N/A")}
+                    </TableCell>
+                    <TableCell>
+                      {toSentenceCase(order.payment_status)}
+                    </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onCancelOrder(order.order_id)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
                           variant="default"
                           size="sm"
+                          className="cursor-pointer"
                           onClick={() => onManageOrder(order)}
                         >
                           Manage
