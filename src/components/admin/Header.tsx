@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CogIcon, LogOutIcon, UserIcon } from "lucide-react";
+import { LogOutIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 
@@ -59,10 +59,6 @@ export default function Header() {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => router.push("/settings")}>
-            <CogIcon className="w-5 h-5 mr-2" />
-            Profile
-          </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleLogout}>
             <LogOutIcon className="w-5 h-5 mr-2" />
             Logout
