@@ -38,7 +38,7 @@ export default function Header() {
         });
 
         // Redirect to login page after logout
-        router.push("/admin");
+        router.push("/");
       } else {
         console.error("Failed to log out");
       }
