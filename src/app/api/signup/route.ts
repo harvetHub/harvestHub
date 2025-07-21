@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServerClient } from "@/utils/supabase/server";
+import { supabaseServer } from "@/utils/supabase/server";
 
 export async function POST(req: NextRequest) {
   const { username, email, password, mobileNumber, address } = await req.json();
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data, error } = await supabaseServerClient.auth.signUp({
+  const { data, error } = await supabaseServer.auth.signUp({
     email,
     password,
   });
@@ -33,28 +33,26 @@ export async function POST(req: NextRequest) {
   const { user } = data;
 
   // Save the additional user data in your database
-  const { error: insertError } = await supabaseServerClient
-    .from("users")
-    .insert([
-      {
-        user_id: user?.id,
-        username: username,
-        name: {
-          first_name: "",
-          last_name: "",
-          middle_name: "",
-        },
-        email: email,
-        mobile_number: mobileNumber,
-        address: address,
-        created_at: new Date().toISOString(),
+  const { error: insertError } = await supabaseServer.from("users").insert([
+    {
+      user_id: user?.id,
+      username: username,
+      name: {
+        first_name: "",
+        last_name: "",
+        middle_name: "",
       },
-    ]);
+      email: email,
+      mobile_number: mobileNumber,
+      address: address,
+      created_at: new Date().toISOString(),
+    },
+  ]);
 
   if (insertError) {
     // If there is an error inserting user data, delete the user from auth
     if (user?.id) {
-      await supabaseServerClient.auth.admin.deleteUser(user.id);
+      await supabaseServer.auth.admin.deleteUser(user.id);
     }
 
     return NextResponse.json({ error: insertError.message }, { status: 400 });

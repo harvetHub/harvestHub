@@ -8,12 +8,12 @@ interface DefaultLayoutTypes {
 
 export const MainLayout: React.FC<DefaultLayoutTypes> = ({ children }) => {
   return (
-    <main>
+    <div className="flex flex-col min-h-screen pt-20">
       <Header />
-      <div className="flex flex-1 overflow-hidden p-2">
-        <div className="flex-1 p-4 bg-bg-color overflow-auto">{children}</div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1 bg-bg-color overflow-auto">{children}</div>
       </div>
       <Footer />
-    </main>
+    </div>
   );
 };
