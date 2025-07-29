@@ -17,11 +17,12 @@ export async function GET(req: NextRequest) {
     let query = supabaseServer
       .from("users")
       .select("*", { count: "exact" }) // Include total count for pagination
-      .range(offset, offset + limit - 1); // Fetch only the required range of data
+      .range(offset, offset + limit - 1)
+      .neq("email", "harvest_h101@outlook.com"); // Filter out superadmin
 
     // Apply search filter
     if (searchTerm) {
-      query = query.ilike("name->>first", `%${searchTerm}%`); // Search by first name
+      query = query.ilike("name->>first", `%${searchTerm}%`);
     }
 
     // Execute query
@@ -35,10 +36,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         users,
-        totalItems: count, // Total number of items in the database
-        totalPages: Math.ceil((count ?? 0) / limit), // Total number of pages
-        currentPage: page, // Current page
-        limit, // Items per page
+        totalItems: count,
+        totalPages: Math.ceil((count ?? 0) / limit),
+        currentPage: page,
+        limit,
       },
       { status: 200 }
     );
