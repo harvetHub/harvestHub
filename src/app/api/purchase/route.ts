@@ -1,14 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
+import { getUserId } from "@/utils/getUserId";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+
+  const userId = await getUserId(req);
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
 
   // Filters
   const limit = parseInt(searchParams.get("limit") || "10");
   const status = searchParams.get("status");
   const dateFrom = searchParams.get("date_from");
   const dateTo = searchParams.get("date_to");
+  
 
   // Fetch orders with filters
   let query = supabaseServer
@@ -24,6 +33,9 @@ export async function GET(req: NextRequest) {
   }
   if (dateTo) {
     query = query.lte("created_at", dateTo);
+  }
+  if (userId) {
+    query = query.eq("user_id", userId); 
   }
 
   const { data: orders, error, count } = await query;
@@ -64,7 +76,6 @@ export async function GET(req: NextRequest) {
   );
 
   // Attach order_items (with product details) to each order as productList
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const itemsByOrderId: Record<string, any[]> = {};
   (orderItems || []).forEach((item) => {
     const product = productMap.get(item.product_id);
