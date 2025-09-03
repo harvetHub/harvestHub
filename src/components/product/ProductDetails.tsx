@@ -56,7 +56,7 @@ const ProductDetails: FC<ProductDetailsProps> = ({ product, loading }) => {
               alt={product.name}
               width={600}
               height={500}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-fill"
               priority
             />
           </div>

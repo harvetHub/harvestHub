@@ -35,7 +35,7 @@ const Header: FC = () => {
 
     if (response.ok) {
       clearCart();
-      router.push("/");
+      router.push("/login");
     } else {
       console.error("Failed to log out");
     }
@@ -45,7 +45,7 @@ const Header: FC = () => {
     <header className="bg-gray-800 text-white py-4 fixed top-0 w-full z-50 ">
       <div className="myContainer mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">
-          <Link href="/home">HarvestHub</Link>
+          <Link href="/login">HarvestHub</Link>
         </h1>
         <nav className="flex items-center">
           <Link href="/cart" className="mr-4 relative">

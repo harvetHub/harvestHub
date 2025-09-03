@@ -8,7 +8,7 @@ const OrderConfirmation = () => {
   const router = useRouter();
 
   const handleContinueShopping = () => {
-    router.push("/home");
+    router.push("/");
   };
 
   return (
