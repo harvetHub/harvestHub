@@ -45,7 +45,7 @@ const Header: FC = () => {
     <header className="bg-gray-800 text-white py-4 fixed top-0 w-full z-50 ">
       <div className="myContainer mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">
-          <Link href="/login">HarvestHub</Link>
+          <Link href="/">HarvestHub</Link>
         </h1>
         <nav className="flex items-center">
           <Link href="/cart" className="mr-4 relative">

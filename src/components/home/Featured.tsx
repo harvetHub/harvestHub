@@ -70,7 +70,7 @@ const FeaturedProductCarousel: FC = () => {
         {featuredProducts.map((product, index) => (
           <CarouselItem
             key={index}
-            className="md:basis-1/3 lg:basis-1/3 cursor-pointer py-2"
+            className="md:basis-1/3 lg:basis-1/3 cursor-pointer pb-2"
             onClick={() =>
               product.product_id && handleProductClick(product.product_id)
             }

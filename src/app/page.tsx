@@ -9,13 +9,20 @@ export default function Home() {
   return (
     <MainLayout>
       <div className="myContainer mx-auto mb-8">
-        <h2 className="text-2xl font-bold mb-4">Featured Products</h2>
+        <h2 className="text-lg text-gray-600 font-bold mb-2 mt-4 ">
+          Featured Products
+        </h2>
         <FeaturedProductCarousel />
+        <p className="border-b border-gray pt-4"> </p>
 
-        <h2 className="text-2xl font-bold mt-8">Categories</h2>
+        <h2 className="text-lg text-gray-600 font-bold mb-2 mt-4 ">
+          Categories
+        </h2>
         <CategoriesSection />
-
-        <h2 className="text-2xl font-bold mt-8 mb-4">Recommended Items</h2>
+        <p className="border-b border-gray pt-4"> </p>
+        <h2 className="text-lg text-gray-600 font-bold mb-2 mt-4 ">
+          Recommended Items
+        </h2>
         <RecommendedItemsSection />
       </div>
     </MainLayout>

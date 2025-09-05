@@ -120,3 +120,19 @@ export type OrderItem = {
 }
 
 
+export type ProductItem = {
+  id: number;
+  name: string;
+  image_url?: string;
+  quantity: number;
+  price: number;
+}
+
+export type PurchaseItem = {
+  productList: ProductItem[];
+  order_id: number;
+  name: string;
+  status: string;
+  total_amount: number;
+  order_date: string;
+}

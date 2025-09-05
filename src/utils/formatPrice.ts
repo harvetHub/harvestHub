@@ -2,8 +2,8 @@ export function formatPrice(price: number) {
     return (
       "₱" +
       new Intl.NumberFormat("en-US", {
-        maximumFractionDigits: 0,
-        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2,
       }).format(price)
     );
   }

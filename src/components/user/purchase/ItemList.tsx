@@ -7,40 +7,9 @@ import { formatPrice } from "@/utils/formatPrice";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRelativeTime } from "@/utils/getRelativeTime";
 import Image from "next/image";
-import Pagination from "@/components/Pagination"; // adjust the import path as needed
-
-interface ProductItem {
-  id: number;
-  name: string;
-  image_url?: string;
-  quantity: number;
-  price: number;
-}
-
-interface PurchaseItem {
-  productList: ProductItem[];
-  order_id: number;
-  name: string;
-  status: string;
-  total_amount: number;
-  order_date: string;
-}
-
-const statusMap: Record<string, string | undefined> = {
-  All: undefined,
-  Pending: "pending",
-  Preparing: "preparing",
-  "Ready to Pickup": "ready_for_pickup",
-  Completed: "released",
-  Canceled: "rejected",
-};
-
-const cancelOptions = [
-  "Changed my mind",
-  "Found a better price",
-  "Ordered by mistake",
-  "Other",
-];
+import Pagination from "@/components/Pagination";
+import { PurchaseItem, ProductItem } from "@/lib/definitions";
+import { statusMap, cancelOptions } from "@/lib/purchaseItemConfig";
 
 const ItemList: React.FC = () => {
   const [filter, setFilter] = useState("All");
