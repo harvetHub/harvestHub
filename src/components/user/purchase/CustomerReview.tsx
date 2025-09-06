@@ -13,9 +13,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ProductItem } from "@/lib/definitions";
 
 type CustomerReviewDialogProps = {
-  orderId: number | string;
+  // prefer productId (matches supabase column). orderId kept for backwards compatibility if needed.
+  productId?: number | string;
+  productList?: ProductItem[];
+  orderId?: number;
   status?: string; // e.g. "completed"
   initialRating?: number;
   initialMessage?: string;
@@ -23,12 +27,12 @@ type CustomerReviewDialogProps = {
 };
 
 export default function CustomerReviewDialog({
+  productId,
   orderId,
   initialRating = 0,
   initialMessage = "",
   onSaved,
 }: CustomerReviewDialogProps) {
-  // hooks must run unconditionally
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<number>(initialRating);
   const [hover, setHover] = useState<number>(0);
@@ -36,23 +40,36 @@ export default function CustomerReviewDialog({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  console.log("Submitting review:", { productId, orderId, rating, message });
+
   const submitReview = async () => {
+    // product_id is required by table
+    const pid = productId ?? null; // parent should pass productId (prefer), fallback null
+
+    if (!pid) {
+      setError("productId is required to submit a review.");
+      return;
+    }
+
     if (rating <= 0) {
       setError("Please provide a rating.");
       return;
     }
+
     setError(null);
     setSaving(true);
     try {
-      const res = await fetch("/api/reviews", {
+      const res = await fetch("/api/purchase/rate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          order_id: typeof orderId === "number" ? orderId : Number(orderId),
+          product_id: Number(pid),
+          orderId,
           rating,
-          message,
+          review_text: message || null,
         }),
       });
+
       const data = await res.json();
       if (!res.ok) {
         setError(data?.error || "Failed to save review.");
@@ -71,8 +88,11 @@ export default function CustomerReviewDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">Rate Order</Button>
+        <Button className="w-full align-bottom rounded-none rounded-tr-md rounded-bl-2xl opacity-60 hover:opacity-100">
+          Rate
+        </Button>
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Rate and Review</DialogTitle>

@@ -31,6 +31,8 @@ const ItemList: React.FC = () => {
     setLoading(false);
   };
 
+  console.log("ItemList purchases:", purchases);
+
   const fetchStatusCounts = async () => {
     const statuses = Object.keys(statusMap).filter((s) => s !== "All");
     const counts: Record<string, number> = {};
