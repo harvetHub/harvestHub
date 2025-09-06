@@ -180,7 +180,7 @@ export default function PurchaseCard({ purchase, onUpdated }: Props) {
                       purchase.status === "completed") && (
                       <div className="flex flex-col gap-2 absolute top-3 right-3">
                         <CustomerReview
-                          productId={item.id}
+                          productId={item.product_id}
                           orderId={purchase.order_id}
                           status={purchase.status}
                           onSaved={() => {

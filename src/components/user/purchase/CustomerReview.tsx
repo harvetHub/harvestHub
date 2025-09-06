@@ -17,7 +17,7 @@ import { ProductItem } from "@/lib/definitions";
 
 type CustomerReviewDialogProps = {
   // prefer productId (matches supabase column). orderId kept for backwards compatibility if needed.
-  productId?: number | string;
+  productId?: number;
   productList?: ProductItem[];
   orderId?: number;
   status?: string; // e.g. "completed"
@@ -64,7 +64,7 @@ export default function CustomerReviewDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           product_id: Number(pid),
-          orderId,
+          order_id: orderId,
           rating,
           review_text: message || null,
         }),

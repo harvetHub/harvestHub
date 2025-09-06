@@ -126,6 +126,8 @@ export type ProductItem = {
   image_url?: string;
   quantity: number;
   price: number;
+  product_id: number;
+  order_id: number;
 }
 
 export type PurchaseItem = {

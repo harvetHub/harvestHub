@@ -1,19 +1,8 @@
+import { getUserId } from "@/utils/getUserId";
 import { supabase } from "@/utils/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 
-// Helper to get user id from HTTP-only cookie
-async function getUserId(req: NextRequest) {
-  const cookie = req.cookies.get("auth-token")?.value;
-  if (!cookie) return null;
 
-  try {
-    const decoded = jwt.verify(cookie, process.env.JWT_SECRET as string) as { id: string };
-    return decoded.id;
-  } catch {
-    return null;
-  }
-}
 
 // GET /api/profile - Fetch user profile
 export async function GET(req: NextRequest) {

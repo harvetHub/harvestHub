@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/utils/supabase/server";
+import { getUserId } from "@/utils/getUserId";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const { product_id, rating, review_text, order_id } = body;
+
+
+    console.log("Received review submission:", { product_id, rating, review_text, order_id });
 
     // basic validation
     if (!product_id) {
@@ -15,21 +19,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "rating must be a number between 1 and 5" }, { status: 400 });
     }
 
-    // Try to resolve user from Supabase server auth session
-    let userId: string | null = null;
-    try {
-      // supabaseServer.auth.getUser() returns { data: { user }, error } in many setups
-      // adjust if your supabase util exposes a different method
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userRes: any = await supabaseServer.auth.getUser?.();
-      if (userRes?.data?.user?.id) userId = userRes.data.user.id;
-    } catch {
-      // ignore and fallback to body-provided user (if any)
-    }
-
-    // fallback: accept user_id in body (useful for server-to-server calls). Prefer session-derived user.
-    if (!userId && body.user_id) userId = body.user_id;
-
+    const userId = await getUserId(req);
+    
     if (!userId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
@@ -37,7 +28,7 @@ export async function POST(req: NextRequest) {
     const payload = {
       user_id: userId,
       product_id,
-      order_id: order_id,
+      order_id,
       rating: parsedRating,
       review_text: review_text ?? null,
       created_at: new Date().toISOString(),
