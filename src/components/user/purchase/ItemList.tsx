@@ -72,9 +72,9 @@ const ItemList: React.FC = () => {
     <div className="myContainer mx-auto p-4 space-y-4">
       <div className="flex space-x-4 bg-white p-4 rounded-md shadow-sm mb-4 overflow-auto">
         {Object.keys(statusMap).map((status) => (
-          <div key={status} className="relative">
+          <div key={status} className="relative ">
             <button
-              className={`px-3 py-2 rounded ${
+              className={`px-3 py-2 rounded cursor-pointer ${
                 filter === status
                   ? "bg-slate-900 text-white"
                   : "bg-transparent border border-slate-200 text-slate-700"
@@ -85,12 +85,12 @@ const ItemList: React.FC = () => {
               }}
             >
               {status}
+              {statusCounts[status] ? (
+                <span className=" text-orange-500 text-sm rounded-full px-2 py-0.5">
+                  ({statusCounts[status]})
+                </span>
+              ) : null}
             </button>
-            {statusCounts[status] ? (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-                {statusCounts[status]}
-              </span>
-            ) : null}
           </div>
         ))}
       </div>
