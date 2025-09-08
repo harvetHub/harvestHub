@@ -149,7 +149,7 @@ export default function CustomerReviewDialog({
   };
 
   // If still checking, avoid showing trigger to prevent flicker.
-  // When not logged in (profile returns null), we allow showing the trigger (it will prompt login on submit).
+  // Hide the trigger when user already rated; optionally show a small label instead.
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {/* only render the trigger when we finished checking and the user has NOT already rated */}
@@ -159,6 +159,13 @@ export default function CustomerReviewDialog({
             Rate
           </Button>
         </DialogTrigger>
+      )}
+
+      {/* If user already rated, show a non-interactive indicator instead of the trigger */}
+      {!checkingRated && hasRated && (
+        <div className="text-sm text-muted-foreground px-2 py-1 opacity-50">
+          Rated
+        </div>
       )}
 
       <DialogContent>
