@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
@@ -16,7 +16,6 @@ import {
 import { ProductItem } from "@/lib/definitions";
 
 type CustomerReviewDialogProps = {
-  // prefer productId (matches supabase column). orderId kept for backwards compatibility if needed.
   productId?: number;
   productList?: ProductItem[];
   orderId?: number;
@@ -33,6 +32,7 @@ export default function CustomerReviewDialog({
   initialMessage = "",
   onSaved,
 }: CustomerReviewDialogProps) {
+  // hooks run unconditionally
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<number>(initialRating);
   const [hover, setHover] = useState<number>(0);
@@ -40,17 +40,79 @@ export default function CustomerReviewDialog({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("Submitting review:", { productId, orderId, rating, message });
+  // new: track if current user already rated this product
+  const [hasRated, setHasRated] = useState(false);
+  const [checkingRated, setCheckingRated] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const checkIfRated = async () => {
+      setCheckingRated(true);
+      setHasRated(false);
+
+      if (!productId) {
+        setCheckingRated(false);
+        return;
+      }
+
+      try {
+        // fetch current user profile to get user id
+        const profileRes = await fetch("/api/profile", {
+          credentials: "include",
+        });
+        let userId: string | number | null = null;
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          userId = profileData?.user_id ?? profileData?.id ?? null;
+        }
+
+        // if no logged in user -> cannot be rated by current user
+        if (!userId) {
+          if (mounted) {
+            setHasRated(false);
+            setCheckingRated(false);
+          }
+          return;
+        }
+
+        // fetch reviews for this product
+        const reviewsRes = await fetch(`/api/reviews?product_id=${productId}`);
+        if (!reviewsRes.ok) {
+          if (mounted) setHasRated(false);
+          return;
+        }
+        const reviewsData = await reviewsRes.json();
+        const reviews = Array.isArray(reviewsData.reviews)
+          ? reviewsData.reviews
+          : [];
+
+        const already = reviews.some(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (r: any) => String(r.user_id) === String(userId)
+        );
+        if (mounted) {
+          setHasRated(Boolean(already));
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        if (mounted) setHasRated(false);
+      } finally {
+        if (mounted) setCheckingRated(false);
+      }
+    };
+
+    checkIfRated();
+    return () => {
+      mounted = false;
+    };
+  }, [productId]);
 
   const submitReview = async () => {
-    // product_id is required by table
-    const pid = productId ?? null; // parent should pass productId (prefer), fallback null
-
+    const pid = productId ?? null;
     if (!pid) {
       setError("productId is required to submit a review.");
       return;
     }
-
     if (rating <= 0) {
       setError("Please provide a rating.");
       return;
@@ -75,6 +137,7 @@ export default function CustomerReviewDialog({
         setError(data?.error || "Failed to save review.");
       } else {
         setOpen(false);
+        setHasRated(true); // hide trigger after successful save
         onSaved?.();
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,13 +148,18 @@ export default function CustomerReviewDialog({
     }
   };
 
+  // If still checking, avoid showing trigger to prevent flicker.
+  // When not logged in (profile returns null), we allow showing the trigger (it will prompt login on submit).
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full align-bottom rounded-none rounded-tr-md rounded-bl-2xl opacity-60 hover:opacity-100">
-          Rate
-        </Button>
-      </DialogTrigger>
+      {/* only render the trigger when we finished checking and the user has NOT already rated */}
+      {!checkingRated && !hasRated && (
+        <DialogTrigger asChild>
+          <Button className="w-full align-bottom rounded-none rounded-tr-md rounded-bl-2xl opacity-60 hover:opacity-100">
+            Rate
+          </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent>
         <DialogHeader>
