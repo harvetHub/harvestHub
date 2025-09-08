@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
+import { toSentenceCase } from "@/utils/toSentenceCase";
 
 type Review = {
   review_id: number | string;
@@ -13,17 +14,17 @@ type Review = {
   rating?: number | null;
   review_text?: string | null;
   created_at?: string | null;
-  // optional user payload if your API includes it:
-  user?: { name?: string; avatar_url?: string | null } | null;
-  user_name?: string | null; // fallback if API returns this
+  // API now returns these fields
+  user_image?: string | null;
+  user_name?: string | null;
 };
 
 type Props = {
-  productId: number;
+  productId: number | string;
   maxPreview?: number; // default 5
 };
 
-export default function ProductReviews({ productId, maxPreview = 4 }: Props) {
+export default function ProductReview({ productId, maxPreview = 4 }: Props) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +36,7 @@ export default function ProductReviews({ productId, maxPreview = 4 }: Props) {
       setLoading(true);
       setError(null);
       try {
-        const url = new URL("/api/reviews", location.origin);
+        const url = new URL("/api/reviews", window.location.origin);
         url.searchParams.set("product_id", String(productId));
         const res = await fetch(url.toString());
         const data = await res.json();
@@ -45,11 +46,12 @@ export default function ProductReviews({ productId, maxPreview = 4 }: Props) {
           setReviews([]);
           return;
         }
-        setReviews(data.reviews ?? []);
+        setReviews(Array.isArray(data.reviews) ? data.reviews : []);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         if (!mounted) return;
         setError(err?.message ?? "Failed to load reviews");
+        setReviews([]);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -96,12 +98,11 @@ export default function ProductReviews({ productId, maxPreview = 4 }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {visibleReviews.map((r) => {
               const name =
-                r.user?.name ||
-                r.user_name ||
+                r.user_name ??
                 (typeof r.user_id !== "undefined"
                   ? `User ${String(r.user_id).slice(0, 6)}`
                   : "Anonymous");
-              const avatar = r.user?.avatar_url ?? null;
+              const avatar = r.user_image ?? null;
               const date = formatDate(r.created_at);
               const rating =
                 typeof r.rating === "number"
@@ -142,12 +143,15 @@ export default function ProductReviews({ productId, maxPreview = 4 }: Props) {
                                 }`}
                               />
                             ))}
+                            <div className="text-xs text-muted-foreground opacity-50">
+                              {rating}/5
+                            </div>
                           </div>
                         </div>
 
                         {r.review_text ? (
                           <p className="mt-3 text-sm text-muted-foreground whitespace-pre-line">
-                            {r.review_text}
+                            {toSentenceCase(r.review_text)}
                           </p>
                         ) : (
                           <p className="mt-3 text-sm text-muted-foreground italic">

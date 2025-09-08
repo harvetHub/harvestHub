@@ -7,14 +7,46 @@ async function fetchReviewsByProduct(productId: number | string) {
     return { error: "invalid product_id", data: null };
   }
 
-  // select explicit columns to avoid unexpected joins; adjust if you want user data
-  const { data, error } = await supabaseServer
+  // Fetch reviews
+  const { data: reviews, error } = await supabaseServer
     .from("reviews")
     .select("review_id, user_id, product_id, rating, review_text, created_at")
     .eq("product_id", pid)
     .order("created_at", { ascending: false });
 
-  return { error, data };
+  if (error || !reviews || reviews.length === 0) {
+    return { error, data: reviews ?? [] };
+  }
+
+  // Get unique user_ids
+  const userIds = Array.from(new Set(reviews.map((r) => r.user_id).filter(Boolean)));
+
+  // Fetch user profiles in one query
+  const userProfiles: Record<string, { image_url: string | null; username: string | null }> = {};
+  if (userIds.length > 0) {
+    const { data: users } = await supabaseServer
+      .from("users")
+      .select("user_id, image_url, username")
+      .in("user_id", userIds);
+
+    if (users && Array.isArray(users)) {
+      users.forEach((u) => {
+        userProfiles[u.user_id] = {
+          image_url: u.image_url ?? null,
+          username: u.username ?? null,
+        };
+      });
+    }
+  }
+
+  // Append user info to each review
+  const reviewsWithUser = reviews.map((r) => ({
+    ...r,
+    user_image: userProfiles[r.user_id]?.image_url ?? null,
+    user_name: userProfiles[r.user_id]?.username ?? null,
+  }));
+
+  return { error: null, data: reviewsWithUser };
 }
 
 export async function GET(req: NextRequest) {
@@ -26,11 +58,11 @@ export async function GET(req: NextRequest) {
     }
 
     const { error, data } = await fetchReviewsByProduct(productId);
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (error) return NextResponse.json({ error: (error as any).message ?? error }, { status: 400 });
 
     return NextResponse.json({ reviews: data ?? [] }, { status: 200 });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? "Server error" }, { status: 500 });
   }
@@ -45,11 +77,11 @@ export async function POST(req: NextRequest) {
     }
 
     const { error, data } = await fetchReviewsByProduct(product_id);
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (error) return NextResponse.json({ error: (error as any).message ?? error }, { status: 400 });
 
     return NextResponse.json({ reviews: data ?? [] }, { status: 200 });
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? "Server error" }, { status: 500 });
   }
