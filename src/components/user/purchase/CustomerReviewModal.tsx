@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
@@ -40,73 +40,6 @@ export default function CustomerReviewDialog({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // new: track if current user already rated this product
-  const [hasRated, setHasRated] = useState(false);
-  const [checkingRated, setCheckingRated] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    const checkIfRated = async () => {
-      setCheckingRated(true);
-      setHasRated(false);
-
-      if (!productId) {
-        setCheckingRated(false);
-        return;
-      }
-
-      try {
-        // fetch current user profile to get user id
-        const profileRes = await fetch("/api/profile", {
-          credentials: "include",
-        });
-        let userId: string | number | null = null;
-        if (profileRes.ok) {
-          const profileData = await profileRes.json();
-          userId = profileData?.user_id ?? profileData?.id ?? null;
-        }
-
-        // if no logged in user -> cannot be rated by current user
-        if (!userId) {
-          if (mounted) {
-            setHasRated(false);
-            setCheckingRated(false);
-          }
-          return;
-        }
-
-        // fetch reviews for this product
-        const reviewsRes = await fetch(`/api/reviews?product_id=${productId}`);
-        if (!reviewsRes.ok) {
-          if (mounted) setHasRated(false);
-          return;
-        }
-        const reviewsData = await reviewsRes.json();
-        const reviews = Array.isArray(reviewsData.reviews)
-          ? reviewsData.reviews
-          : [];
-
-        const already = reviews.some(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (r: any) => String(r.user_id) === String(userId)
-        );
-        if (mounted) {
-          setHasRated(Boolean(already));
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err) {
-        if (mounted) setHasRated(false);
-      } finally {
-        if (mounted) setCheckingRated(false);
-      }
-    };
-
-    checkIfRated();
-    return () => {
-      mounted = false;
-    };
-  }, [productId]);
-
   const submitReview = async () => {
     const pid = productId ?? null;
     if (!pid) {
@@ -137,7 +70,6 @@ export default function CustomerReviewDialog({
         setError(data?.error || "Failed to save review.");
       } else {
         setOpen(false);
-        setHasRated(true); // hide trigger after successful save
         onSaved?.();
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,20 +85,14 @@ export default function CustomerReviewDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {/* only render the trigger when we finished checking and the user has NOT already rated */}
-      {!checkingRated && !hasRated && (
-        <DialogTrigger asChild>
-          <Button className="w-full align-bottom rounded-none rounded-tr-md rounded-bl-2xl opacity-60 hover:opacity-100">
-            Rate
-          </Button>
-        </DialogTrigger>
-      )}
+
+      <DialogTrigger asChild>
+        <Button className="w-full align-bottom rounded-none rounded-tr-sm rounded-bl-2xl opacity-60 hover:opacity-100">
+          Rate
+        </Button>
+      </DialogTrigger>
 
       {/* If user already rated, show a non-interactive indicator instead of the trigger */}
-      {!checkingRated && hasRated && (
-        <div className="text-sm text-muted-foreground px-2 py-1 opacity-50">
-          Rated
-        </div>
-      )}
 
       <DialogContent>
         <DialogHeader>

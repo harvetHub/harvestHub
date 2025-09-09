@@ -33,8 +33,6 @@ export default function ManageOrderModal({
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  console.log("orderData:", order);
-
   useEffect(() => {
     setLoading(true);
     fetch(`/api/admin/orders/${order.order_id}/items`)

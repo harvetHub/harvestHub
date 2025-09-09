@@ -10,7 +10,7 @@ import { PurchaseItem, ProductItem } from "@/lib/definitions";
 import PurchaseProductItem from "./PurchaseProductItem";
 import { cancelOptions } from "@/lib/purchaseItemConfig";
 import { Calendar, Clock, Tag } from "lucide-react";
-import CustomerReview from "./CustomerReview";
+import CustomerReview from "./CustomerReviewModal";
 
 type Props = {
   purchase: PurchaseItem;
@@ -166,10 +166,10 @@ export default function PurchaseCard({ purchase, onUpdated }: Props) {
             <div className="font-semibold mb-2">Items</div>
             <div className="flex flex-col gap-4">
               {purchase.productList && purchase.productList.length > 0 ? (
-                purchase.productList.map((item: ProductItem) => (
+                purchase.productList.map((item: ProductItem, index) => (
                   // render each item individually and show rate button per-item for released/completed orders
                   <div
-                    key={item.id}
+                    key={index}
                     className="flex items-start gap-4 p-3 border rounded-md bg-white relative"
                   >
                     <div className="flex-1">
@@ -179,14 +179,20 @@ export default function PurchaseCard({ purchase, onUpdated }: Props) {
                     {(purchase.status === "released" ||
                       purchase.status === "completed") && (
                       <div className="flex flex-col gap-2 absolute top-3 right-3">
-                        <CustomerReview
-                          productId={item.product_id}
-                          orderId={purchase.order_id}
-                          status={purchase.status}
-                          onSaved={() => {
-                            onUpdated?.();
-                          }}
-                        />
+                        {item.is_rated ? (
+                          <div className="text-sm inline-flex items-center gap-2 px-2 py-1 opacity-50">
+                            Rated
+                          </div>
+                        ) : (
+                          <CustomerReview
+                            productId={item.product_id}
+                            orderId={purchase.order_id}
+                            status={purchase.status}
+                            onSaved={() => {
+                              onUpdated?.();
+                            }}
+                          />
+                        )}
                       </div>
                     )}
                   </div>

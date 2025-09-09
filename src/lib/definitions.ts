@@ -93,6 +93,7 @@ export type User = {
 export type Order = {
   order_id: number;
   user_id?: string;
+  is_rated?: boolean;
   customer_name: string;
   order_date: string;
   total_amount: number;
@@ -121,6 +122,7 @@ export type OrderItem = {
 
 
 export type ProductItem = {
+  is_rated: boolean;
   id: number;
   name: string;
   image_url?: string;
