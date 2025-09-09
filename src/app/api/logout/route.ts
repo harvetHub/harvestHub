@@ -15,6 +15,7 @@ export async function POST() {
   const cookiesToClear = [
     "auth-token",
     "supabase-access-token",
+    "supabase-refresh-token", 
   ];
 
   cookiesToClear.forEach((name) =>

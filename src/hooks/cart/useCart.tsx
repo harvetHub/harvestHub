@@ -21,13 +21,13 @@ export const useCart = () => {
 
     try {
       // Call server endpoint that validates the supabase-access-token cookie.
-      const res = await fetch("/api/auth/validate", {
+      const res = await fetch("/api/auth/validate-token", {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
       if (res.ok) return true;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       // ignore and fallback to cookie check
     }
