@@ -12,10 +12,13 @@ export async function GET(req: NextRequest) {
 
   try {
     // Base query
-    let query = supabaseServer
-      .from("orders")
-      .select("*, users!inner(name)", { count: "exact" }) // Include total count for pagination
-      .range(offset, offset + limit - 1); // Fetch only the required range of data
+
+let query = supabaseServer
+  .from("orders")
+  .select("*, users!inner(name)", { count: "exact" })
+  .order("order_date", { ascending: false }) // 👈 ensure latest first
+  .range(offset, offset + limit - 1);        // then apply pagination
+
 
     // Apply filters
     if (status && status !== "All") {

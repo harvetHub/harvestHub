@@ -68,6 +68,7 @@ export default function OrdersTable({
                   new Date(b.order_date).getTime() -
                   new Date(a.order_date).getTime()
               ) // Sort by date (latest first)
+
               .map((order, index) => {
                 const orderDate = new Date(order.order_date);
                 return (

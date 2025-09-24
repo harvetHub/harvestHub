@@ -103,9 +103,17 @@ export type Order = {
   customer_name: string;
   order_date: string;
   total_amount: number;
-  status: string;
+  status: OrderStatus
   shipping_method: 'pickup' | 'cod';
   payment_status: 'paid' | 'unpaid';
+}
+
+export enum OrderStatus {
+  Pending = "pending",
+  Preparing = "preparing",
+  ReadyForPickup = "ready_for_pickup",
+  Released = "released",
+  Rejected = "rejected",
 }
 
 
