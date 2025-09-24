@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,9 @@ interface ProductFormProps {
   formData: Product;
   errors: Partial<Record<keyof Product, string>>;
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => void;
   onImageUpload: (file: File) => void;
   onSave: () => void;
@@ -49,6 +52,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
       onImageUpload(file);
     }
   };
+
+  // status options must match the DB enum values
+  const statusOptions = [
+    { value: "available", label: "Available" },
+    { value: "out_of_stock", label: "Out of stock" },
+    { value: "coming_soon", label: "Coming soon" },
+    { value: "preorder", label: "Pre-order" },
+    { value: "discontinued", label: "Discontinued" },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -91,7 +103,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               name="price"
               type="number"
               placeholder="Price in Peso"
-              value={formData.price}
+              value={String(formData.price ?? "")}
               onChange={onChange}
             />
             {errors.price && (
@@ -153,6 +165,46 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onChange={onChange}
             />
             {errors.sku && <p className="text-red-500 text-sm">{errors.sku}</p>}
+          </div>
+
+          {/* Status (enum) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status ?? "coming_soon"}
+              onChange={onChange}
+              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            >
+              {statusOptions.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            {errors.status && (
+              <p className="text-red-500 text-sm">{errors.status}</p>
+            )}
+          </div>
+
+          {/* Status message */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status message (optional)
+            </label>
+            <Textarea
+              name="status_message"
+              value={formData.status_message ?? ""}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              onChange={onChange as any}
+              placeholder="Optional message shown with the status (e.g., expected restock date)"
+              className="min-h-[80px]"
+            />
+            {errors.status_message && (
+              <p className="text-red-500 text-sm">{errors.status_message}</p>
+            )}
           </div>
 
           {/* Actions */}

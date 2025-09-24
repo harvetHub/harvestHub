@@ -6,6 +6,8 @@ export type Product = {
   image_url: string | File;
   product_type: string;
   rating?: number;
+  rating_average?: number | null;
+  rating_count?: number;
   sku?: string;
   stocks?: number;
   reorder_level?: number;
@@ -14,6 +16,8 @@ export type Product = {
   sold?: number;
   is_featured?: boolean;
   is_recommended?: boolean;
+  status?: "available" | "out_of_stock" | "coming_soon" | "preorder" | "discontinued";
+  status_message?: string | null;
 };
 
 export type InventoryType = {

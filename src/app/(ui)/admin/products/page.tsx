@@ -18,6 +18,8 @@ export default function ProductManagement() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Updated formData: include new fields status and status_message (defaults)
   const [formData, setFormData] = useState<Product>({
     product_id: 0,
     name: "",
@@ -26,7 +28,10 @@ export default function ProductManagement() {
     image_url: "",
     product_type: "",
     sku: "",
+    status: "coming_soon",
+    status_message: "",
   });
+
   const [errors, setErrors] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -46,7 +51,7 @@ export default function ProductManagement() {
       if (response.ok) {
         setProducts(data.products);
         setFilteredProducts(data.products);
-        setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages
+        setTotalPages(Math.max(1, Math.ceil(data.total / 10))); // Calculate total pages
       } else {
         Swal.fire("Error", data.error || "Failed to fetch products", "error");
       }
@@ -69,9 +74,9 @@ export default function ProductManagement() {
   }, [searchTerm, selectedCategory, page]);
 
   const handleInputChange: React.ChangeEventHandler<
-    HTMLInputElement | HTMLSelectElement
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
   > = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target as HTMLInputElement;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" }); // Clear error when user types
   };
@@ -82,7 +87,8 @@ export default function ProductManagement() {
 
     // Optionally, generate a preview URL for the frontend
     const previewUrl = URL.createObjectURL(file);
-    setFormData((prev) => ({ ...prev, imagePreview: previewUrl }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setFormData((prev) => ({ ...prev, imagePreview: previewUrl } as any));
   };
 
   const handleAddProduct = () => {
@@ -95,6 +101,9 @@ export default function ProductManagement() {
       image_url: "",
       product_type: "",
       sku: "",
+      // reset new fields too
+      status: "coming_soon",
+      status_message: "",
     });
     setErrors({});
     setIsDialogOpen(true);
@@ -110,6 +119,9 @@ export default function ProductManagement() {
       image_url: typeof product.image_url === "string" ? product.image_url : "",
       product_type: product.product_type,
       sku: product.sku || "",
+      // map the new fields for editing
+      status: product.status ?? "coming_soon",
+      status_message: product.status_message ?? "",
     });
     setErrors({});
     setIsDialogOpen(true);
@@ -181,6 +193,19 @@ export default function ProductManagement() {
         formData.image_url instanceof File
       ) {
         formDataToSend.append("image_url", formData.image_url);
+      }
+
+      // Append new fields: status and status_message
+      // Only append if present in formData (so PUT handler can detect presence)
+      if ("status" in formData) {
+        formDataToSend.append("status", String(formData.status ?? ""));
+      }
+      if ("status_message" in formData) {
+        // allow empty string
+        formDataToSend.append(
+          "status_message",
+          String(formData.status_message ?? "")
+        );
       }
 
       const response = await fetch(`/api/admin/products`, {
