@@ -92,6 +92,8 @@ export type User = {
   image_url?: string | File;
   gender?: string ;
   birthDay?: string | null ;
+  is_deleted?: boolean;
+  deleted_at?: string | null;
 };
 
 export type Order = {
