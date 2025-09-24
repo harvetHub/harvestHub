@@ -34,13 +34,8 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
     );
   }
 
-  // Filter out products with stocks null or 0
-  const filteredProducts = products.filter(
-    (product) =>
-      product.stocks !== undefined &&
-      product.stocks !== null &&
-      product.stocks > 0
-  );
+  // Show all products (including those with stocks = 0)
+  const filteredProducts = products;
 
   if (filteredProducts.length === 0) {
     return <p className="text-center text-xl">No products found.</p>;

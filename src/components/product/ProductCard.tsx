@@ -31,7 +31,7 @@ const statusColor = (status?: Product["status"]) => {
       return "bg-gray-100 text-gray-700";
     case "coming_soon":
     default:
-      return "bg-blue-50 text-blue-800";
+      return "bg-orange-50 text-orange-500";
   }
 };
 
@@ -77,9 +77,6 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
     return String(input).replace(/_/g, " ").trim();
   };
 
-  // sanitize status message by replacing underscores with spaces
-  const statusMsg = humanize(product.status_message);
-
   // humanize the status enum (e.g. "out_of_stock" -> "Out Of Stock")
   const statusLabel = product.status
     ? humanize(String(product.status))?.replace(/\b\w/g, (ch) =>
@@ -92,12 +89,24 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       onClick={() =>
         product.product_id && handleProductClick(product.product_id)
       }
-      className="flex rounded-md border hover:shadow-md transition-transform transform hover:-translate-y-0.5 flex-col justify-between cursor-pointer"
+      className="h-full min-h-[300px] gap-2 flex rounded-md border hover:shadow-md transition-transform transform hover:-translate-y-0.5 flex-col justify-between cursor-pointer"
       role="button"
       aria-label={`${product.name} — ${avg} out of 5`}
     >
-      <CardHeader className="relative p-0">
-        <div className="relative w-full h-fit md:h-40 lg:h-44">
+      <CardHeader className="relative p-0 shrink-0">
+        {/* fixed, constant image height so all cards align */}
+        <div className="relative w-full h-40">
+          {product.status !== "available" && (
+            <div className="absolute top-0 right-0 z-10 ">
+              <span
+                className={`inline-flex items-center px-2 r-2 py-1 text-xs font-medium rounded-bl-md border ${statusColor(
+                  product.status
+                )}`}
+              >
+                {statusLabel}
+              </span>
+            </div>
+          )}
           <Image
             src={
               typeof product.image_url === "string"
@@ -106,6 +115,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
             }
             alt={product.name ?? "Product image"}
             fill
+            sizes="(max-width: 640px) 100vw, 33vw"
             className="object-cover rounded-t-md"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = fallbackImage;
@@ -114,37 +124,17 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           />
         </div>
 
-        {/* status_message badge placed absolutely on image */}
-        {statusMsg && (
-          <div className="absolute top-2 left-2 z-10">
-            <span
-              className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-white/90 text-slate-800`}
-            >
-              {statusMsg}
-            </span>
-          </div>
-        )}
-
         <div className="px-3  flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-sm md:text-base line-clamp-2">
+            <CardTitle className="text-sm md:text-base truncate">
               {product.name}
             </CardTitle>
-          </div>
-
-          <div className="ml-2">
-            <span
-              className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${statusColor(
-                product.status
-              )}`}
-            >
-              {statusLabel}
-            </span>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="px-3 pt-0 pb-2">
+      {/* make content flex-grow so footer stays pinned to bottom while layout remains compact */}
+      <CardContent className="px-3 mt-[-2] pb-2 flex-1 min-h-0">
         <div className="flex items-center gap-2">
           <div className="flex items-center" aria-hidden>
             {renderStars(avg)}
@@ -158,8 +148,8 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between gap-2 px-3 pb-3 pt-0">
-        <div>
+      <CardFooter className="flex items-center justify-between gap-2 px-3 pb-3 pt-0 mt-auto">
+        <div className="flex flex-row items-baseline gap-1 justify-between w-full">
           <p className="font-bold text-base">
             {formatPrice(product.price ?? 0)}
           </p>
