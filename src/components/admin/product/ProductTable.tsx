@@ -80,7 +80,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       alt={product.name}
                       width={50}
                       height={50}
-                      className="h-12 object-contain"
+                      className="h-12 w-12 object-contain"
                     />
                   </div>
                 </TableCell>
