@@ -22,7 +22,7 @@ let query = supabaseServer
 
     // Apply filters
     if (status && status !== "All") {
-      query = query.eq("payment_status", status);
+      query = query.eq("status", status);
     }
     if (searchTerm) {
       query = query.ilike("users.name->>first", `%${searchTerm}%`); // Search by customer's first name
