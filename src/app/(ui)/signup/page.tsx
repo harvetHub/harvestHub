@@ -97,7 +97,7 @@ export default function Signup() {
             title: "Success",
             text: "User signed up successfully",
           });
-          router.push("/");
+          router.push("/login");
         } else {
           Swal.fire({
             icon: "error",
