@@ -5,6 +5,14 @@ import { OrderItem } from "@/lib/definitions";
 
 // POST /api/cart/checkout - Place an order for the current user's cart
 export async function POST(req: NextRequest) {
+
+  const order_date = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
+  ).toISOString();
+
+  
+
+
   const userId = await getUserId(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -26,7 +34,7 @@ export async function POST(req: NextRequest) {
         shipping_method: deliveryOption,
         status: "pending",
         payment_status: "unpaid",
-        order_date: new Date().toISOString(),
+        order_date: order_date
       },
     ])
     .select()
