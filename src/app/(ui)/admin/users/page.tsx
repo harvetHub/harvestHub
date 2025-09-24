@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import UserTable from "@/components/admin/user/UserTable";
 import UserForm from "@/components/admin/user/UserForm";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Pagination from "@/components/Pagination"; // Ensure you have a Pagination component
 import Swal from "sweetalert2";
@@ -72,21 +71,6 @@ export default function UserManagement() {
     setPage(newPage);
   };
 
-  const handleAddUser = () => {
-    setEditingUser(null);
-    setFormData({
-      user_id: "",
-      name: { first: "", middle: "", last: "" },
-      username: "",
-      email: "",
-      address: "",
-      mobile_number: "",
-      image_url: "",
-    });
-    setErrors({});
-    setIsDialogOpen(true);
-  };
-
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     setFormData({
@@ -102,7 +86,12 @@ export default function UserManagement() {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (userId: string) => {
+    if (!userId) {
+      Swal.fire("Error", "Missing user id.", "error");
+      return;
+    }
+
     Swal.fire({
       title: "Are you sure?",
       text: "This action cannot be undone!",
@@ -113,16 +102,25 @@ export default function UserManagement() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`/api/admin/users?user_id=${userId}`, {
-            method: "DELETE",
-          });
+          const encoded = encodeURIComponent(userId);
+          const response = await fetch(
+            `/api/admin/users/delete?user_id=${encoded}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          const data = await response.json();
 
           if (response.ok) {
             Swal.fire("Deleted!", "The user has been deleted.", "success");
             fetchUsers(); // Refresh the user list
           } else {
-            const data = await response.json();
-            Swal.fire("Error", data.error || "Failed to delete user.", "error");
+            Swal.fire(
+              "Error",
+              data?.error || "Failed to delete user.",
+              "error"
+            );
           }
         } catch {
           Swal.fire("Error", "An unexpected error occurred.", "error");
@@ -216,9 +214,6 @@ export default function UserManagement() {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Button className="cursor-pointer" onClick={handleAddUser}>
-            Add User
-          </Button>
         </div>
 
         <UserTable

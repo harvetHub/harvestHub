@@ -83,7 +83,7 @@ const Header: FC = () => {
                         src={user?.image_url ?? ""}
                         alt={user?.username ?? "User"}
                       />
-                      <AvatarFallback className="bg-gray-0">
+                      <AvatarFallback className="bg-white text-black font-bold">
                         {user?.username
                           ? user.username.charAt(0).toUpperCase()
                           : null}

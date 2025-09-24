@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { User } from "@/lib/definitions";
 import { toSentenceCase } from "@/utils/toSentenceCase";
 
-interface UserTableProps {
+type UserTableProps = {
   users: User[];
   onEdit: (user: User) => void;
-  onDelete: (userId: number) => void;
+  onDelete: (userId: string) => void;
   loading: boolean;
-}
+};
 
 const UserTable: React.FC<UserTableProps> = ({
   users,
@@ -87,7 +87,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     </Button>
                     <Button
                       variant="destructive"
-                      onClick={() => onDelete(Number(user.user_id) || 0)}
+                      onClick={() => onDelete(String(user.user_id))}
                     >
                       Delete
                     </Button>
