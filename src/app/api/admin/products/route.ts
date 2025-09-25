@@ -189,10 +189,7 @@ export async function DELETE(req: NextRequest) {
     const product_id = searchParams.get("product_id");
 
     if (!product_id) {
-      return NextResponse.json(
-        { error: "Product ID is required." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Product ID is required." }, { status: 400 });
     }
 
     const idNum = Number(product_id);
@@ -200,20 +197,42 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Invalid product_id." }, { status: 400 });
     }
 
-    const { data, error } = await supabaseServer
+    // Try hard delete first
+    const { error: deleteError } = await supabaseServer
       .from("products")
       .delete()
       .eq("product_id", idNum);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (deleteError) {
+      // If FK constraint error, fallback to soft delete
+      if (deleteError.message.includes("violates foreign key constraint")) {
+        const { error: updateError, data: updated } = await supabaseServer
+          .from("products")
+          .update({
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+          })
+          .eq("product_id", idNum);
+
+        if (updateError) {
+          return NextResponse.json({ error: updateError.message }, { status: 400 });
+        }
+
+        return NextResponse.json(
+          { message: "Product archived instead of deleted.", product: updated },
+          { status: 200 }
+        );
+      }
+
+      return NextResponse.json({ error: deleteError.message }, { status: 400 });
     }
 
     return NextResponse.json(
-      { message: "Product deleted successfully.", product: data },
+      { message: "Product deleted successfully." },
       { status: 200 }
     );
-  } catch {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (err) {
     return NextResponse.json(
       { error: "An unexpected error occurred." },
       { status: 500 }

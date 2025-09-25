@@ -97,9 +97,9 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
         {/* fixed, constant image height so all cards align */}
         <div className="relative w-full h-40">
           {product.status !== "available" && (
-            <div className="absolute top-0 right-0 z-10 ">
+            <div className="absolute top-[-4] right-0 z-10 ">
               <span
-                className={`inline-flex items-center px-2 r-2 py-1 text-xs font-medium rounded-bl-md border ${statusColor(
+                className={`inline-flex items-center px-2 r-2 py-1 text-xs font-medium rounded-bl-md ${statusColor(
                   product.status
                 )}`}
               >
