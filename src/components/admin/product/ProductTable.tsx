@@ -66,7 +66,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </TableCell>
               </TableRow>
             ))
-          : products.map((product) => (
+          : products.length > 0 ? products.map((product) => (
               <TableRow key={product.product_id}>
                 <TableCell>{product.product_id}</TableCell>
                 <TableCell>
@@ -108,7 +108,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            )):  <TableRow>
+              <TableCell colSpan={8} className="text-center py-4">
+                No products found.
+              </TableCell>
+            </TableRow>}
       </TableBody>
     </Table>
   );

@@ -47,8 +47,8 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
         isProductPage ? "xl:grid-cols-5" : "xl:grid-cols-6"
       } gap-2`}
     >
-      {filteredProducts.map((product) => (
-        <ProductCard key={product.product_id} product={product} />
+      {filteredProducts.map((product, index) => (
+        <ProductCard key={index} product={product} />
       ))}
     </div>
   );
