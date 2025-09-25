@@ -52,15 +52,25 @@ const Products = () => {
   }, [page, limit, filter, searchTerm]);
 
 useEffect(() => {
-  if (priceRange[0] !== 0 || priceRange[1] !== 1000) {
-    const filtered = products.filter(
-      (product) =>
-        product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
-    setFilteredProducts(filtered);
-  } else {
-    setFilteredProducts(products);
-  }
+  const filtered = products.filter((product) => {
+    // Exclude if name is null, undefined, or empty string
+    if (!product.name || product.name.trim().length === 0) {
+      return false;
+    }
+
+    // Apply price range filter
+    if (priceRange[0] !== 0 || priceRange[1] !== 1000) {
+      return (
+        product.price >= priceRange[0] &&
+        product.price <= priceRange[1]
+      );
+    }
+
+    // If default range, include all valid-name products
+    return true;
+  });
+
+  setFilteredProducts(filtered);
 }, [priceRange, products]);
 
 
