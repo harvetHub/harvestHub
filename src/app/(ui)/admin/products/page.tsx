@@ -39,7 +39,6 @@ export default function ProductManagement() {
   const [page, setPage] = useState(1); // Current page
   const [totalPages, setTotalPages] = useState(1); // Total pages
 
-  // Fetch products from the API
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -49,8 +48,15 @@ export default function ProductManagement() {
       const data = await response.json();
 
       if (response.ok) {
-        setProducts(data.products);
-        setFilteredProducts(data.products);
+        const validProducts = data.products.filter(
+          (product: { name: string | null | undefined }) =>
+            product.name !== null &&
+            product.name !== undefined &&
+            product.name.trim() !== ""
+        );
+
+        setProducts(validProducts);
+        setFilteredProducts(validProducts);
         setTotalPages(Math.max(1, Math.ceil(data.total / 10))); // Calculate total pages
       } else {
         Swal.fire("Error", data.error || "Failed to fetch products", "error");
