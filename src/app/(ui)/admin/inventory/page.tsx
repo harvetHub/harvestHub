@@ -10,7 +10,6 @@ import InventoryTable from "@/components/admin/inventory/InvenTable";
 import { categories } from "@/lib/productsConfig";
 import Swal from "sweetalert2";
 import { InventoryType } from "@/lib/definitions";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
 
 export default function InventoryManagement() {
@@ -38,11 +37,21 @@ export default function InventoryManagement() {
       if (response.ok) {
         setInventory(
           data.products
+            // filter out products with empty or whitespace-only name/sku
+            .filter(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (product: any) =>
+                product &&
+                typeof product.name === "string" &&
+                product.name.trim() !== "" &&
+                typeof product.sku === "string" &&
+                product.sku.trim() !== ""
+            )
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .map((product: any) => ({
               id: product.product_id,
-              sku: product.sku,
-              name: product.name,
+              sku: product.sku.trim(),
+              name: product.name.trim(),
               category:
                 categories.find((cat) => cat.value === product.product_type)
                   ?.name || "Unknown",
@@ -54,6 +63,7 @@ export default function InventoryManagement() {
               a.name.localeCompare(b.name)
             )
         );
+
         setTotalPages(Math.ceil(data.total / 10)); // Calculate total pages
       } else {
         Swal.fire("Error", data.error || "Failed to fetch inventory", "error");
