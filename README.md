@@ -17,7 +17,7 @@ HarvestHub is a Next.js 15 application bootstrapped with create-next-app. It ser
 ```bash
 git clone https://github.com/HarvestHubIloilo/harvestHub.git
 ```
-cd <your-repo>
+cd harvestHub
 2. Install dependencies
 ```bash
 pnpm install
