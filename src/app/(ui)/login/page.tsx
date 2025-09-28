@@ -214,7 +214,7 @@ export default function Login() {
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
         {/* Left Side with Carousel */}
-        <div className="relative flex items-center justify-center bg-gradient-to-r">
+        <div className="relative flex items-center justify-center bg-gradient-to-r lg:h-full">
           <Carousel className="w-full h-full">
             <CarouselContent>
               {carouselImages.map((image, index) => (
@@ -224,7 +224,7 @@ export default function Login() {
                     height={800}
                     src={image}
                     alt={`Carousel Image ${index + 1}`}
-                    className="w-full h-screen object-cover"
+                    className="h-[35vh] w-full lg:h-screen object-cover object-center"
                   />
                 </CarouselItem>
               ))}
@@ -243,7 +243,7 @@ export default function Login() {
         </div>
 
         {/* Right Side with Login Form */}
-        <div className="flex items-center justify-center px-4 py-10 bg-white sm:px-6 lg:px-8 sm:py-16 lg:py-24">
+        <div className="flex items-center justify-center px-4 py-10 bg-white z-0 sm:px-6 lg:px-8 sm:py-16 lg:py-24">
           <div className="xl:w-full xl:max-w-sm 2xl:max-w-md xl:mx-auto">
             <h2 className="text-3xl font-bold text-center leading-tight text-black sm:text-4xl">
               Sign in to HarvestHub
