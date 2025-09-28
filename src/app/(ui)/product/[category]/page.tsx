@@ -21,7 +21,7 @@ const Products = () => {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
   const [page, setPage] = useState(1);
-  const [limit] = useState(13);
+  const [limit] = useState(15);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -51,13 +51,28 @@ const Products = () => {
     fetchProducts();
   }, [page, limit, filter, searchTerm]);
 
-  useEffect(() => {
-    const filtered = products.filter(
-      (product) =>
-        product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
-    setFilteredProducts(filtered);
-  }, [priceRange, products]);
+useEffect(() => {
+  const filtered = products.filter((product) => {
+    // Exclude if name is null, undefined, or empty string
+    if (!product.name || product.name.trim().length === 0) {
+      return false;
+    }
+
+    // Apply price range filter
+    if (priceRange[0] !== 0 || priceRange[1] !== 1000) {
+      return (
+        product.price >= priceRange[0] &&
+        product.price <= priceRange[1]
+      );
+    }
+
+    // If default range, include all valid-name products
+    return true;
+  });
+
+  setFilteredProducts(filtered);
+}, [priceRange, products]);
+
 
   // Update the URL dynamically when the filter changes
   useEffect(() => {

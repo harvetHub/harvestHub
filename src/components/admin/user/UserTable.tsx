@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { User } from "@/lib/definitions";
 import { toSentenceCase } from "@/utils/toSentenceCase";
 
-interface UserTableProps {
+type UserTableProps = {
   users: User[];
   onEdit: (user: User) => void;
-  onDelete: (userId: number) => void;
+  onDelete: (userId: string) => void;
   loading: boolean;
-}
+};
 
 const UserTable: React.FC<UserTableProps> = ({
   users,
@@ -60,41 +60,43 @@ const UserTable: React.FC<UserTableProps> = ({
                 </TableCell>
               </TableRow>
             ))
-          : users.map((user, index) => (
-              <TableRow key={index + 1}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  {toSentenceCase(
-                    `${user.name?.first || "N/A"} ${user.name?.middle || ""} ${
-                      user.name?.last || ""
-                    }`.trim()
-                  )}
-                </TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.mobile_number}</TableCell>
-                <TableCell>
-                  {typeof user.address === "string"
-                    ? user.address
-                    : user.address
-                    ? JSON.stringify(user.address)
-                    : "N/A"}
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" onClick={() => onEdit(user)}>
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={() => onDelete(Number(user.user_id) || 0)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+          : users
+              .filter((user) => !user.is_deleted) // 👈 filter out deleted users
+              .map((user, index) => (
+                <TableRow key={index + 1}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    {toSentenceCase(
+                      `${user.name?.first || "N/A"} ${
+                        user.name?.middle || ""
+                      } ${user.name?.last || ""}`.trim()
+                    )}
+                  </TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.mobile_number}</TableCell>
+                  <TableCell>
+                    {typeof user.address === "string"
+                      ? user.address
+                      : user.address
+                      ? JSON.stringify(user.address)
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" onClick={() => onEdit(user)}>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => onDelete(String(user.user_id))}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
       </TableBody>
     </Table>
   );

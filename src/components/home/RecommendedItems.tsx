@@ -9,7 +9,7 @@ const RecommendedItemsSection: FC = () => {
   useEffect(() => {
     const fetchRecommendedProducts = async () => {
       try {
-        const response = await fetch("/api/products?is_recommended=true");
+        const response = await fetch("/api/products?is_recommended=true&limit=12");
         const data = await response.json();
         setRecommendedProducts(data.products || []);
         setLoading(false);

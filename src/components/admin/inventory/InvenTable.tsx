@@ -66,17 +66,17 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                 </TableCell>
               </TableRow>
             ))
-          : inventory.map((item) => (
-              <TableRow key={item.id}>
+          : inventory.map((item, index) => (
+              <TableRow key={index}>
                 <TableCell>{item.id}</TableCell>
                 <TableCell>
                   <div className="bg-white w-fit rounded">
                     <Image
                       src={item.image_url || "/placeholder.png"}
-                      alt={""}
+                      alt={item.name}
                       width={50}
                       height={50}
-                      className="h-12 object-contain"
+                      className="h-12 w-12 object-contain"
                     />
                   </div>
                 </TableCell>

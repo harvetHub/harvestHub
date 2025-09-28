@@ -6,6 +6,7 @@ import ProductDetails from "@/components/product/ProductDetails";
 import { Product } from "@/lib/definitions";
 import { MainLayout } from "@/layout/MainLayout";
 import RelatedProducts from "@/components/product/RelatedProducts";
+import ProductReviews from "@/components/product/ProductReview";
 
 const ProductDetailsPage = () => {
   const params = useParams();
@@ -36,6 +37,12 @@ const ProductDetailsPage = () => {
     <MainLayout>
       <ProductDetails product={product} loading={loading} />{" "}
       {/* <RecommendedItemsSection /> */}
+      <div className="myContainer mx-auto mb-10">
+        <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+        {product?.product_id && (
+          <ProductReviews productId={product.product_id} />
+        )}
+      </div>
       <div className="myContainer mx-auto mb-10">
         <h2 className="text-2xl font-bold mb-4">Recommended Items</h2>
         <RelatedProducts category={product?.product_type ?? null} />

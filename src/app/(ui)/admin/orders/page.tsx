@@ -15,12 +15,13 @@ import ManageOrderModal from "@/components/admin/order/modal/ManageOrder";
 import Pagination from "@/components/Pagination";
 import Swal from "sweetalert2";
 import useAuthCheck from "@/hooks/admin/useAuthCheck";
-import { Order } from "@/lib/definitions";
+import { Order, OrderStatus } from "@/lib/definitions";
 
 export default function OrdersManagement() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [statuses, setStatuses] = useState<OrderStatus[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusType, setStatusType] = useState<string | null>("All");
+  const [statusType, setStatusType] = useState<string>("All");
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
@@ -28,6 +29,25 @@ export default function OrdersManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [totalPages, setTotalPages] = useState(1);
+
+  // Fetch available statuses from DB
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      try {
+        const res = await fetch("/api/admin/orders/statuses");
+        const data = await res.json();
+        if (res.ok) {
+          setStatuses(data.statuses);
+        } else {
+          Swal.fire("Error", data.error || "Failed to fetch statuses", "error");
+        }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        Swal.fire("Error", "Failed to fetch statuses", "error");
+      }
+    };
+    fetchStatuses();
+  }, []);
 
   // Fetch orders from the API
   const fetchOrders = useCallback(async () => {
@@ -66,7 +86,7 @@ export default function OrdersManagement() {
     setCurrentPage(1); // Reset to the first page after filtering
   };
 
-  const handleStatusFilter = (value: string | null) => {
+  const handleStatusFilter = (value: string) => {
     setStatusType(value);
     setCurrentPage(1); // Reset to the first page after filtering
   };
@@ -107,7 +127,7 @@ export default function OrdersManagement() {
     });
   };
 
-  const handleUpdateOrderStatus = async (status: string) => {
+  const handleUpdateOrderStatus = async (status: OrderStatus) => {
     if (!selectedOrder) return;
 
     try {
@@ -150,15 +170,17 @@ export default function OrdersManagement() {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Select onValueChange={handleStatusFilter}>
+          <Select onValueChange={handleStatusFilter} value={statusType}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Select Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All</SelectItem>
-              <SelectItem value="Paid">Paid</SelectItem>
-              <SelectItem value="Unpaid">Unpaid</SelectItem>
-              <SelectItem value="Refunded">Refunded</SelectItem>
+              {statuses.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {status.replace(/_/g, " ")}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

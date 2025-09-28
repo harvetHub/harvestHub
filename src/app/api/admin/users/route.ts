@@ -230,29 +230,3 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// This route handles the deletion of users
-export async function DELETE(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const user_id = searchParams.get("user_id");
-
-  if (!user_id) {
-    return NextResponse.json(
-      { error: "User ID is required." },
-      { status: 400 }
-    );
-  }
-
-  const { data, error } = await supabaseServer
-    .from("users")
-    .delete()
-    .eq("user_id", user_id);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  return NextResponse.json({
-    message: "User deleted successfully.",
-    user: data,
-  });
-}

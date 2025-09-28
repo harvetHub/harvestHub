@@ -34,13 +34,8 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
     );
   }
 
-  // Filter out products with stocks null or 0
-  const filteredProducts = products.filter(
-    (product) =>
-      product.stocks !== undefined &&
-      product.stocks !== null &&
-      product.stocks > 0
-  );
+  // Show all products (including those with stocks = 0)
+  const filteredProducts = products;
 
   if (filteredProducts.length === 0) {
     return <p className="text-center text-xl">No products found.</p>;
@@ -52,8 +47,8 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
         isProductPage ? "xl:grid-cols-5" : "xl:grid-cols-6"
       } gap-2`}
     >
-      {filteredProducts.map((product) => (
-        <ProductCard key={product.product_id} product={product} />
+      {filteredProducts.map((product, index) => (
+        <ProductCard key={index} product={product} />
       ))}
     </div>
   );

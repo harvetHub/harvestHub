@@ -6,6 +6,8 @@ export type Product = {
   image_url: string | File;
   product_type: string;
   rating?: number;
+  rating_average?: number | null;
+  rating_count?: number;
   sku?: string;
   stocks?: number;
   reorder_level?: number;
@@ -14,6 +16,8 @@ export type Product = {
   sold?: number;
   is_featured?: boolean;
   is_recommended?: boolean;
+  status?: "available" | "out_of_stock" | "coming_soon" | "preorder" | "discontinued";
+  status_message?: string | null;
 };
 
 export type InventoryType = {
@@ -88,17 +92,28 @@ export type User = {
   image_url?: string | File;
   gender?: string ;
   birthDay?: string | null ;
+  is_deleted?: boolean;
+  deleted_at?: string | null;
 };
 
 export type Order = {
   order_id: number;
   user_id?: string;
+  is_rated?: boolean;
   customer_name: string;
   order_date: string;
   total_amount: number;
-  status: string;
+  status: OrderStatus
   shipping_method: 'pickup' | 'cod';
   payment_status: 'paid' | 'unpaid';
+}
+
+export enum OrderStatus {
+  Pending = "pending",
+  Preparing = "preparing",
+  ReadyForPickup = "ready_for_pickup",
+  Released = "released",
+  Rejected = "rejected",
 }
 
 
@@ -120,3 +135,22 @@ export type OrderItem = {
 }
 
 
+export type ProductItem = {
+  is_rated: boolean;
+  id: number;
+  name: string;
+  image_url?: string;
+  quantity: number;
+  price: number;
+  product_id: number;
+  order_id: number;
+}
+
+export type PurchaseItem = {
+  productList: ProductItem[];
+  order_id: number;
+  name: string;
+  status: string;
+  total_amount: number;
+  order_date: string;
+}
