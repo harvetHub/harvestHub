@@ -224,7 +224,7 @@ export default function Login() {
                     height={800}
                     src={image}
                     alt={`Carousel Image ${index + 1}`}
-                    className="h-[35vh] w-full lg:h-screen object-cover object-center"
+                    className="h-[40vh] w-full lg:h-screen object-cover object-center"
                   />
                 </CarouselItem>
               ))}
