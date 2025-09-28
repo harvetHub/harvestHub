@@ -127,7 +127,7 @@ export default function Signup() {
     <section className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 h-screen">
         {/* Left Side with Carousel */}
-        <div className="relative flex items-center justify-center bg-gradient-to-r">
+        <div className="relative flex items-center justify-center bg-gradient-to-r lg:h-full">
           <Carousel className="w-full h-full">
             <CarouselContent>
               {carouselImages.map((image, index) => (
@@ -137,7 +137,7 @@ export default function Signup() {
                     height={800}
                     src={image}
                     alt={`Carousel Image ${index + 1}`}
-                    className="w-full h-screen object-cover"
+                    className="h-[40vh] w-full lg:h-screen object-cover object-center"
                   />
                 </CarouselItem>
               ))}
@@ -184,7 +184,7 @@ export default function Signup() {
                 <p className="mt-2 text-right text-gray-600">
                   Already have an account?{" "}
                   <Link
-                    href="/"
+                    href="/login"
                     title=""
                     className="font-medium text-blue-600 transition-all duration-200 hover:text-blue-700 focus:text-blue-700 hover:underline"
                   >
