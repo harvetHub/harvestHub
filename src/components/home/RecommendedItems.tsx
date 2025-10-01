@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import ProductList from "@/components/product/ProductList";
 import { Product } from "@/lib/definitions";
+import { is_recommendedCount } from "@/lib/ItemsCountConfig";
 
 const RecommendedItemsSection: FC = () => {
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
@@ -9,7 +10,9 @@ const RecommendedItemsSection: FC = () => {
   useEffect(() => {
     const fetchRecommendedProducts = async () => {
       try {
-        const response = await fetch("/api/products?is_recommended=true&limit=12");
+        const response = await fetch(
+          `/api/products?is_recommended=true&limit=${is_recommendedCount}`
+        );
         const data = await response.json();
         setRecommendedProducts(data.products || []);
         setLoading(false);
