@@ -22,7 +22,7 @@ const ProductList: FC<ProductListProps> = ({ products, loading }) => {
           isProductPage ? "xl:grid-cols-5" : "xl:grid-cols-6"
         } gap-2`}
       >
-        {[...Array(13)].map((_, index) => (
+        {[...Array(15)].map((_, index) => (
           <div key={index} className="shadow-lg p-8">
             <Skeleton className="w-full h-30" />
             <Skeleton className="h-6 w-3/4 mt-4" />

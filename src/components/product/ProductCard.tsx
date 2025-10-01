@@ -113,7 +113,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
                 ? product.image_url
                 : fallbackImage
             }
-            alt={product.name ?? "Product image"}
+            alt="product image"
             fill
             sizes="(max-width: 640px) 100vw, 33vw"
             className="object-cover rounded-t-md"
