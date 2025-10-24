@@ -26,7 +26,8 @@ export default function OrdersTable({
 }: OrdersTableProps) {
   const getRelativeTime = (date: Date) => {
     const now = new Date();
-    const diffInMs = now.getTime() - date.getTime();
+    // ensure negative differences (future dates) are treated as 0
+    const diffInMs = Math.max(0, now.getTime() - date.getTime());
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
     const diffInHours = Math.floor(diffInMinutes / 60);
     const diffInDays = Math.floor(diffInHours / 24);
